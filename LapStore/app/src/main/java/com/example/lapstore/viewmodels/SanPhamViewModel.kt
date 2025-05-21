@@ -50,19 +50,19 @@ class SanPhamViewModel : ViewModel() {
     val danhsachSanPham: StateFlow<List<SanPham>> get() = _danhsachSanPham
 
     // Lấy danh sách phụ kiện từ API (giả sử id loại phụ kiện là 3)
-    private val _danhSachSanPhamPhuKien = MutableStateFlow<List<SanPham>>(emptyList())
-    val danhSachSanPhamPhuKien: StateFlow<List<SanPham>> get() = _danhSachSanPhamPhuKien
+
+     private val _danhSachSanPhamPhuKien = MutableStateFlow<List<SanPham>>(emptyList())
+    val danhSachSanPhamPhuKien: StateFlow<List<SanPham>> = _danhSachSanPhamPhuKien
 
     fun getSanPhamTheoLoaiPhuKien() {
         viewModelScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    // Đổi "3" thành id loại phụ kiện bên API nếu khác
                     QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamTheoLoai(3)
                 }
                 _danhSachSanPhamPhuKien.value = response.sanpham ?: emptyList()
             } catch (e: Exception) {
-                Log.e("SanPhamViewModel", "Lỗi khi lấy phụ kiện: ${e.message}")
+                Log.e("SanPham Error", "Lỗi khi lấy sanpham: ${e.message}")
                 _danhSachSanPhamPhuKien.value = emptyList()
             }
         }

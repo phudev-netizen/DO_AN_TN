@@ -1,194 +1,3 @@
-//package com.example.lapstore.views
-//
-//import SanPhamViewModel
-//import androidx.compose.foundation.background
-//import androidx.compose.foundation.clickable
-//import androidx.compose.foundation.layout.*
-//import androidx.compose.foundation.lazy.LazyColumn
-//import androidx.compose.foundation.lazy.LazyRow
-//import androidx.compose.foundation.lazy.items
-//import androidx.compose.foundation.shape.RoundedCornerShape
-//import androidx.compose.material.icons.Icons
-//import androidx.compose.material.icons.filled.Menu
-//import androidx.compose.material.icons.filled.Search
-//import androidx.compose.material3.*
-//import androidx.compose.runtime.*
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.focus.onFocusChanged
-//import androidx.compose.ui.graphics.Color
-//import androidx.compose.ui.text.TextStyle
-//import androidx.compose.ui.text.font.FontWeight
-//import androidx.compose.ui.unit.dp
-//import androidx.compose.ui.unit.sp
-//
-//// Dữ liệu mẫu hoặc model thật của bạn (bạn có thể thay bằng model thật)
-//data class SanPham(
-//    val tenSanPham: String?,
-//    val giaBan: Int?
-//)
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun AccessoryScreen(
-//    accessories: List<SanPham>,
-//    onMenuClick: () -> Unit,
-//    onSearchFocused: () -> Unit,
-//    onProductClick: (SanPham) -> Unit
-//) {
-//    var isFocused by remember { mutableStateOf(false) }
-//
-//    Scaffold(
-//        containerColor = Color.White,
-//        topBar = {
-//            CenterAlignedTopAppBar(
-//                navigationIcon = {
-//                    IconButton(onClick = onMenuClick) {
-//                        Icon(
-//                            imageVector = Icons.Filled.Menu,
-//                            contentDescription = "",
-//                            tint = Color.White
-//                        )
-//                    }
-//                },
-//                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-//                    containerColor = Color.Red
-//                ),
-//                title = {
-//                    Row(
-//                        modifier = Modifier.fillMaxWidth()
-//                    ) {
-//                        OutlinedTextField(
-//                            value = "",
-//                            onValueChange = {},
-//                            modifier = Modifier
-//                                .height(50.dp)
-//                                .fillMaxWidth()
-//                                .onFocusChanged { focusState ->
-//                                    val nowFocused = focusState.isFocused
-//                                    if (nowFocused && !isFocused) {
-//                                        onSearchFocused()
-//                                    }
-//                                    isFocused = nowFocused
-//                                },
-//                            textStyle = TextStyle(
-//                                color = Color.Black,
-//                                fontSize = 16.sp
-//                            ),
-//                            colors = OutlinedTextFieldDefaults.colors(
-//                                focusedContainerColor = Color.White,
-//                                unfocusedContainerColor = Color.White,
-//                                focusedBorderColor = Color.White,
-//                                unfocusedBorderColor = Color.White
-//                            ),
-//                            placeholder = {
-//                                Text(
-//                                    text = "Bạn cần tìm gì",
-//                                    style = TextStyle(
-//                                        color = Color.Black,
-//                                        fontSize = 13.sp
-//                                    ),
-//                                )
-//                            },
-//                            trailingIcon = {
-//                                Icon(
-//                                    imageVector = Icons.Filled.Search,
-//                                    contentDescription = "",
-//                                    tint = Color.Black
-//                                )
-//                            },
-//                            shape = RoundedCornerShape(50)
-//                        )
-//                    }
-//                }
-//            )
-//        }
-//    ) { paddingValues ->
-//        LazyColumn(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(paddingValues)
-//        ) {
-//            item {
-//                Text(
-//                    text = "Phụ kiện",
-//                    modifier = Modifier.padding(10.dp),
-//                    fontWeight = FontWeight.Bold,
-//                    fontSize = 20.sp
-//                )
-//            }
-//            item {
-//                LazyRow(
-//                    contentPadding = PaddingValues(horizontal = 8.dp),
-//                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-//                ) {
-//                    items(accessories) { accessory ->
-//                        AccessoryCard(
-//                            accessory = accessory,
-//                            onClick = { onProductClick(accessory) }
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//fun IconButton(onClick: SanPhamViewModel, content: @Composable () -> Unit) {
-//    TODO("Not yet implemented")
-//}
-//
-//@Composable
-//fun AccessoryCard(
-//    accessory: SanPham,
-//    onClick: () -> Unit
-//) {
-//    Card(
-//        modifier = Modifier
-//            .width(160.dp)
-//            .height(220.dp)
-//            .padding(8.dp)
-//            .clickable { onClick() },
-//        shape = RoundedCornerShape(12.dp),
-//        elevation = CardDefaults.cardElevation(4.dp)
-//    ) {
-//        Column(
-//            Modifier
-//                .fillMaxSize()
-//                .background(Color(0xFFF8F8F8)),
-//            verticalArrangement = Arrangement.SpaceBetween,
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            // Ảnh sản phẩm (bạn có thể thay thế Box này bằng Image khi có url ảnh)
-//            Box(
-//                modifier = Modifier
-//                    .height(120.dp)
-//                    .fillMaxWidth()
-//                    .background(Color.LightGray)
-//            ) {
-//                // Image(...) // Thêm ảnh phụ kiện ở đây nếu có
-//            }
-//            // Tên phụ kiện
-//            Text(
-//                text = accessory.tenSanPham ?: "Tên phụ kiện",
-//                fontWeight = FontWeight.SemiBold,
-//                fontSize = 16.sp,
-//                maxLines = 2,
-//                modifier = Modifier
-//                    .padding(horizontal = 8.dp, vertical = 4.dp)
-//            )
-//            // Giá bán
-//            Text(
-//                text = accessory.giaBan?.toString() ?: "Giá",
-//                color = Color.Red,
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 15.sp,
-//                modifier = Modifier.padding(bottom = 8.dp)
-//            )
-//        }
-//    }
-//}
-
 package com.example.lapstore.views
 
 import NavRoute
@@ -247,6 +56,10 @@ fun AccessoryScreen(
     val taiKhoanViewModel: TaiKhoanViewModel = viewModel()
     val taikhoan = taiKhoanViewModel.taikhoan
 
+    val danhSachSanPham = viewModel.danhSachAllSanPham
+    val danhSachSanPhamGaming = viewModel.danhSachSanPhamGaming.collectAsState()
+    val danhSachSanPhamVanPhong = viewModel.danhSachSanPhamVanPhong.collectAsState()
+
     LaunchedEffect(isFocused) {
         if (isFocused) {
             if (taikhoan != null)
@@ -264,6 +77,9 @@ fun AccessoryScreen(
     }
     LaunchedEffect(Unit) {
         viewModel.getSanPhamTheoLoaiPhuKien()
+        viewModel.getSanPhamTheoLoaiGaming()
+        viewModel.getSanPhamTheoLoaiVanPhong()
+        viewModel.getAllSanPham()
     }
     ModalNavigationDrawer(
         modifier = Modifier.background(Color.White),
@@ -532,6 +348,34 @@ fun AccessoryScreen(
                             modifier = Modifier.padding(10.dp),
                             fontWeight = FontWeight.Bold
                         )
+                    }
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(danhSachSanPhamVanPhong.value) { phukien ->
+                                if (taikhoan != null) {
+                                    ProductCard(phukien, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
+                                } else {
+                                    ProductCard(phukien, null, tentaikhoan, navController)
+                                }
+                            }
+                        }
+                    }
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(danhSachSanPhamGaming.value) { phukien ->
+                                if (taikhoan != null) {
+                                    ProductCard(phukien, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
+                                } else {
+                                    ProductCard(phukien, null, tentaikhoan, navController)
+                                }
+                            }
+                        }
                     }
                     item {
                         LazyRow(
