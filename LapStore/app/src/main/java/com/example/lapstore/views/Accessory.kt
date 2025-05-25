@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.lapstore.ui.ProductCard_Accessory
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
@@ -349,18 +350,15 @@ fun AccessoryScreen(
                             fontWeight = FontWeight.Bold
                         )
                     }
+
+                    // LazyRow cho Laptop Văn Phòng
                     item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(danhSachSanPhamVanPhong.value) { phukien ->
-                                if (taikhoan != null) {
-                                    ProductCard(phukien, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
-                                } else {
-                                    ProductCard(phukien, null, tentaikhoan, navController)
-                                }
-                            }
+                        Row {
+                            Text(
+                                text = "Laptop Văn Phòng",
+                                modifier = Modifier.padding(10.dp),
+                                fontWeight = FontWeight.Bold,
+                            )
                         }
                     }
                     item {
@@ -368,26 +366,60 @@ fun AccessoryScreen(
                             contentPadding = PaddingValues(horizontal = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(danhSachSanPhamGaming.value) { phukien ->
+                            items(danhSachSanPhamVanPhong.value) { sanphamvp ->
                                 if (taikhoan != null) {
-                                    ProductCard(phukien, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
+                                    ProductCard(sanphamvp, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
                                 } else {
-                                    ProductCard(phukien, null, tentaikhoan, navController)
+                                    ProductCard(sanphamvp, null, tentaikhoan, navController)
                                 }
                             }
                         }
+                    }
+                    // LazyRow cho Laptop Gaming
+                    item {
+                        Text(
+                            text = "Laptop Gaming",
+                            modifier = Modifier.padding(10.dp),
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                     item {
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            items(danhSachPhuKien.value) { phukien ->
+                            items(danhSachSanPhamGaming.value) { sanphamgm ->
                                 if (taikhoan != null) {
-                                    ProductCard(phukien, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
+                                    ProductCard(sanphamgm, taikhoan.MaKhachHang.toString(), tentaikhoan, navController)
                                 } else {
-                                    ProductCard(phukien, null, tentaikhoan, navController)
+                                    ProductCard(sanphamgm, null, null, navController)
                                 }
+                            }
+                        }
+                    }
+                    // phụ kiện
+                    item {
+                        Text(
+                            text = "Phụ kiện ",
+                            modifier = Modifier.padding(10.dp),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(danhSachPhuKien.value ?: emptyList()) { phukien ->
+                                if (taikhoan != null) {
+                                    ProductCard_Accessory(phukien, taikhoan.MaKhachHang?.toString(), tentaikhoan, navController)
+                                } else {
+                                    ProductCard_Accessory(phukien, null, null, navController)
+                                }
+                            }
+                            item {
+                                Text("Số lượng phụ kiện: ${(danhSachPhuKien.value ?: emptyList()).size}")
+                                Text("Lỗi: ${viewModel.errorMessage ?: "Không có"}")
                             }
                         }
                     }

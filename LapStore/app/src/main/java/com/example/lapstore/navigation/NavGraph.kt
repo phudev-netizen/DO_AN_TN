@@ -63,21 +63,7 @@ fun NavgationGraph(
             val tentaikhoan = it.arguments?.getString("tentaikhoan")
             HomeScreen(navController,viewmodel, tentaikhoan)  // Hiển thị tên tài khoản khi đăng nhập
         }
-//        //dữ liệu mẫu chưa lấy api
-//        composable(NavRoute.ACCESSORY.route) {
-//            // Data mẫu, thay bằng dữ liệu thực từ ViewModel khi tích hợp
-//            val accessoriesSample = listOf(
-//                SanPham("Chuột không dây", 250000),
-//                SanPham("Bàn phím cơ", 800000),
-//                SanPham("Tai nghe gaming", 650000)
-//            )
-//            AccessoryScreen(
-//                accessories = accessoriesSample,
-//                onMenuClick = { /* TODO: mở drawer hoặc menu */ },
-//                onSearchFocused = { /* TODO: chuyển sang màn hình tìm kiếm */ },
-//                onProductClick = { /* TODO: chuyển sang chi tiết sản phẩm hoặc thêm vào giỏ hàng */ }
-//            )
-//        }
+
 // Trang phụ kiện - chưa đăng nhập
         composable(NavRoute.ACCESSORY.route) {
             AccessoryScreen(

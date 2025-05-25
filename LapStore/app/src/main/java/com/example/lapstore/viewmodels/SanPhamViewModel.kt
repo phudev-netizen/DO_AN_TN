@@ -54,19 +54,7 @@ class SanPhamViewModel : ViewModel() {
      private val _danhSachSanPhamPhuKien = MutableStateFlow<List<SanPham>>(emptyList())
     val danhSachSanPhamPhuKien: StateFlow<List<SanPham>> = _danhSachSanPhamPhuKien
 
-    fun getSanPhamTheoLoaiPhuKien() {
-        viewModelScope.launch {
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamTheoLoai(3)
-                }
-                _danhSachSanPhamPhuKien.value = response.sanpham ?: emptyList()
-            } catch (e: Exception) {
-                Log.e("SanPham Error", "Lỗi khi lấy sanpham: ${e.message}")
-                _danhSachSanPhamPhuKien.value = emptyList()
-            }
-        }
-    }
+
 
     fun getAllSanPham() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -79,6 +67,21 @@ class SanPhamViewModel : ViewModel() {
                 errorMessage = e.message
             } finally {
                 isLoading = false
+            }
+        }
+    }
+
+    fun getSanPhamTheoLoaiPhuKien() {
+        viewModelScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamTheoLoai(3)
+                }
+                Log.d("SanPhamViewModel", "PhuKien API trả về: ${response.sanpham}")
+                _danhSachSanPhamPhuKien.value = response.sanpham ?: emptyList()
+            } catch (e: Exception) {
+                Log.e("SanPham Error", "Lỗi khi lấy sanpham: ${e.message}")
+                _danhSachSanPhamPhuKien.value = emptyList()
             }
         }
     }
@@ -144,6 +147,17 @@ class SanPhamViewModel : ViewModel() {
             }
         }
     }
+
+//    fun getSanPhamById3(id: String) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            try {
+//                val sanPham = QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamById(id)
+//                _danhsachSanPham.update { currentList -> currentList + sanPham }
+//            } catch (e: Exception) {
+//                Log.e("SanPhamViewModel", "Error getting SanPham", e)
+//            }
+//        }
+//    }
 
     fun getSanPhamSearch(search:String) {
         viewModelScope.launch {
