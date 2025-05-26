@@ -90,7 +90,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductDetail_Screen(
+fun ProductDetail_AccessoryScreen(
     navController: NavHostController,
     id: String,
     makhachhang: String?,
@@ -224,7 +224,7 @@ fun ProductDetail_Screen(
                             ),
                             placeholder = {
                                 Text(
-                                    text = "Bạn cần tìm gì",
+                                    text = "Bạn cần tìm gì cứ nhập đây ",
                                     style = TextStyle(
                                         color = Color.Black,
                                         fontSize = 13.sp
@@ -323,7 +323,7 @@ fun ProductDetail_Screen(
                 item {
 
                     Text(
-                        text = "Giá: ${formatGiaTien(sanPham.Gia)}",
+                        text = "Giá: ${formatGiaTienpk(sanPham.Gia)}",
                         fontSize = 20.sp,
                         color = Color.Red,
                         fontWeight = FontWeight.Bold,
@@ -491,32 +491,32 @@ fun ProductDetail_Screen(
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-//                // Thông số kỹ thuật
-                item {
-                    Text(
-                        text = "Thông số kỹ thuật",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(top = 8.dp)
-                    ) {
-                        Text("CPU: ${sanPham!!.CPU}", fontWeight = FontWeight.Bold)
-                        Text("Card đồ họa: ${sanPham!!.CardManHinh}", fontWeight = FontWeight.Bold)
-                        Text("${sanPham!!.RAM}", fontWeight = FontWeight.Bold)
-                        Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
-                        Text("Màn Hình: ${sanPham!!.ManHinh}", fontWeight = FontWeight.Bold)
-                        Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
-                    }
-                }
+////                // Thông số kỹ thuật
+//                item {
+//                    Text(
+//                        text = "Thông số kỹ thuật",
+//                        fontSize = 18.sp,
+//                        fontWeight = FontWeight.SemiBold
+//                    )
+//                    Column(
+//                        verticalArrangement = Arrangement.spacedBy(8.dp),
+//                        modifier = Modifier.padding(top = 8.dp)
+//                    ) {
+//                        Text("CPU: ${sanPham!!.CPU}", fontWeight = FontWeight.Bold)
+//                        Text("Card đồ họa: ${sanPham!!.CardManHinh}", fontWeight = FontWeight.Bold)
+//                        Text("${sanPham!!.RAM}", fontWeight = FontWeight.Bold)
+//                        Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
+//                        Text("Màn Hình: ${sanPham!!.ManHinh}", fontWeight = FontWeight.Bold)
+//                        Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
+//                    }
+//                }
             }
         }
     }
 }
 
 
-fun formatGiaTien(gia: Int): String {
+fun formatGiaTienpk(gia: Int): String {
     val formatter = DecimalFormat("#,###")
     return "${formatter.format(gia)}đ"
 }

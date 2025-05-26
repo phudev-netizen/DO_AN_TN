@@ -35,88 +35,153 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.lapstore.models.SanPham
 
+//@Composable
+//fun ProductCard_Accessory(
+//    sanpham: SanPham,
+//    makhachhang:String?,
+//    tentaikhoan:String?,
+//    navController: NavHostController
+//) {
+//    Card(
+//        modifier = Modifier
+//            .padding(8.dp)
+//            .size(width = 260.dp, height = 480.dp),
+//        shape = RoundedCornerShape(10.dp),
+//        colors = CardDefaults.cardColors(containerColor = Color.White),
+//        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+//        onClick = {
+//            if(tentaikhoan != null)
+//                navController.navigate(NavRoute.PRODUCTDETAILSCREEN.route + "?id=${sanpham.MaSanPham}&makhachhang=${makhachhang}&tentaikhoan=${tentaikhoan}")
+//            else
+//                navController.navigate(NavRoute.PRODUCTDETAILSCREEN.route + "?id=${sanpham.MaSanPham}&makhachhang=${makhachhang}")
+//        }
+//    ) {
+//        Column(modifier = Modifier.padding(10.dp)) {
+//            AsyncImage(
+//                model= sanpham.HinhAnh,
+//                contentDescription = null,
+//                modifier = Modifier
+//                    .padding(8.dp)
+//                    .size(200.dp),
+//                contentScale = ContentScale.Fit
+//            )
+//
+//            Text(
+//                text = sanpham.TenSanPham,
+//                fontSize = 18.sp,
+//                fontWeight = FontWeight.Bold,
+//                modifier = Modifier.padding(vertical = 4.dp)
+//            )
+////            //mô tả chi tiết
+////            Card(
+////                modifier = Modifier.size(width = 270.dp, height = 120.dp),
+////                colors = CardDefaults.cardColors(containerColor = Color(0xFFCCCCCC)),
+////            ) {
+////                Column(
+////                    modifier = Modifier.padding(10.dp),
+////                    verticalArrangement = Arrangement.SpaceAround
+////                ) {
+////                    Text("CPU " + sanpham.CPU, fontWeight = FontWeight.Bold)
+////                    Text("Card " + sanpham.CardManHinh, fontWeight = FontWeight.Bold)
+////                    Text(sanpham.RAM, fontWeight = FontWeight.Bold)
+////                    Text(sanpham.SSD, fontWeight = FontWeight.Bold)
+////                }
+////
+////            }
+//            // Giá sản phẩm
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                Text(
+//                    text = "Giá: ${formatGiaTien(sanpham.Gia)}",
+//                    fontSize = 16.sp,
+//                    color = Color.Red,
+//                    fontWeight = FontWeight.Bold,
+//                    modifier = Modifier.padding(vertical = 4.dp)
+//                )
+//                if(sanpham.SoLuong == 0){
+//                    Text(
+//                        text = "(Hết hàng)",
+//                        fontSize = 16.sp,
+//                        color = Color.Red,
+//                        fontWeight = FontWeight.Bold,
+//                        modifier = Modifier.padding(vertical = 4.dp)
+//                    )
+//                }
+//            }
+//
+//        }
+//    }
+//}
+//
+fun formatGiaTien(gia: Int): String {
+    val formatter = DecimalFormat("#,###")
+    return "${formatter.format(gia)}đ"
+}
 @Composable
 fun ProductCard_Accessory(
     sanpham: SanPham,
-    makhachhang:String?,
-    tentaikhoan:String?,
+    makhachhang: String?,
+    tentaikhoan: String?,
     navController: NavHostController
 ) {
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .size(width = 260.dp, height = 480.dp),
+            .size(width = 200.dp, height = 300.dp),
         shape = RoundedCornerShape(10.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         onClick = {
-            if(tentaikhoan != null)
-                navController.navigate(NavRoute.PRODUCTDETAILSCREEN.route + "?id=${sanpham.MaSanPham}&makhachhang=${makhachhang}&tentaikhoan=${tentaikhoan}")
+            val baseRoute = NavRoute.PRODUCTDETAIL_ACCESSORY.route + "?id=${sanpham.MaSanPham}"
+            val fullRoute = if (tentaikhoan != null)
+                "$baseRoute&makhachhang=${makhachhang}&tentaikhoan=${tentaikhoan}"
             else
-                navController.navigate(NavRoute.PRODUCTDETAILSCREEN.route + "?id=${sanpham.MaSanPham}&makhachhang=${makhachhang}")
+                "$baseRoute&makhachhang=${makhachhang}"
+
+            navController.navigate(fullRoute)
         }
     ) {
-        Column(modifier = Modifier.padding(10.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             AsyncImage(
-                model= sanpham.HinhAnh,
+                model = sanpham.HinhAnh,
                 contentDescription = null,
                 modifier = Modifier
-                    .padding(8.dp)
-                    .size(200.dp),
+                    .size(160.dp)
+                    .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Fit
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            //tên sp
             Text(
                 text = sanpham.TenSanPham,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 4.dp)
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .fillMaxWidth()
             )
-//            //mô tả chi tiết
-//            Card(
-//                modifier = Modifier.size(width = 270.dp, height = 120.dp),
-//                colors = CardDefaults.cardColors(containerColor = Color(0xFFCCCCCC)),
-//            ) {
-//                Column(
-//                    modifier = Modifier.padding(10.dp),
-//                    verticalArrangement = Arrangement.SpaceAround
-//                ) {
-//                    Text("CPU " + sanpham.CPU, fontWeight = FontWeight.Bold)
-//                    Text("Card " + sanpham.CardManHinh, fontWeight = FontWeight.Bold)
-//                    Text(sanpham.RAM, fontWeight = FontWeight.Bold)
-//                    Text(sanpham.SSD, fontWeight = FontWeight.Bold)
-//                }
-//
-//            }
-            // Giá sản phẩm
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Giá: ${formatGiaTien(sanpham.Gia)}",
-                    fontSize = 16.sp,
-                    color = Color.Red,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-                if(sanpham.SoLuong == 0){
-                    Text(
-                        text = "(Hết hàng)",
-                        fontSize = 16.sp,
-                        color = Color.Red,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
-                }
-            }
 
+            Spacer(modifier = Modifier.height(4.dp))
+             // giá sp
+            Text(
+                text = formatGiaTien(sanpham.Gia),
+                fontSize = 14.sp,
+                color = Color.Red,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Start)
+            )
         }
     }
-}
-
-fun formatGiaTien(gia: Int): String {
-    val formatter = DecimalFormat("#,###")
-    return "${formatter.format(gia)}đ"
 }

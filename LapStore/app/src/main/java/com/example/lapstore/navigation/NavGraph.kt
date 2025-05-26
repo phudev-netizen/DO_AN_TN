@@ -14,6 +14,7 @@ import com.example.lapstore.views.AdminScreen
 import com.example.lapstore.views.CartManagementSection
 import com.example.lapstore.views.HomeScreen
 import com.example.lapstore.views.LoginScreen
+import com.example.lapstore.views.ProductDetail_AccessoryScreen
 import com.example.lapstore.views.ProductDetail_Screen
 import com.example.lapstore.views.RegisterScreen
 import com.example.lapstore.views.UpdateDiaChiScreen
@@ -36,6 +37,7 @@ sealed class NavRoute(val route: String) {
     object REGISTERSCREEN: NavRoute("register_screen")
     object ADDRESS_SELECTION: NavRoute("address_selection")
     object ACCESSORY: NavRoute("accessory_screen")
+    object PRODUCTDETAIL_ACCESSORY  : NavRoute("productdetail_accesory")
 }
 
 
@@ -113,6 +115,7 @@ fun NavgationGraph(
             LoginScreen(navController,taiKhoanViewModel)
         }
 
+        //màn hình chi tiết trang chủ
         composable(
             route = NavRoute.PRODUCTDETAILSCREEN.route + "?id={id}&makhachhang={makhachhang}",
             arguments = listOf(
@@ -158,7 +161,55 @@ fun NavgationGraph(
                 )
             }
         }
+        // Màn hình chi tiết phụ kiện (accessory)
+        composable(
+            route = NavRoute.PRODUCTDETAIL_ACCESSORY.route + "?id={id}&makhachhang={makhachhang}",
+            arguments = listOf(
+                navArgument("id") { nullable = true },
+                navArgument("makhachhang") { nullable = true },
+            )
+        ) {
+            val id = it.arguments?.getString("id")
+            val makhachhang = it.arguments?.getString("makhachhang")
 
+            if (id != null) {
+                ProductDetail_AccessoryScreen(
+                    navController = navController,
+                    id = id,
+                    makhachhang = makhachhang,
+                    tentaikhoan = null,
+                    viewModel = viewmodel,
+                    hinhAnhViewModel = hinhAnhViewModel
+                )
+            }
+        }
+
+        composable(
+            route = NavRoute.PRODUCTDETAIL_ACCESSORY.route + "?id={id}&makhachhang={makhachhang}&tentaikhoan={tentaikhoan}",
+            arguments = listOf(
+                navArgument("id") { nullable = true },
+                navArgument("makhachhang") { nullable = true },
+                navArgument("tentaikhoan") { type = NavType.StringType }
+            )
+        ) {
+            val id = it.arguments?.getString("id")
+            val makhachhang = it.arguments?.getString("makhachhang")
+            val tentaikhoan = it.arguments?.getString("tentaikhoan")
+
+            if (id != null) {
+                ProductDetail_AccessoryScreen(
+                    navController = navController,
+                    id = id,
+                    makhachhang = makhachhang,
+                    tentaikhoan = tentaikhoan,
+                    viewModel = viewmodel,
+                    hinhAnhViewModel = hinhAnhViewModel
+                )
+            }
+        }
+
+
+        //màn hình thanh toán
         composable(
             route = NavRoute.PAYSCREEN.route + "?selectedProducts={selectedProducts}&tongtien={tongtien}&tentaikhoan={tentaikhoan}",
             arguments = listOf(

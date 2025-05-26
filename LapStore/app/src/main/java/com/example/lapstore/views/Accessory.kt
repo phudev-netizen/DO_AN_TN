@@ -350,6 +350,32 @@ fun AccessoryScreen(
                             fontWeight = FontWeight.Bold
                         )
                     }
+                    // phụ kiện
+                    item {
+                        Text(
+                            text = "Phụ kiện ",
+                            modifier = Modifier.padding(10.dp),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(danhSachPhuKien.value ?: emptyList()) { phukien ->
+                                if (taikhoan != null) {
+                                    ProductCard_Accessory(phukien, taikhoan.MaKhachHang?.toString(), tentaikhoan, navController)
+                                } else {
+                                    ProductCard_Accessory(phukien, null, null, navController)
+                                }
+                            }
+//                            item {
+//                                Text("Số lượng phụ kiện: ${(danhSachPhuKien.value ?: emptyList()).size}")
+//                                Text("Lỗi: ${viewModel.errorMessage ?: "Không có"}")
+//                            }
+                        }
+                    }
 
                     // LazyRow cho Laptop Văn Phòng
                     item {
@@ -397,32 +423,7 @@ fun AccessoryScreen(
                             }
                         }
                     }
-                    // phụ kiện
-                    item {
-                        Text(
-                            text = "Phụ kiện ",
-                            modifier = Modifier.padding(10.dp),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(danhSachPhuKien.value ?: emptyList()) { phukien ->
-                                if (taikhoan != null) {
-                                    ProductCard_Accessory(phukien, taikhoan.MaKhachHang?.toString(), tentaikhoan, navController)
-                                } else {
-                                    ProductCard_Accessory(phukien, null, null, navController)
-                                }
-                            }
-                            item {
-                                Text("Số lượng phụ kiện: ${(danhSachPhuKien.value ?: emptyList()).size}")
-                                Text("Lỗi: ${viewModel.errorMessage ?: "Không có"}")
-                            }
-                        }
-                    }
+
                 }
             }
         }
