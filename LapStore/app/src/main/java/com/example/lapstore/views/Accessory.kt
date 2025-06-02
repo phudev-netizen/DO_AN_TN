@@ -1,7 +1,6 @@
 package com.example.lapstore.views
 
 import NavRoute
-import ProductCard
 import SanPhamViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -377,52 +376,52 @@ fun AccessoryScreen(
                         }
                     }
 
-                    // LazyRow cho Laptop Văn Phòng
-                    item {
-                        Row {
-                            Text(
-                                text = "Laptop Văn Phòng",
-                                modifier = Modifier.padding(10.dp),
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-                    item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(danhSachSanPhamVanPhong.value) { sanphamvp ->
-                                if (taikhoan != null) {
-                                    ProductCard(sanphamvp, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
-                                } else {
-                                    ProductCard(sanphamvp, null, tentaikhoan, navController)
-                                }
-                            }
-                        }
-                    }
-                    // LazyRow cho Laptop Gaming
-                    item {
-                        Text(
-                            text = "Laptop Gaming",
-                            modifier = Modifier.padding(10.dp),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(danhSachSanPhamGaming.value) { sanphamgm ->
-                                if (taikhoan != null) {
-                                    ProductCard(sanphamgm, taikhoan.MaKhachHang.toString(), tentaikhoan, navController)
-                                } else {
-                                    ProductCard(sanphamgm, null, null, navController)
-                                }
-                            }
-                        }
-                    }
+//                    // LazyRow cho Laptop Văn Phòng
+//                    item {
+//                        Row {
+//                            Text(
+//                                text = "Laptop Văn Phòng",
+//                                modifier = Modifier.padding(10.dp),
+//                                fontWeight = FontWeight.Bold,
+//                            )
+//                        }
+//                    }
+//                    item {
+//                        LazyRow(
+//                            contentPadding = PaddingValues(horizontal = 8.dp),
+//                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                        ) {
+//                            items(danhSachSanPhamVanPhong.value) { sanphamvp ->
+//                                if (taikhoan != null) {
+//                                    ProductCard(sanphamvp, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
+//                                } else {
+//                                    ProductCard(sanphamvp, null, tentaikhoan, navController)
+//                                }
+//                            }
+//                        }
+//                    }
+//                    // LazyRow cho Laptop Gaming
+//                    item {
+//                        Text(
+//                            text = "Laptop Gaming",
+//                            modifier = Modifier.padding(10.dp),
+//                            fontWeight = FontWeight.Bold
+//                        )
+//                    }
+//                    item {
+//                        LazyRow(
+//                            contentPadding = PaddingValues(horizontal = 8.dp),
+//                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                        ) {
+//                            items(danhSachSanPhamGaming.value) { sanphamgm ->
+//                                if (taikhoan != null) {
+//                                    ProductCard(sanphamgm, taikhoan.MaKhachHang.toString(), tentaikhoan, navController)
+//                                } else {
+//                                    ProductCard(sanphamgm, null, null, navController)
+//                                }
+//                            }
+//                        }
+//                    }
 
                 }
             }
