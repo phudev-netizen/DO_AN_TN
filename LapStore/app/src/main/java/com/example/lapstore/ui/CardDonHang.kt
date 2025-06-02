@@ -31,7 +31,6 @@ import com.example.lapstore.viewmodels.ChiTietHoaDonBanViewmodel
 import com.example.lapstore.viewmodels.DiaChiViewmodel
 import com.example.lapstore.viewmodels.HoaDonBanVỉewModel
 import com.example.lapstore.views.formatDate
-import com.example.lapstore.views.formatGiaTien
 
 @Composable
 fun CardDonHang(

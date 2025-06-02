@@ -507,8 +507,7 @@ fun ProductDetail_Screen(
                         Text("${sanPham!!.RAM}", fontWeight = FontWeight.Bold)
                         Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
                         Text("Màn Hình: ${sanPham!!.ManHinh}", fontWeight = FontWeight.Bold)
-                        //Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
-                        //Text("BUS ${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
+                        Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
                     }
                 }
             }

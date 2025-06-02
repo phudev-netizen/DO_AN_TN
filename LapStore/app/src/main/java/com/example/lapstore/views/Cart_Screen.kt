@@ -56,7 +56,6 @@ import coil.compose.AsyncImage
 import com.example.lapstore.models.DiaChi
 import com.example.lapstore.viewmodels.DiaChiViewmodel
 import com.example.lapstore.viewmodels.GioHangViewModel
-import com.example.lapstore.views.formatGiaTien
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 

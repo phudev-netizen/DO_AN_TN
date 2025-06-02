@@ -491,24 +491,25 @@ fun ProductDetail_AccessoryScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-//                // Thông số kỹ thuật
-                item {
-                    Text(
-                        text = "Thông số kỹ thuật",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(top = 8.dp)
-                    ) {
-                        //Text("CPU: ${sanPham!!.CPU}", fontWeight = FontWeight.Bold)
-                        //Text("Card đồ họa: ${sanPham!!.CardManHinh}", fontWeight = FontWeight.Bold)
-                        Text("${sanPham!!.RAM}", fontWeight = FontWeight.Bold)
-                        Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
-                        Text("${sanPham!!.ManHinh}", fontWeight = FontWeight.Bold)
-                    }
-                }
+////                // Thông số kỹ thuật
+//                item {
+//                    Text(
+//                        text = "Thông số kỹ thuật",
+//                        fontSize = 18.sp,
+//                        fontWeight = FontWeight.SemiBold
+//                    )
+//                    Column(
+//                        verticalArrangement = Arrangement.spacedBy(8.dp),
+//                        modifier = Modifier.padding(top = 8.dp)
+//                    ) {
+//                        Text("CPU: ${sanPham!!.CPU}", fontWeight = FontWeight.Bold)
+//                        Text("Card đồ họa: ${sanPham!!.CardManHinh}", fontWeight = FontWeight.Bold)
+//                        Text("${sanPham!!.RAM}", fontWeight = FontWeight.Bold)
+//                        Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
+//                        Text("Màn Hình: ${sanPham!!.ManHinh}", fontWeight = FontWeight.Bold)
+//                        Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
+//                    }
+//                }
             }
         }
     }
