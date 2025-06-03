@@ -370,10 +370,6 @@ fun AccessoryScreen(
                                     ProductCard_Accessory(phukien, null, null, navController)
                                 }
                             }
-//                            item {
-//                                Text("Số lượng phụ kiện: ${(danhSachPhuKien.value ?: emptyList()).size}")
-//                                Text("Lỗi: ${viewModel.errorMessage ?: "Không có"}")
-//                            }
                         }
                     }
 
@@ -387,42 +383,42 @@ fun AccessoryScreen(
                             )
                         }
                     }
-                    item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(danhSachSanPhamVanPhong.value) { sanphamvp ->
-                                if (taikhoan != null) {
-                                    ProductCard(sanphamvp, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
-                                } else {
-                                    ProductCard(sanphamvp, null, tentaikhoan, navController)
-                                }
-                            }
-                        }
-                    }
-                    // LazyRow cho Laptop Gaming
-                    item {
-                        Text(
-                            text = "Laptop Gaming",
-                            modifier = Modifier.padding(10.dp),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(danhSachSanPhamGaming.value) { sanphamgm ->
-                                if (taikhoan != null) {
-                                    ProductCard(sanphamgm, taikhoan.MaKhachHang.toString(), tentaikhoan, navController)
-                                } else {
-                                    ProductCard(sanphamgm, null, null, navController)
-                                }
-                            }
-                        }
-                    }
+//                    item {
+//                        LazyRow(
+//                            contentPadding = PaddingValues(horizontal = 8.dp),
+//                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                        ) {
+//                            items(danhSachSanPhamVanPhong.value) { sanphamvp ->
+//                                if (taikhoan != null) {
+//                                    ProductCard(sanphamvp, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
+//                                } else {
+//                                    ProductCard(sanphamvp, null, tentaikhoan, navController)
+//                                }
+//                            }
+//                        }
+//                    }
+//                    // LazyRow cho Laptop Gaming
+//                    item {
+//                        Text(
+//                            text = "Laptop Gaming",
+//                            modifier = Modifier.padding(10.dp),
+//                            fontWeight = FontWeight.Bold
+//                        )
+//                    }
+//                    item {
+//                        LazyRow(
+//                            contentPadding = PaddingValues(horizontal = 8.dp),
+//                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                        ) {
+//                            items(danhSachSanPhamGaming.value) { sanphamgm ->
+//                                if (taikhoan != null) {
+//                                    ProductCard(sanphamgm, taikhoan.MaKhachHang.toString(), tentaikhoan, navController)
+//                                } else {
+//                                    ProductCard(sanphamgm, null, null, navController)
+//                                }
+//                            }
+//                        }
+//                    }
 
                 }
             }

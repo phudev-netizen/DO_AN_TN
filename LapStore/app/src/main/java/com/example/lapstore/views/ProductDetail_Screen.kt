@@ -86,6 +86,14 @@ import com.example.lapstore.viewmodels.TaiKhoanViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.example.lapstore.R
+import com.example.lapstore.views.ThongSoRow
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.border
+import androidx.compose.ui.draw.shadow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -267,9 +275,15 @@ fun ProductDetail_Screen(
                 item {
                     Box(
                         modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 8.dp) // khoảng cách với viền ngoài
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.LightGray) // Tùy chọn nền cho vùng ảnh
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .clip(RoundedCornerShape(12.dp)) // bo góc lớn hơn 1 chút
+                            .background(Color.White) // nền trắng sang hơn LightGray
+                            .border(
+                                width = 1.5.dp,
+                                color = Color.LightGray,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+
                     ) {
                         AsyncImage(
                             model = hinhAnhHienTai,
@@ -277,7 +291,7 @@ fun ProductDetail_Screen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(300.dp)
-                                .clip(RoundedCornerShape(8.dp)), // clip bo góc cho hình ảnh
+                                .clip(RoundedCornerShape(12.dp)),
                             contentScale = ContentScale.Crop
                         )
                     }
@@ -286,27 +300,37 @@ fun ProductDetail_Screen(
                 // Danh sách hình ảnh nhỏ trong LazyRow
                 item {
                     LazyRow(
-                        contentPadding = PaddingValues(horizontal = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         items(danhSachHinhAnh) { hinhanh ->
-                            AsyncImage(
-                                model = hinhanh.DuongDan,
-                                contentDescription = "Hình ảnh sản phẩm",
+                            Box(
                                 modifier = Modifier
-                                    .height(90.dp)
-                                    .width(100.dp)
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .size(width = 100.dp, height = 90.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .border(
+                                        width = 1.5.dp,
+                                        color = if (hinhanh.DuongDan == hinhAnhHienTai) Color(0xFF6200EE) else Color.LightGray,
+                                        shape = RoundedCornerShape(12.dp)
+                                    )
                                     .clickable {
                                         hinhAnhHienTai = hinhanh.DuongDan
-                                    },
-                                contentScale = ContentScale.Crop,
-                            )
+                                    }
+                                    .background(Color.White)
+                            ) {
+                                AsyncImage(
+                                    model = hinhanh.DuongDan,
+                                    contentDescription = "Hình ảnh sản phẩm",
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(RoundedCornerShape(12.dp)),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
                         }
                     }
                 }
-
                 // Tên sản phẩm
                 item {
                     Text(
@@ -325,7 +349,7 @@ fun ProductDetail_Screen(
                     Text(
                         text = "Giá: ${formatGiaTien(sanPham.Gia)}",
                         fontSize = 20.sp,
-                        color = Color.Red,
+                        color = Color.Black,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Left
@@ -340,130 +364,126 @@ fun ProductDetail_Screen(
                         )
                     }
                 }
-
                 // Nút thêm vào giỏ hàng
                 item {
-                    Button(
-                        onClick = {
-                            if (makhachhang == null) {
-                                // Điều hướng tới màn hình đăng nhập nếu khách hàng chưa đăng nhập
-                                navController.navigate(NavRoute.LOGINSCREEN.route)
-                            } else {
-                                isLoading = true // Bắt đầu hiệu ứng loading
-                                scope.launch {
-                                    gioHangViewModel.getGioHangByKhachHang(makhachhang.toInt())
-                                    val gioHangHienTai = danhsachgiohang
-
-                                    // Kiểm tra sản phẩm đã có trong giỏ hàng hay chưa
-                                    val gioHangSanPham =
-                                        gioHangHienTai.find { it.MaSanPham == sanPham.MaSanPham }
-
-                                    val sanPhamTonKho =
-                                        danhsachsanpham.find { it.MaSanPham == sanPham.MaSanPham }
-
-                                    // Đảm bảo vòng loading kết thúc trước khi hiện snackbar
-                                    if (sanPhamTonKho == null || sanPhamTonKho.SoLuong <= 0) {
-                                        // Trường hợp sản phẩm hết hàng
-                                        delay(500) // Hiệu ứng loading trong 1 giây
-                                        snackbarHostState.showSnackbar(
-                                            "Sản phẩm đã hết hàng, không thể thêm vào giỏ hàng.",
-                                            duration = SnackbarDuration.Short
-                                        )
-                                    } else if (gioHangSanPham != null) {
-                                        // Nếu sản phẩm đã có trong giỏ hàng, kiểm tra số lượng
-                                        if (gioHangSanPham.SoLuong >= sanPhamTonKho.SoLuong) {
-                                            // Đạt giới hạn kho
-                                            delay(500) // Hiệu ứng loading trong 1 giây
-                                            snackbarHostState.showSnackbar(
-                                                "Số lượng trong kho chỉ còn ${sanPhamTonKho.SoLuong} sản phẩm, không thể thêm nữa.",
-                                                duration = SnackbarDuration.Short
-                                            )
-                                        } else {
-                                            // Tăng số lượng sản phẩm trong giỏ hàng
-                                            gioHangSanPham.SoLuong += 1
-                                            gioHangViewModel.updateGioHang(gioHangSanPham)
-                                            delay(500) // Hiệu ứng loading trong 1 giây
-                                            snackbarHostState.showSnackbar(
-                                                "Cập nhật số lượng sản phẩm trong giỏ hàng thành công.",
-                                                duration = SnackbarDuration.Short
-                                            )
-                                        }
-                                    } else {
-                                        val gioHangMoi = GioHang(
-                                            MaGioHang = 0,
-                                            MaKhachHang = makhachhang.toInt(),
-                                            MaSanPham = sanPham.MaSanPham,
-                                            SoLuong = 1,
-                                            TrangThai = 1
-                                        )
-                                        gioHangViewModel.addToCart(gioHangMoi)
-                                        gioHangViewModel.getGioHangByKhachHang(makhachhang.toInt())
-                                        delay(500)
-                                        snackbarHostState.showSnackbar(
-                                            "Thêm sản phẩm mới vào giỏ hàng thành công.",
-                                            duration = SnackbarDuration.Short
-                                        )
-                                    }
-                                    isLoading = false
-                                }
-                            }
-                        },
-                        enabled = !isLoading,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (!isLoading) Color(0XFF27A4F2) else Color.Gray // Màu nút thay đổi khi bị vô hiệu hóa
-                        )
-                    ) {
+                    Column {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.AddShoppingCart,
-                                contentDescription = "",
-                                tint = Color.White
-                            )
-                            Text(
-                                "THÊM VÀO GIỎ HÀNG",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp
-                            )
-                        }
-                    }
-                }
-                // Nút mua ngay
-                item {
-                    Button(
-                        onClick = { /* TODO: Xử lý mua ngay */ },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Red
-                        )
-                    ) {
-                        Text(
-                            "MUA NGAY",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
-                        )
-                    }
-                }
-                item {
-                    SnackbarHost(
-                        modifier = Modifier.padding(4.dp),
-                        hostState = snackbarHostState
-                    )
+                            Button(
+                                onClick = {
+                                    if (makhachhang == null) {
+                                        navController.navigate(NavRoute.LOGINSCREEN.route)
+                                    } else {
+                                        isLoading = true
+                                        scope.launch {
+                                            gioHangViewModel.getGioHangByKhachHang(makhachhang.toInt())
+                                            val gioHangHienTai = danhsachgiohang
 
+                                            val gioHangSanPham = gioHangHienTai.find { it.MaSanPham == sanPham.MaSanPham }
+                                            val sanPhamTonKho = danhsachsanpham.find { it.MaSanPham == sanPham.MaSanPham }
+
+                                            if (sanPhamTonKho == null || sanPhamTonKho.SoLuong <= 0) {
+                                                delay(500)
+                                                snackbarHostState.showSnackbar(
+                                                    "Sản phẩm đã hết hàng, không thể thêm vào giỏ hàng.",
+                                                    duration = SnackbarDuration.Short
+                                                )
+                                            } else if (gioHangSanPham != null) {
+                                                if (gioHangSanPham.SoLuong >= sanPhamTonKho.SoLuong) {
+                                                    delay(500)
+                                                    snackbarHostState.showSnackbar(
+                                                        "Số lượng trong kho chỉ còn ${sanPhamTonKho.SoLuong} sản phẩm, không thể thêm nữa.",
+                                                        duration = SnackbarDuration.Short
+                                                    )
+                                                } else {
+                                                    gioHangSanPham.SoLuong += 1
+                                                    gioHangViewModel.updateGioHang(gioHangSanPham)
+                                                    delay(500)
+                                                    snackbarHostState.showSnackbar(
+                                                        "Cập nhật số lượng sản phẩm trong giỏ hàng thành công.",
+                                                        duration = SnackbarDuration.Short
+                                                    )
+                                                }
+                                            } else {
+                                                val gioHangMoi = GioHang(
+                                                    MaGioHang = 0,
+                                                    MaKhachHang = makhachhang.toInt(),
+                                                    MaSanPham = sanPham.MaSanPham,
+                                                    SoLuong = 1,
+                                                    TrangThai = 1
+                                                )
+                                                gioHangViewModel.addToCart(gioHangMoi)
+                                                gioHangViewModel.getGioHangByKhachHang(makhachhang.toInt())
+                                                delay(500)
+                                                snackbarHostState.showSnackbar(
+                                                    "Thêm sản phẩm mới vào giỏ hàng thành công.",
+                                                    duration = SnackbarDuration.Short
+                                                )
+                                            }
+                                            isLoading = false
+                                        }
+                                    }
+                                },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (!isLoading) Color.LightGray else Color.LightGray
+                                )
+                            ) {
+                                Text(
+                                    "THÊM VÀO GIỎ HÀNG",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = Color.Black,
+                                    modifier = Modifier.weight(1f),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+
+                            Button(
+                                onClick = { /* TODO: Xử lý mua ngay */ },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(10.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                            ) {
+                                Text(
+                                    "MUA NGAY",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    color = Color.White
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        SnackbarHost(
+                            modifier = Modifier.padding(4.dp),
+                            hostState = snackbarHostState
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(3.dp)
+                                .background(
+                                    brush = Brush.horizontalGradient(
+                                        colors = listOf(Color.Transparent, Color(0xFF9C27B0), Color.Transparent)
+                                    )
+                                )
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                 }
-                item {
-                    HorizontalDivider(
-                        color = Color.Black,
-                        thickness = 1.dp,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+
 //                // Mô tả sản phẩm
                 item {
                     Column(
@@ -477,7 +497,7 @@ fun ProductDetail_Screen(
                         )
                         Text(
                             text = sanPham!!.MoTa,
-                            fontSize = 20.sp,
+                            fontSize = 17.sp,
                             textAlign = TextAlign.Justify,
                             lineHeight = 28.sp,
                             modifier = Modifier.padding(top = 8.dp)
@@ -485,29 +505,42 @@ fun ProductDetail_Screen(
                     }
                 }
                 item {
-                    HorizontalDivider(
-                        color = Color.Black,
-                        thickness = 1.dp,
-                        modifier = Modifier.fillMaxWidth()
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(3.dp)
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(Color.Transparent, Color(0xFF9C27B0), Color.Transparent)
+                                )
+                            )
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
-//                // Thông số kỹ thuật
+                // Thông số kỹ thuật
                 item {
-                    Text(
-                        text = "Thông số kỹ thuật",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))  // Thêm đoạn này
+                            .background(Color(0xFF1B263B))
                     ) {
-                        Text("CPU: ${sanPham!!.CPU}", fontWeight = FontWeight.Bold)
-                        Text("Card đồ họa: ${sanPham!!.CardManHinh}", fontWeight = FontWeight.Bold)
-                        Text("${sanPham!!.RAM}", fontWeight = FontWeight.Bold)
-                        Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
-                        Text("Màn Hình: ${sanPham!!.ManHinh}", fontWeight = FontWeight.Bold)
-                        Text("${sanPham!!.SSD}", fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "Thông số kỹ thuật",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFFF5C518),
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(top = 16.dp, bottom = 12.dp)
+                        )
+                        // Dòng thông số
+                        ThongSoRow("CPU", sanPham!!.CPU)
+                        ThongSoRow("Card đồ họa", sanPham.CardManHinh)
+                        ThongSoRow("RAM", sanPham.RAM)
+                        ThongSoRow("SSD", sanPham.SSD)
+                        ThongSoRow("Màn Hình", sanPham.ManHinh)
                     }
                 }
             }

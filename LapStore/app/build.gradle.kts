@@ -74,6 +74,9 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     implementation("androidx.compose.material3:material3:1.3.1")
+    implementation ("androidx.compose.foundation:foundation:<version>")
+
+    implementation(libs.play.services.analytics.impl)
 
     val composeBom = platform("androidx.compose:compose-bom:2024.09.00")
     implementation(composeBom)
