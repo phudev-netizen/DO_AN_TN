@@ -84,8 +84,8 @@ data class CategoryData(
 fun CategoryMenuMain() {
     // Tạo danh sách các CategoryData đại diện cho từng CategoryMenu
     val categories = listOf(
-        CategoryData("LAPTOP", listOf("Thương hiệu", "Giá bán", "CPU Intel - AMD", "Nhu cầu sử dụng"),Icons.Filled.Computer),
-        CategoryData("ĐIỆN THOẠI", listOf("Hãng sản xuất", "Giá bán", "Hệ điều hành", "Dung lượng pin"),Icons.Filled.PhoneIphone),
+//        CategoryData("LAPTOP", listOf("Thương hiệu", "Giá bán", "CPU Intel - AMD", "Nhu cầu sử dụng"),Icons.Filled.Computer),
+//        CategoryData("ĐIỆN THOẠI", listOf("Hãng sản xuất", "Giá bán", "Hệ điều hành", "Dung lượng pin"),Icons.Filled.PhoneIphone),
         CategoryData("PHỤ KIỆN", listOf("Tai nghe", "Sạc dự phòng", "Cáp sạc", "Ốp lưng"),Icons.Filled.Headset)
     )
 
