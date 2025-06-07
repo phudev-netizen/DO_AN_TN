@@ -13,6 +13,7 @@ import com.example.lapstore.api.QuanLyBanLaptopRetrofitClient
 import com.example.lapstore.models.HoaDonBan
 import com.example.lapstore.models.KhachHang
 import com.example.lapstore.models.SanPham
+import com.example.lapstore.models.TaiKhoan
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -45,6 +46,11 @@ class SanPhamViewModel : ViewModel() {
         private set
 
     var danhSach by mutableStateOf<List<SanPham>>(emptyList())
+
+    // SanPhamViewModel.kt
+    val taikhoan = MutableStateFlow<TaiKhoan?>(null)
+    // hoặc nếu là StateFlow
+    //val taikhoan: StateFlow<TaiKhoan?> = _taikhoan
 
     private val _danhsachSanPham = MutableStateFlow<List<SanPham>>(emptyList())
     val danhsachSanPham: StateFlow<List<SanPham>> get() = _danhsachSanPham

@@ -1,7 +1,6 @@
-//
+
 //import android.icu.text.DecimalFormat
 //import androidx.compose.foundation.background
-//import androidx.compose.foundation.clickable
 //import androidx.compose.foundation.layout.*
 //import androidx.compose.foundation.shape.CircleShape
 //import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,7 +8,8 @@
 //import androidx.compose.material.icons.filled.Favorite
 //import androidx.compose.material.icons.outlined.FavoriteBorder
 //import androidx.compose.material3.*
-//import androidx.compose.runtime.*
+//import androidx.compose.runtime.Composable
+//import androidx.compose.runtime.rememberCoroutineScope
 //import androidx.compose.ui.Alignment
 //import androidx.compose.ui.Modifier
 //import androidx.compose.ui.draw.clip
@@ -20,15 +20,12 @@
 //import androidx.compose.ui.unit.sp
 //import androidx.navigation.NavHostController
 //import coil.compose.AsyncImage
-//import com.example.lapstore.api.addToFavorite
-//import com.example.lapstore.api.removeFromFavorite
 //import com.example.lapstore.models.SanPham
 //import kotlinx.coroutines.launch
 //
-//
 //@Composable
 //fun ProductCard(
-//    maKhachHang: Int,
+//    maKhachHang: Int?,
 //    isFavorite: Boolean,
 //    onFavoriteStateChanged: (Boolean) -> Unit,
 //    addToFavorite: suspend (Int, Int) -> Unit,
@@ -38,7 +35,7 @@
 //    tentaikhoan: String?,
 //    navController: NavHostController
 //) {
-//    var isFavorite by remember { mutableStateOf(false) }
+//    val scope = rememberCoroutineScope()
 //
 //    Card(
 //        modifier = Modifier
@@ -50,11 +47,11 @@
 //        onClick = {
 //            if (tentaikhoan != null)
 //                navController.navigate(
-//                    "product_detail_screen?id=${sanpham.MaSanPham}&makhachhang=$makhachhang&tentaikhoan=$tentaikhoan"
+//                    "productdetail_screen?id=${sanpham.MaSanPham}&makhachhang=$makhachhang&tentaikhoan=$tentaikhoan"
 //                )
 //            else
 //                navController.navigate(
-//                    "product_detail_screen?id=${sanpham.MaSanPham}&makhachhang=$makhachhang"
+//                    "productdetail_screen?id=${sanpham.MaSanPham}&makhachhang=$makhachhang"
 //                )
 //        }
 //    ) {
@@ -118,10 +115,19 @@
 //                }
 //            }
 //
-//            // Nút yêu thích ở góc trái trên
-//            val scope = rememberCoroutineScope()
+//// Nút yêu thích ở góc trái trên
 //            IconButton(
-//                onClick = { },
+//                onClick = {
+//                    scope.launch {
+//                        if (isFavorite) {
+//                            maKhachHang?.let { removeFromFavorite(it, sanpham.MaSanPham) }
+//                            onFavoriteStateChanged(false)
+//                        } else {
+//                            maKhachHang?.let { addToFavorite(it, sanpham.MaSanPham) }
+//                            onFavoriteStateChanged(true)
+//                        }
+//                    }
+//                },
 //                modifier = Modifier
 //                    .align(Alignment.TopStart)
 //                    .padding(8.dp)
@@ -139,15 +145,15 @@
 //    }
 //}
 //
-//
 //fun formatGiaTien(gia: Int): String {
 //    val formatter = DecimalFormat("#,###")
 //    return "${formatter.format(gia)}đ"
 //}
-//
 
-import android.icu.text.DecimalFormat
+package com.example.lapstore.views
+
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -156,7 +162,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -168,39 +173,30 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.lapstore.models.SanPham
-import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 
 @Composable
 fun ProductCard(
-    maKhachHang: Int?,
-    isFavorite: Boolean,
-    onFavoriteStateChanged: (Boolean) -> Unit,
-    addToFavorite: suspend (Int, Int) -> Unit,
-    removeFromFavorite: suspend (Int, Int) -> Unit,
     sanpham: SanPham,
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
+    navController: NavHostController,
     makhachhang: String?,
-    tentaikhoan: String?,
-    navController: NavHostController
+    tentaikhoan: String?
 ) {
-    val scope = rememberCoroutineScope()
-
     Card(
         modifier = Modifier
             .padding(8.dp)
-            .size(width = 260.dp, height = 480.dp),
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        onClick = {
-            if (tentaikhoan != null)
-                navController.navigate(
+            .width(220.dp)
+            .height(400.dp)
+            .clickable {
+                val detailRoute = if (tentaikhoan != null)
                     "productdetail_screen?id=${sanpham.MaSanPham}&makhachhang=$makhachhang&tentaikhoan=$tentaikhoan"
-                )
-            else
-                navController.navigate(
+                else
                     "productdetail_screen?id=${sanpham.MaSanPham}&makhachhang=$makhachhang"
-                )
-        }
+                navController.navigate(detailRoute)
+            },
+        shape = RoundedCornerShape(10.dp)
     ) {
         Box {
             Column(modifier = Modifier.padding(10.dp)) {
@@ -261,22 +257,27 @@ fun ProductCard(
                     }
                 }
             }
-
-// Nút yêu thích ở góc trái trên
+//        Box {
+//            Column(modifier = Modifier.padding(10.dp)) {
+//                AsyncImage(
+//                    model = sanpham.HinhAnh,
+//                    contentDescription = null,
+//                    modifier = Modifier.size(180.dp)
+//                )
+//                Spacer(Modifier.height(8.dp))
+//                Text(sanpham.TenSanPham, style = MaterialTheme.typography.titleMedium)
+//                Spacer(Modifier.height(4.dp))
+//                Text(
+//                    text = "Giá: ${formatGiaTien(sanpham.Gia)}",
+//                    fontSize = 16.sp,
+//                    color = Color.Red,
+//                    fontWeight = FontWeight.Bold
+//                )
+//            }
             IconButton(
-                onClick = {
-                    scope.launch {
-                        if (isFavorite) {
-                            maKhachHang?.let { removeFromFavorite(it, sanpham.MaSanPham) }
-                            onFavoriteStateChanged(false)
-                        } else {
-                            maKhachHang?.let { addToFavorite(it, sanpham.MaSanPham) }
-                            onFavoriteStateChanged(true)
-                        }
-                    }
-                },
+                onClick = onFavoriteClick,
                 modifier = Modifier
-                    .align(Alignment.TopStart)
+                    .align(Alignment.TopEnd)
                     .padding(8.dp)
                     .size(32.dp)
                     .clip(CircleShape)
@@ -292,7 +293,3 @@ fun ProductCard(
     }
 }
 
-fun formatGiaTien(gia: Int): String {
-    val formatter = DecimalFormat("#,###")
-    return "${formatter.format(gia)}đ"
-}

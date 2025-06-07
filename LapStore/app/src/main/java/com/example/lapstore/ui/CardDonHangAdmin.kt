@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.lapstore.models.HoaDonBan
+import com.example.lapstore.ui.formatGiaTien
 import com.example.lapstore.viewmodels.ChiTietHoaDonBanViewmodel
 import com.example.lapstore.viewmodels.DiaChiViewmodel
 import com.example.lapstore.viewmodels.HoaDonBanVỉewModel

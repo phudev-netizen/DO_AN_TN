@@ -57,6 +57,7 @@ import com.example.lapstore.R
 import com.example.lapstore.models.ChiTietHoaDonBan
 import com.example.lapstore.models.HoaDonBan
 import com.example.lapstore.models.SanPham
+import com.example.lapstore.ui.formatGiaTien
 import com.example.lapstore.viewmodels.ChiTietHoaDonBanViewmodel
 import com.example.lapstore.viewmodels.DiaChiViewmodel
 import com.example.lapstore.viewmodels.GioHangViewModel

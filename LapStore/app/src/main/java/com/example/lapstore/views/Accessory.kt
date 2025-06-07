@@ -1,7 +1,6 @@
 package com.example.lapstore.views
 
 import NavRoute
-import ProductCard
 import SanPhamViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

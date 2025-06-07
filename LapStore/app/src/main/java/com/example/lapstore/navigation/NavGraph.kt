@@ -12,7 +12,6 @@ import com.example.lapstore.views.AddDiaChiScreen
 import com.example.lapstore.views.AddressManagementScreen
 import com.example.lapstore.views.AdminScreen
 import com.example.lapstore.views.CartManagementSection
-import com.example.lapstore.views.HomeScreen
 import com.example.lapstore.views.LoginScreen
 import com.example.lapstore.views.ProductDetail_AccessoryScreen
 import com.example.lapstore.views.ProductDetail_Screen
@@ -38,6 +37,7 @@ sealed class NavRoute(val route: String) {
     object ADDRESS_SELECTION: NavRoute("address_selection")
     object ACCESSORY: NavRoute("accessory_screen")
     object PRODUCTDETAIL_ACCESSORY  : NavRoute("productdetail_accesory")
+    object FAVORITE : NavRoute("favorite_screen")
 }
 
 
@@ -316,6 +316,19 @@ fun NavgationGraph(
                 khachHangViewModel
             )
         }
+        //yeu thích
+//        // Thêm vào NavHost trong NavgationGraph
+//        composable(
+//            route = NavRoute.FAVORITE.route + "?makhachhang={makhachhang}",
+//            arguments = listOf(navArgument("makhachhang") { type = NavType.IntType })
+//        ) { backStackEntry ->
+//            val makhachhang = backStackEntry.arguments?.getInt("makhachhang") ?: 0
+//            FavoriteScreen(
+//                customerId = makhachhang,
+//                navController = navController,
+//                sanPhamViewModel = viewmodel,
+//            )
+//        }
     }
 }
 
