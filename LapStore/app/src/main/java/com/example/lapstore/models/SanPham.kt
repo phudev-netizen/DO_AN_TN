@@ -17,5 +17,6 @@ data class SanPham(
     @SerializedName("MoTa") var MoTa: String,
     @SerializedName("HinhAnh") var HinhAnh: String,
     @SerializedName("TrangThai") var TrangThai: Int,
+    val loaiPhuKien: String?,
 )
 

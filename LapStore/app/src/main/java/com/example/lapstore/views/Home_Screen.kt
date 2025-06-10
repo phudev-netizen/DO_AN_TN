@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.lapstore.CategoryMenuMain
 import com.example.lapstore.R
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
 import com.example.lapstore.viewmodels.YeuThichViewModel
@@ -117,7 +118,18 @@ fun HomeScreen(
                         )
                     }
                 }
-                com.example.lapstore.CategoryMenuMain()
+                CategoryMenuMain(
+                    onItemClick = { category ->
+                        scope.launch {
+                            drawerState.close()
+                            if (taikhoan != null) {
+                                navController.navigate("${NavRoute.ACCESSORY.route}?category=${category}&tentaikhoan=${taikhoan.TenTaiKhoan}")
+                            } else {
+                                navController.navigate("${NavRoute.ACCESSORY.route}?category=${category}")
+                            }
+                        }
+                    }
+                )
                 Text("Thông tin", modifier = Modifier.padding(10.dp))
                 Row(
                     modifier = Modifier
@@ -264,22 +276,23 @@ fun HomeScreen(
                                 IconButton(
                                     modifier = Modifier.size(45.dp),
                                     onClick = {
-                                        keyboardController?.hide()
-                                        scope.launch {
-                                            drawerState.apply {
-                                                if (isClosed) open() else close()
+                                        if (tentaikhoan != null) {
+                                            navController.navigate("${NavRoute.FAVORITE.route}?tentaikhoan=${tentaikhoan}") {
+                                                popUpTo(0) { inclusive = true }
                                             }
+                                        } else {
+                                            navController.navigate(NavRoute.FAVORITE.route)
                                         }
                                     }
                                 ) {
                                     Icon(
-                                        Icons.Outlined.Menu,
+                                        Icons.Outlined.Favorite,
                                         contentDescription = "Profile",
                                         tint = Color.Red
                                     )
                                 }
                                 Text(
-                                    text = "Danh mục",
+                                    text = "Yêu thích",
                                 )
                             }
                             Column(
@@ -299,7 +312,7 @@ fun HomeScreen(
                                     }
                                 ) {
                                     Icon(
-                                        Icons.Outlined.Computer,
+                                        Icons.Outlined.Category,
                                         contentDescription = "Profile",
                                         tint = Color.Red
                                     )
@@ -550,5 +563,5 @@ fun BannerAuto() {
     }
 }
 
-//code dang lỗi
+//code dang lỗi yêu thích
 

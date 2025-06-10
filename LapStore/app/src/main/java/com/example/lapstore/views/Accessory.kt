@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.lapstore.CategoryMenuMain
 import com.example.lapstore.ui.ProductCard_Accessory
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -50,15 +51,13 @@ fun AccessoryScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val danhSachPhuKien = viewModel.danhSachSanPhamPhuKien.collectAsState()
+    val danhSachSanPhamPhuKienphim = viewModel.danhSachSanPhamPhuKienphim.collectAsState()
+
     val isLoading = viewModel.isLoading
     val errorMessage = viewModel.errorMessage
 
     val taiKhoanViewModel: TaiKhoanViewModel = viewModel()
     val taikhoan = taiKhoanViewModel.taikhoan
-
-    val danhSachSanPham = viewModel.danhSachAllSanPham
-    val danhSachSanPhamGaming = viewModel.danhSachSanPhamGaming.collectAsState()
-    val danhSachSanPhamVanPhong = viewModel.danhSachSanPhamVanPhong.collectAsState()
 
     LaunchedEffect(isFocused) {
         if (isFocused) {
@@ -76,10 +75,10 @@ fun AccessoryScreen(
         systemUiController.setStatusBarColor(color = Color.Red, darkIcons = false)
     }
     LaunchedEffect(Unit) {
-        viewModel.getSanPhamTheoLoaiPhuKien()
-        viewModel.getSanPhamTheoLoaiGaming()
-        viewModel.getSanPhamTheoLoaiVanPhong()
-        viewModel.getAllSanPham()
+        //viewModel.getSanPhamTheoLoaiPhuKien()
+        viewModel.getSanPhamTheoLoaiRAM()
+        viewModel.getSanPhamTheoLoaiPHIM()
+
     }
     ModalNavigationDrawer(
         modifier = Modifier.background(Color.White),
@@ -116,7 +115,36 @@ fun AccessoryScreen(
                         )
                     }
                 }
-                com.example.lapstore.CategoryMenuMain()
+                CategoryMenuMain(
+                    onItemClick = { category ->
+                        scope.launch {
+                            drawerState.close()
+                            when (category) {
+//                                "Laptop Văn Phòng" -> {
+//                                    if (tentaikhoan != null) {
+//                                        navController.navigate("${NavRoute.LAPTOP_VANPHONG.route}?tentaikhoan=${tentaikhoan}")
+//                                    } else {
+//                                        navController.navigate(NavRoute.LAPTOP_VANPHONG.route)
+//                                    }
+//                                }
+//                                "Laptop Gaming" -> {
+//                                    if (tentaikhoan != null) {
+//                                        navController.navigate("${NavRoute.LAPTOP_GAMING.route}?tentaikhoan=${tentaikhoan}")
+//                                    } else {
+//                                        navController.navigate(NavRoute.LAPTOP_GAMING.route)
+//                                    }
+//                                }
+                                "Phụ kiện" -> {
+                                    if (tentaikhoan != null) {
+                                        navController.navigate("${NavRoute.ACCESSORY.route}?tentaikhoan=${tentaikhoan}")
+                                    } else {
+                                        navController.navigate(NavRoute.ACCESSORY.route)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                )
                 Text("Thông tin", modifier = Modifier.padding(10.dp))
                 Row(
                     modifier = Modifier
@@ -263,55 +291,6 @@ fun AccessoryScreen(
                                 IconButton(
                                     modifier = Modifier.size(45.dp),
                                     onClick = {
-                                        keyboardController?.hide()
-                                        scope.launch {
-                                            drawerState.apply {
-                                                if (isClosed) open() else close()
-                                            }
-                                        }
-                                    }
-                                ) {
-                                    Icon(
-                                        Icons.Outlined.Menu,
-                                        contentDescription = "Profile",
-                                        tint = Color.Red
-                                    )
-                                }
-                                Text(
-                                    text = "Danh mục",
-                                )
-                            }
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.SpaceAround
-                            ) {
-                                IconButton(
-                                    modifier = Modifier.size(45.dp),
-                                    onClick = {
-                                        if (tentaikhoan != null) {
-                                            navController.navigate("${NavRoute.ACCESSORY.route}?tentaikhoan=${tentaikhoan}") {
-                                                popUpTo(0) { inclusive = true }
-                                            }
-                                        } else {
-                                            navController.navigate(NavRoute.ACCESSORY.route)
-                                        }
-                                    }
-                                ) {
-                                    Icon(
-                                        Icons.Outlined.SupportAgent,
-                                        contentDescription = "Profile",
-                                        tint = Color.Red
-                                    )
-                                }
-                                Text(text = "Phụ kiện")
-                            }
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.SpaceAround
-                            ) {
-                                IconButton(
-                                    modifier = Modifier.size(45.dp),
-                                    onClick = {
                                         if (tentaikhoan != null) {
                                             navController.navigate("${NavRoute.ACCOUNT.route}?tentaikhoan=${taiKhoanViewModel.tentaikhoan}")
                                         } else {
@@ -352,7 +331,7 @@ fun AccessoryScreen(
                     // phụ kiện
                     item {
                         Text(
-                            text = "Phụ kiện ",
+                            text = "Phụ kiện RAM và SSD",
                             modifier = Modifier.padding(10.dp),
                             fontWeight = FontWeight.Bold
                         )
@@ -371,54 +350,27 @@ fun AccessoryScreen(
                             }
                         }
                     }
-
-                    // LazyRow cho Laptop Văn Phòng
                     item {
-                        Row {
-                            Text(
-                                text = "Laptop Văn Phòng",
-                                modifier = Modifier.padding(10.dp),
-                                fontWeight = FontWeight.Bold,
-                            )
+                        Text(
+                            text = "Phụ kiện Bàn phím và Chuột",
+                            modifier = Modifier.padding(10.dp),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    item {
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(danhSachSanPhamPhuKienphim.value ?: emptyList()) { phimchuot ->
+                                if (taikhoan != null) {
+                                    ProductCard_Accessory(phimchuot, taikhoan.MaKhachHang?.toString(), tentaikhoan, navController)
+                                } else {
+                                    ProductCard_Accessory(phimchuot, null, null, navController)
+                                }
+                            }
                         }
                     }
-//                    item {
-//                        LazyRow(
-//                            contentPadding = PaddingValues(horizontal = 8.dp),
-//                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-//                        ) {
-//                            items(danhSachSanPhamVanPhong.value) { sanphamvp ->
-//                                if (taikhoan != null) {
-//                                    ProductCard(sanphamvp, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
-//                                } else {
-//                                    ProductCard(sanphamvp, null, tentaikhoan, navController)
-//                                }
-//                            }
-//                        }
-//                    }
-//                    // LazyRow cho Laptop Gaming
-//                    item {
-//                        Text(
-//                            text = "Laptop Gaming",
-//                            modifier = Modifier.padding(10.dp),
-//                            fontWeight = FontWeight.Bold
-//                        )
-//                    }
-//                    item {
-//                        LazyRow(
-//                            contentPadding = PaddingValues(horizontal = 8.dp),
-//                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-//                        ) {
-//                            items(danhSachSanPhamGaming.value) { sanphamgm ->
-//                                if (taikhoan != null) {
-//                                    ProductCard(sanphamgm, taikhoan.MaKhachHang.toString(), tentaikhoan, navController)
-//                                } else {
-//                                    ProductCard(sanphamgm, null, null, navController)
-//                                }
-//                            }
-//                        }
-//                    }
-
                 }
             }
         }

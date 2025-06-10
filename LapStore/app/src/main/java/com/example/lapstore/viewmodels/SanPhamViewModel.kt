@@ -60,6 +60,10 @@ class SanPhamViewModel : ViewModel() {
      private val _danhSachSanPhamPhuKien = MutableStateFlow<List<SanPham>>(emptyList())
     val danhSachSanPhamPhuKien: StateFlow<List<SanPham>> = _danhSachSanPhamPhuKien
 
+    // Lấy danh sách phụ kiện từ API (giả sử id loại phụ kiện là 4)
+    private val _danhSachSanPhamPhuKienphim = MutableStateFlow<List<SanPham>>(emptyList())
+    val danhSachSanPhamPhuKienphim: StateFlow<List<SanPham>> = _danhSachSanPhamPhuKienphim
+
 
 
     fun getAllSanPham() {
@@ -77,7 +81,21 @@ class SanPhamViewModel : ViewModel() {
         }
     }
 
-    fun getSanPhamTheoLoaiPhuKien() {
+//    fun getSanPhamTheoLoaiPhuKien() {
+//        viewModelScope.launch {
+//            try {
+//                val response = withContext(Dispatchers.IO) {
+//                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamTheoLoai(3)
+//                }
+//                Log.d("SanPhamViewModel", "PhuKien API trả về: ${response.sanpham}")
+//                _danhSachSanPhamPhuKien.value = response.sanpham ?: emptyList()
+//            } catch (e: Exception) {
+//                Log.e("SanPham Error", "Lỗi khi lấy sanpham: ${e.message}")
+//                _danhSachSanPhamPhuKien.value = emptyList()
+//            }
+//        }
+//    }
+    fun getSanPhamTheoLoaiRAM() {
         viewModelScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
@@ -88,6 +106,20 @@ class SanPhamViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("SanPham Error", "Lỗi khi lấy sanpham: ${e.message}")
                 _danhSachSanPhamPhuKien.value = emptyList()
+            }
+        }
+    }
+    fun getSanPhamTheoLoaiPHIM() {
+        viewModelScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamTheoLoai(4)
+                }
+                Log.d("SanPhamViewModel", "PhuKien API trả về: ${response.sanpham}")
+                _danhSachSanPhamPhuKienphim.value = response.sanpham ?: emptyList()
+            } catch (e: Exception) {
+                Log.e("SanPham Error", "Lỗi khi lấy sanpham: ${e.message}")
+                _danhSachSanPhamPhuKienphim.value = emptyList()
             }
         }
     }

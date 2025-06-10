@@ -19,9 +19,14 @@ data class UpdateResponse(
     val message: String
 )
 
+//data class ApiResponse(
+//    val message: String
+//)
 data class ApiResponse(
-    val message: String
+    val success: Boolean? = null,
+    val message: String? = null
 )
+
 
 
 data class DeleteRequest(

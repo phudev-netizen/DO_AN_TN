@@ -1,6 +1,7 @@
 // QuanLyBanLaptopRetrofitClient.kt
 package com.example.lapstore.api
 
+import BinhLuanApiService
 import ChiTietHoaDonBanAPIService
 import DiaChiAPIService
 import GioHangAPIService
@@ -15,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import com.example.lapstore.api.SanPhamYeuThichAPIService
 object Constants {
     //const val BASE_URL = "http://10.0.2.2/lap_store_api/api/"
-   const val BASE_URL = "http://192.168.3.50/lap_store_api/api/"
+   const val BASE_URL = "http://192.168.1.17/lap_store_api/api/"
 }
 
 object QuanLyBanLaptopRetrofitClient {
@@ -89,5 +90,12 @@ object QuanLyBanLaptopRetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
             .build()
             .create(SanPhamYeuThichAPIService::class.java)
+    }
+    val binhLuanAPIService: BinhLuanApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .build()
+            .create(BinhLuanApiService::class.java)
     }
 }

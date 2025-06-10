@@ -1,4 +1,5 @@
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -6,12 +7,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.lapstore.viewmodels.KhachHangViewModel
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
+import com.example.lapstore.viewmodels.YeuThichViewModel
 import com.example.lapstore.views.AcccountScreen
 import com.example.lapstore.views.AccessoryScreen
 import com.example.lapstore.views.AddDiaChiScreen
 import com.example.lapstore.views.AddressManagementScreen
 import com.example.lapstore.views.AdminScreen
 import com.example.lapstore.views.CartManagementSection
+import com.example.lapstore.views.FavoriteProductsScreen
 import com.example.lapstore.views.LoginScreen
 import com.example.lapstore.views.ProductDetail_AccessoryScreen
 import com.example.lapstore.views.ProductDetail_Screen
@@ -38,6 +41,7 @@ sealed class NavRoute(val route: String) {
     object ACCESSORY: NavRoute("accessory_screen")
     object PRODUCTDETAIL_ACCESSORY  : NavRoute("productdetail_accesory")
     object FAVORITE : NavRoute("favorite_screen")
+    object BINHLUAN : NavRoute("binhluan_screen")
 }
 
 
@@ -66,7 +70,7 @@ fun NavgationGraph(
             HomeScreen(navController,viewmodel, tentaikhoan)  // Hiển thị tên tài khoản khi đăng nhập
         }
 
-// Trang phụ kiện - chưa đăng nhập
+        // Trang phụ kiện - chưa đăng nhập
         composable(NavRoute.ACCESSORY.route) {
             AccessoryScreen(
                 navController = navController,
@@ -316,22 +320,24 @@ fun NavgationGraph(
                 khachHangViewModel
             )
         }
-        //yeu thích
-//        // Thêm vào NavHost trong NavgationGraph
-//        composable(
-//            route = NavRoute.FAVORITE.route + "?makhachhang={makhachhang}",
-//            arguments = listOf(navArgument("makhachhang") { type = NavType.IntType })
-//        ) { backStackEntry ->
-//            val makhachhang = backStackEntry.arguments?.getInt("makhachhang") ?: 0
-//            FavoriteScreen(
-//                customerId = makhachhang,
-//                navController = navController,
-//                sanPhamViewModel = viewmodel,
-//            )
-//        }
+//        //yeu thích
+        composable(
+            route = NavRoute.FAVORITE.route + "?tentaikhoan={tentaikhoan}",
+            arguments = listOf(
+                navArgument("tentaikhoan") { nullable = true; type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val yeuThichViewModel: YeuThichViewModel = viewModel()
+            val allProducts = viewmodel.danhSachAllSanPham
+            FavoriteProductsScreen(
+                navController = navController,
+                allProducts = allProducts,
+                yeuThichViewModel = yeuThichViewModel,
+                taiKhoanViewModel = taiKhoanViewModel
+            )
+        }
     }
 }
-
 
 
 

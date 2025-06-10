@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th6 03, 2025 lúc 06:57 PM
+-- Thời gian đã tạo: Th6 10, 2025 lúc 04:12 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.2.12
+-- Phiên bản PHP: 8.1.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `binhluandanhgia` (
   `MaBinhLuan` int(11) NOT NULL,
-  `MaKhachHang` int(11) NOT NULL,
+  `MaKhachHang` varchar(50) NOT NULL,
   `MaSanPham` int(11) NOT NULL,
   `MaHoaDonBan` int(11) NOT NULL,
   `SoSao` int(11) NOT NULL,
@@ -37,6 +37,14 @@ CREATE TABLE `binhluandanhgia` (
   `NgayDanhGia` datetime NOT NULL,
   `TrangThai` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `binhluandanhgia`
+--
+
+INSERT INTO `binhluandanhgia` (`MaBinhLuan`, `MaKhachHang`, `MaSanPham`, `MaHoaDonBan`, `SoSao`, `NoiDung`, `NgayDanhGia`, `TrangThai`) VALUES
+(1, '1', 2, 56, 3, 'hài lòng', '2025-06-10 14:10:10', 1),
+(2, '12', 1, 0, 5, 'hài lòng lắm ', '2025-06-10 00:00:00', 1);
 
 -- --------------------------------------------------------
 
@@ -82,7 +90,10 @@ INSERT INTO `chitiethoadonban` (`MaChiTietHoaDonBan`, `MaHoaDonBan`, `MaSanPham`
 (78, 56, 1, 10, 29990000, 0),
 (79, 57, 1, 3, 29990000, 0),
 (80, 58, 1, 4, 29990000, 0),
-(81, 59, 7, 1, 73990000, 0);
+(81, 59, 7, 1, 73990000, 0),
+(82, 60, 7, 1, 850000, 0),
+(83, 61, 5, 1, 13399000, 0),
+(84, 62, 1, 2, 29990000, 0);
 
 -- --------------------------------------------------------
 
@@ -128,6 +139,13 @@ CREATE TABLE `giohang` (
   `SoLuong` int(11) NOT NULL,
   `TrangThai` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `giohang`
+--
+
+INSERT INTO `giohang` (`MaGioHang`, `MaKhachHang`, `MaSanPham`, `SoLuong`, `TrangThai`) VALUES
+(233, 12, 4, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -183,7 +201,9 @@ INSERT INTO `hinhanh` (`MaHinhAnh`, `DuongDan`, `MacDinh`, `MaSanPham`) VALUES
 (40, 'https://i.postimg.cc/yxnts74t/sd128.jpg', 1, 10),
 (41, 'https://i.postimg.cc/vBzDF2XT/sd1282.jpg', 0, 10),
 (42, 'https://i.postimg.cc/9MJXNRFq/SD5-SG2-128-G-1052-E-lg.jpg', 0, 10),
-(46, 'https://i.postimg.cc/gj1Mx8vf/Lexar.png', 1, 11);
+(46, 'https://i.postimg.cc/gj1Mx8vf/Lexar.png', 1, 11),
+(47, 'https://i.postimg.cc/s2hWTjSB/ban-phim-co-khong-day-e-dra-ek368-L.jpg', 1, 12),
+(48, 'https://i.postimg.cc/prgnt3KG/ziyoulang.png', 0, 12);
 
 -- --------------------------------------------------------
 
@@ -209,7 +229,7 @@ INSERT INTO `hoadonban` (`MaHoaDonBan`, `MaKhachHang`, `NgayDatHang`, `MaDiaChi`
 (40, 11, '2025-01-17', 33, 39010000, 'Thanh toán khi nhận hàng', '4'),
 (41, 11, '2025-01-17', 33, 39010000, 'Thanh toán khi nhận hàng', '6'),
 (42, 11, '2025-01-17', 33, 47410000, 'Thanh toán khi nhận hàng', '6'),
-(43, 11, '2025-01-17', 33, 30020000, 'Thanh toán khi nhận hàng', '3'),
+(43, 11, '2025-01-17', 33, 30020000, 'Thanh toán khi nhận hàng', '4'),
 (44, 11, '2025-01-17', 33, 9020000, 'Thanh toán khi nhận hàng', '4'),
 (45, 1, '2025-05-09', 1, 30020000, 'Thanh toán khi nhận hàng', '6'),
 (46, 12, '2025-05-09', 34, 74020000, 'Thanh toán khi nhận hàng', '5'),
@@ -225,7 +245,10 @@ INSERT INTO `hoadonban` (`MaHoaDonBan`, `MaKhachHang`, `NgayDatHang`, `MaDiaChi`
 (56, 12, '2025-05-12', 34, 299930000, 'Chuyển khoản ngân hàng', '1'),
 (57, 12, '2025-05-14', 34, 90000000, 'Thanh toán khi nhận hàng', '5'),
 (58, 12, '2025-05-14', 34, 119990000, 'Chuyển khoản ngân hàng', '5'),
-(59, 12, '2025-05-25', 34, 74020000, 'Thanh toán khi nhận hàng', '1');
+(59, 12, '2025-05-25', 34, 74020000, 'Thanh toán khi nhận hàng', '1'),
+(60, 12, '2025-06-09', 34, 880000, 'Chuyển khoản ngân hàng', '1'),
+(61, 12, '2025-06-10', 34, 13429000, 'Thanh toán khi nhận hàng', '2'),
+(62, 12, '2025-06-10', 34, 60010000, 'Thanh toán khi nhận hàng', '1');
 
 -- --------------------------------------------------------
 
@@ -276,7 +299,8 @@ CREATE TABLE `loaisanpham` (
 INSERT INTO `loaisanpham` (`MaLoai`, `TenLoai`) VALUES
 (1, 'Laptop văn phòng'),
 (2, 'Laptop Gaming'),
-(3, 'Phụ kiện');
+(3, 'Phụ kiện RAM'),
+(4, 'Bàn phím');
 
 -- --------------------------------------------------------
 
@@ -335,7 +359,8 @@ INSERT INTO `sanpham` (`MaSanPham`, `TenSanPham`, `MaLoaiSanPham`, `CPU`, `RAM`,
 (8, 'RAM laptop Kingston CL42  DDR5  (KVR52S42BS8-16)', 3, 'AMD Ryzen 3', 'RAM:16GB', 'NVIDIA® GeForce RTX™', 'BUS :5200MHz', 'Kích thước 13.8cm', 2, 1249000, 15, 'Nâng cấp hiệu suất cho chiếc laptop của bạn với RAM Laptop DDR4 8GB Bus 3200MHz – giải pháp tối ưu giúp tăng tốc độ xử lý, cải thiện đa nhiệm và mang đến trải nghiệm mượt mà hơn trong công việc lẫn giải trí.', 1),
 (9, 'SSD KingSton ', 3, 'AMD Ryzen7', 'RAM:2TB', 'RTX 3060', 'BUS:3200MHz', 'Kích thước 8cm', 1, 1099000, 30, 'SSD laptop lưu trữ nhiều dữ liệu còn nhanh nữa chứ ', 1),
 (10, 'SSD SanDisk ', 3, 'AMD Ryzen 5', 'RAM:128GB', 'RTX 7090', 'BUS: 2800MHz', 'Kích thước 8cm', 1, 900000, 50, 'SSD Laptop 128GB – tăng tốc khởi động máy, truy xuất dữ liệu nhanh, nhỏ gọn, tiết kiệm điện, phù hợp nâng cấp cho laptop cũ.', 1),
-(11, 'RAM laptop Lexar LD4AS016G-B3200GSST  DDR4  (LD4AS016G-B3200GSST (L))', 3, 'AMD Ryzen 3', 'Ram:16GB', 'RTX 3060', 'BUS:3200MHz', 'Kích thước 8cm', 2, 1090000, 25, 'Ram Laptop Lexar DDR4 16G (1x 16Gb) 3200Mhz hiệu năng cao đã được chọn lọc và hoàn toàn đáng tin cậy. Ram Lexar 32GB dành cho laptop với độ trễ thấp, mang lại một tốc độ đáp ứng gần như tức thì cho mọi ứng dụng, tối ưu trải nghiệm của bạn với hiệu năng cải thiện đáng kể.\nLắp đặt dễ dàng, ít tiêu tốn điện năng \nRam Laptop Lexar DDR4 16G (1x 16Gb) 3200Mhz cho phép bạn lắp đặt ngay mà không thông qua trình cài đặt phức tạp, dễ dàng nâng cấp cấu hình của chiếc máy tính ngay lập tức để tận hưởng hiệu năng mong muốn. Quá trình kiểm tra nghiêm ngặt đảm bảo độ tin cậy cho Ram Lexar DDR4.', 1);
+(11, 'RAM laptop Lexar LD4AS016G-B3200GSST  DDR4  (LD4AS016G-B3200GSST (L))', 3, 'AMD Ryzen 3', 'Ram:16GB', 'RTX 3060', 'BUS:3200MHz', 'Kích thước 8cm', 2, 1090000, 25, 'Ram Laptop Lexar DDR4 16G (1x 16Gb) 3200Mhz hiệu năng cao đã được chọn lọc và hoàn toàn đáng tin cậy. Ram Lexar 32GB dành cho laptop với độ trễ thấp, mang lại một tốc độ đáp ứng gần như tức thì cho mọi ứng dụng, tối ưu trải nghiệm của bạn với hiệu năng cải thiện đáng kể.\nLắp đặt dễ dàng, ít tiêu tốn điện năng \nRam Laptop Lexar DDR4 16G (1x 16Gb) 3200Mhz cho phép bạn lắp đặt ngay mà không thông qua trình cài đặt phức tạp, dễ dàng nâng cấp cấu hình của chiếc máy tính ngay lập tức để tận hưởng hiệu năng mong muốn. Quá trình kiểm tra nghiêm ngặt đảm bảo độ tin cậy cho Ram Lexar DDR4.', 1),
+(12, 'Bàn phím', 4, 'AMD', '8GB', 'GTX 1080', '512GB', '25cm', 2, 1800000, 32, 'thích hợp mọi loại máy', 1);
 
 -- --------------------------------------------------------
 
@@ -349,6 +374,13 @@ CREATE TABLE `sanphamyeuthich` (
   `MaSanPham` int(11) NOT NULL,
   `NgayYeuThich` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `sanphamyeuthich`
+--
+
+INSERT INTO `sanphamyeuthich` (`ID`, `MaKhachHang`, `MaSanPham`, `NgayYeuThich`) VALUES
+(1, 1, 2, '2025-06-09 13:25:35');
 
 -- --------------------------------------------------------
 
@@ -477,13 +509,13 @@ ALTER TABLE `taikhoan`
 -- AUTO_INCREMENT cho bảng `binhluandanhgia`
 --
 ALTER TABLE `binhluandanhgia`
-  MODIFY `MaBinhLuan` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `MaBinhLuan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2147483648;
 
 --
 -- AUTO_INCREMENT cho bảng `chitiethoadonban`
 --
 ALTER TABLE `chitiethoadonban`
-  MODIFY `MaChiTietHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `MaChiTietHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT cho bảng `diachi`
@@ -495,19 +527,19 @@ ALTER TABLE `diachi`
 -- AUTO_INCREMENT cho bảng `giohang`
 --
 ALTER TABLE `giohang`
-  MODIFY `MaGioHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=230;
+  MODIFY `MaGioHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=234;
 
 --
 -- AUTO_INCREMENT cho bảng `hinhanh`
 --
 ALTER TABLE `hinhanh`
-  MODIFY `MaHinhAnh` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `MaHinhAnh` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT cho bảng `hoadonban`
 --
 ALTER TABLE `hoadonban`
-  MODIFY `MaHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `MaHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- AUTO_INCREMENT cho bảng `khachhang`
@@ -519,7 +551,7 @@ ALTER TABLE `khachhang`
 -- AUTO_INCREMENT cho bảng `loaisanpham`
 --
 ALTER TABLE `loaisanpham`
-  MODIFY `MaLoai` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `MaLoai` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT cho bảng `mausac`
@@ -531,13 +563,13 @@ ALTER TABLE `mausac`
 -- AUTO_INCREMENT cho bảng `sanpham`
 --
 ALTER TABLE `sanpham`
-  MODIFY `MaSanPham` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `MaSanPham` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT cho bảng `sanphamyeuthich`
 --
 ALTER TABLE `sanphamyeuthich`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Các ràng buộc cho các bảng đã đổ
