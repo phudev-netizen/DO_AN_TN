@@ -25,10 +25,17 @@ fun FavoriteProductsScreen(
 ) {
     val favoriteIds by yeuThichViewModel.favoriteIds.collectAsState()
     val taikhoan = taiKhoanViewModel.taikhoan
+    val errorMessage by yeuThichViewModel.errorMessage.collectAsState()
     val favoriteProducts = remember(favoriteIds, allProducts) {
         allProducts.filter { it.MaSanPham in favoriteIds }
     }
-    val errorMessage by yeuThichViewModel.errorMessage.collectAsState()
+
+    // Lấy danh sách yêu thích khi có MaKhachHang
+    LaunchedEffect(taikhoan?.MaKhachHang) {
+        taikhoan?.MaKhachHang?.let {
+            yeuThichViewModel.getFavoritesByKhachHang(it)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -68,7 +75,6 @@ fun FavoriteProductsScreen(
                         modifier = Modifier.padding(8.dp)
                     )
                 }
-
                 if (favoriteProducts.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),

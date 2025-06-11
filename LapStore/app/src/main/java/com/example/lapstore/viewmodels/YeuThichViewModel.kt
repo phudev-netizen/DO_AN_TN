@@ -2,6 +2,7 @@ package com.example.lapstore.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lapstore.api.KhachHangRequest
 import com.example.lapstore.api.QuanLyBanLaptopRetrofitClient
 import com.example.lapstore.models.YeuThich
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,9 @@ class YeuThichViewModel : ViewModel() {
     fun getFavoritesByKhachHang(maKhachHang: Int) {
         viewModelScope.launch {
             try {
-                val result = QuanLyBanLaptopRetrofitClient.SanPhamYeuThichAPIService.getFavoritesByKhachHang(maKhachHang)
+                val result = QuanLyBanLaptopRetrofitClient.SanPhamYeuThichAPIService.getFavoritesByKhachHang(
+                    KhachHangRequest(maKhachHang)
+                )
                 _favoriteIds.value = result.map { it.MaSanPham }
             } catch (e: Exception) {
                 _errorMessage.value = "Lỗi lấy danh sách yêu thích: ${e.message}"

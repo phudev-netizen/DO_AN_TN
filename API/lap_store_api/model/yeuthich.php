@@ -2,11 +2,12 @@
 // objects/SanPhamYeuThich.php
 class SanPhamYeuThich {
     private $conn;
-    private $table_name = "Sanphamyeuthich";
+    private $table_name = "sanphamyeuthich"; // Đúng theo tên bảng trong CSDL (không phân biệt hoa thường nếu dùng MySQL, nhưng nên đồng nhất)
 
-    public $id;
+    public $ID;
     public $MaSanPham;
     public $MaKhachHang;
+    public $NgayYeuThich;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -14,7 +15,7 @@ class SanPhamYeuThich {
 
     // Kiểm tra sản phẩm đã được yêu thích chưa
     public function check($MaSanPham, $MaKhachHang) {
-        $query = "SELECT id FROM " . $this->table_name . " WHERE MaSanPham = ? AND MaKhachHang = ?";
+        $query = "SELECT ID FROM " . $this->table_name . " WHERE MaSanPham = ? AND MaKhachHang = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $MaSanPham, PDO::PARAM_INT);
         $stmt->bindParam(2, $MaKhachHang, PDO::PARAM_INT);
@@ -32,8 +33,8 @@ class SanPhamYeuThich {
         $query = "INSERT INTO " . $this->table_name . " (MaSanPham, MaKhachHang) VALUES (:MaSanPham, :MaKhachHang)";
         $stmt = $this->conn->prepare($query);
 
-        $this->MaSanPham = htmlspecialchars(strip_tags($this->MaSanPham));
-        $this->MaKhachHang = htmlspecialchars(strip_tags($this->MaKhachHang));
+        $this->MaSanPham = (int) $this->MaSanPham;
+        $this->MaKhachHang = (int) $this->MaKhachHang;
 
         $stmt->bindParam(":MaSanPham", $this->MaSanPham, PDO::PARAM_INT);
         $stmt->bindParam(":MaKhachHang", $this->MaKhachHang, PDO::PARAM_INT);
@@ -49,8 +50,8 @@ class SanPhamYeuThich {
         $query = "DELETE FROM " . $this->table_name . " WHERE MaSanPham = :MaSanPham AND MaKhachHang = :MaKhachHang";
         $stmt = $this->conn->prepare($query);
 
-        $this->MaSanPham = htmlspecialchars(strip_tags($this->MaSanPham));
-        $this->MaKhachHang = htmlspecialchars(strip_tags($this->MaKhachHang));
+        $this->MaSanPham = (int) $this->MaSanPham;
+        $this->MaKhachHang = (int) $this->MaKhachHang;
 
         $stmt->bindParam(":MaSanPham", $this->MaSanPham, PDO::PARAM_INT);
         $stmt->bindParam(":MaKhachHang", $this->MaKhachHang, PDO::PARAM_INT);
@@ -63,7 +64,7 @@ class SanPhamYeuThich {
 
     // Lấy danh sách sản phẩm yêu thích của khách hàng
     public function readByKhachHang($MaKhachHang) {
-        $query = "SELECT * FROM " . $this->table_name . " WHERE MaKhachHang = ? ORDER BY id DESC";
+        $query = "SELECT ID, MaKhachHang, MaSanPham, NgayYeuThich FROM " . $this->table_name . " WHERE MaKhachHang = ? ORDER BY ID DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $MaKhachHang, PDO::PARAM_INT);
         $stmt->execute();

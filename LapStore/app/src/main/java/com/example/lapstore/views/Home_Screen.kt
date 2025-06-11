@@ -1,6 +1,4 @@
 import com.example.lapstore.views.ProductCard
-
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -65,19 +63,25 @@ fun HomeScreen(
 
     LaunchedEffect(isFocused) {
         if (isFocused) {
-            if (taikhoan != null)
-                navController.navigate("${NavRoute.SEARCHSCREEN.route}?makhachhang=${taikhoan.MaKhachHang}&tentaikhoan=${taikhoan.TenTaiKhoan}")
-            else
-                navController.navigate(NavRoute.SEARCHSCREEN.route)
+            if (taikhoan?.MaKhachHang != null && taikhoan.TenTaiKhoan != null) {
+            navController.navigate("${NavRoute.SEARCHSCREEN.route}?makhachhang=${taikhoan.MaKhachHang}&tentaikhoan=${taikhoan.TenTaiKhoan}")
+        } else {
+            navController.navigate(NavRoute.SEARCHSCREEN.route)
+            }
+            //            if (taikhoan != null)
+//                navController.navigate("${NavRoute.SEARCHSCREEN.route}?makhachhang=${taikhoan.MaKhachHang}&tentaikhoan=${taikhoan.TenTaiKhoan}")
+//            else
+//                navController.navigate(NavRoute.SEARCHSCREEN.route)
         }
     }
 
-    if (tentaikhoan != null) {
+    if (!tentaikhoan.isNullOrEmpty()) {
         taiKhoanViewModel.getTaiKhoanByTentaikhoan(tentaikhoan)
     }
     SideEffect {
         systemUiController.setStatusBarColor(color = Color.Red, darkIcons = false)
     }
+    // Lấy danh sách sản phẩm yêu thích khi có MaKhachHang
     LaunchedEffect(Unit) {
         viewModel.getSanPhamTheoLoaiGaming()
         viewModel.getSanPhamTheoLoaiVanPhong()

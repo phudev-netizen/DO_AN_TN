@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL); // Bật lỗi khi debug
-ini_set('display_errors', 0);
 // Cấu hình header
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json; charset=utf-8');

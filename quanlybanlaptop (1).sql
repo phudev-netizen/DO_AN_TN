@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th6 10, 2025 lúc 04:12 PM
+-- Thời gian đã tạo: Th6 11, 2025 lúc 08:36 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.1.25
 
@@ -43,8 +43,16 @@ CREATE TABLE `binhluandanhgia` (
 --
 
 INSERT INTO `binhluandanhgia` (`MaBinhLuan`, `MaKhachHang`, `MaSanPham`, `MaHoaDonBan`, `SoSao`, `NoiDung`, `NgayDanhGia`, `TrangThai`) VALUES
-(1, '1', 2, 56, 3, 'hài lòng', '2025-06-10 14:10:10', 1),
-(2, '12', 1, 0, 5, 'hài lòng lắm ', '2025-06-10 00:00:00', 1);
+(1, '12', 3, 3, 5, 'hài lòng', '2025-06-11 11:33:05', 1),
+(3, '12', 1, 0, 5, 'hài lòng ', '2025-06-11 00:00:00', 1),
+(4, '12', 1, 0, 3, 'tạm ổn', '2025-06-11 00:00:00', 1),
+(5, '12', 5, 0, 5, 'ổn nhe 10đ', '2025-06-11 00:00:00', 1),
+(6, '5', 1, 0, 1, 'quá tệ ', '2025-06-11 00:00:00', 1),
+(7, '12', 2, 0, 4, 'ok', '2025-06-11 00:00:00', 1),
+(8, '12', 6, 0, 5, 'ok', '2025-06-11 00:00:00', 1),
+(9, '12', 1, 0, 3, 'kê', '2025-06-11 00:00:00', 1),
+(10, '12', 1, 0, 3, 'oki', '2025-06-11 11:58:05', 1),
+(11, '', 0, 0, 0, '', '0000-00-00 00:00:00', 0);
 
 -- --------------------------------------------------------
 
@@ -360,7 +368,8 @@ INSERT INTO `sanpham` (`MaSanPham`, `TenSanPham`, `MaLoaiSanPham`, `CPU`, `RAM`,
 (9, 'SSD KingSton ', 3, 'AMD Ryzen7', 'RAM:2TB', 'RTX 3060', 'BUS:3200MHz', 'Kích thước 8cm', 1, 1099000, 30, 'SSD laptop lưu trữ nhiều dữ liệu còn nhanh nữa chứ ', 1),
 (10, 'SSD SanDisk ', 3, 'AMD Ryzen 5', 'RAM:128GB', 'RTX 7090', 'BUS: 2800MHz', 'Kích thước 8cm', 1, 900000, 50, 'SSD Laptop 128GB – tăng tốc khởi động máy, truy xuất dữ liệu nhanh, nhỏ gọn, tiết kiệm điện, phù hợp nâng cấp cho laptop cũ.', 1),
 (11, 'RAM laptop Lexar LD4AS016G-B3200GSST  DDR4  (LD4AS016G-B3200GSST (L))', 3, 'AMD Ryzen 3', 'Ram:16GB', 'RTX 3060', 'BUS:3200MHz', 'Kích thước 8cm', 2, 1090000, 25, 'Ram Laptop Lexar DDR4 16G (1x 16Gb) 3200Mhz hiệu năng cao đã được chọn lọc và hoàn toàn đáng tin cậy. Ram Lexar 32GB dành cho laptop với độ trễ thấp, mang lại một tốc độ đáp ứng gần như tức thì cho mọi ứng dụng, tối ưu trải nghiệm của bạn với hiệu năng cải thiện đáng kể.\nLắp đặt dễ dàng, ít tiêu tốn điện năng \nRam Laptop Lexar DDR4 16G (1x 16Gb) 3200Mhz cho phép bạn lắp đặt ngay mà không thông qua trình cài đặt phức tạp, dễ dàng nâng cấp cấu hình của chiếc máy tính ngay lập tức để tận hưởng hiệu năng mong muốn. Quá trình kiểm tra nghiêm ngặt đảm bảo độ tin cậy cho Ram Lexar DDR4.', 1),
-(12, 'Bàn phím', 4, 'AMD', '8GB', 'GTX 1080', '512GB', '25cm', 2, 1800000, 32, 'thích hợp mọi loại máy', 1);
+(12, 'Bàn phím', 4, 'AMD', '8GB', 'GTX 1080', '512GB', '25cm', 2, 1800000, 32, 'thích hợp mọi loại máy', 1),
+(14, '', 0, '', '', '', '', '', 0, 0, 0, '', 0);
 
 -- --------------------------------------------------------
 
@@ -380,7 +389,7 @@ CREATE TABLE `sanphamyeuthich` (
 --
 
 INSERT INTO `sanphamyeuthich` (`ID`, `MaKhachHang`, `MaSanPham`, `NgayYeuThich`) VALUES
-(1, 1, 2, '2025-06-09 13:25:35');
+(1, 12, 1, '2025-06-11 13:14:57');
 
 -- --------------------------------------------------------
 
@@ -417,10 +426,7 @@ INSERT INTO `taikhoan` (`TenTaiKhoan`, `MaKhachHang`, `MatKhau`, `LoaiTaiKhoan`,
 -- Chỉ mục cho bảng `binhluandanhgia`
 --
 ALTER TABLE `binhluandanhgia`
-  ADD PRIMARY KEY (`MaBinhLuan`),
-  ADD KEY `FK_BinhLuanDanhGia_KhachHang` (`MaKhachHang`),
-  ADD KEY `FK_BinhLuanDanhGia_SanPham` (`MaSanPham`),
-  ADD KEY `FK_BinhLuanDanhGia_HoaDonBan` (`MaHoaDonBan`);
+  ADD PRIMARY KEY (`MaBinhLuan`);
 
 --
 -- Chỉ mục cho bảng `chitiethoadonban`
@@ -492,7 +498,8 @@ ALTER TABLE `sanpham`
 --
 ALTER TABLE `sanphamyeuthich`
   ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `MaKhachHang` (`MaKhachHang`,`MaSanPham`);
+  ADD UNIQUE KEY `unique_yeuthich` (`MaKhachHang`,`MaSanPham`),
+  ADD KEY `MaSanPham` (`MaSanPham`);
 
 --
 -- Chỉ mục cho bảng `taikhoan`
@@ -509,7 +516,7 @@ ALTER TABLE `taikhoan`
 -- AUTO_INCREMENT cho bảng `binhluandanhgia`
 --
 ALTER TABLE `binhluandanhgia`
-  MODIFY `MaBinhLuan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2147483648;
+  MODIFY `MaBinhLuan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT cho bảng `chitiethoadonban`
@@ -563,13 +570,13 @@ ALTER TABLE `mausac`
 -- AUTO_INCREMENT cho bảng `sanpham`
 --
 ALTER TABLE `sanpham`
-  MODIFY `MaSanPham` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `MaSanPham` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT cho bảng `sanphamyeuthich`
 --
 ALTER TABLE `sanphamyeuthich`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Các ràng buộc cho các bảng đã đổ
@@ -580,6 +587,13 @@ ALTER TABLE `sanphamyeuthich`
 --
 ALTER TABLE `diachi`
   ADD CONSTRAINT `fk_diachi_khachhang` FOREIGN KEY (`MaKhachHang`) REFERENCES `khachhang` (`MaKhachHang`);
+
+--
+-- Các ràng buộc cho bảng `sanphamyeuthich`
+--
+ALTER TABLE `sanphamyeuthich`
+  ADD CONSTRAINT `sanphamyeuthich_ibfk_1` FOREIGN KEY (`MaKhachHang`) REFERENCES `khachhang` (`MaKhachHang`) ON DELETE CASCADE,
+  ADD CONSTRAINT `sanphamyeuthich_ibfk_2` FOREIGN KEY (`MaSanPham`) REFERENCES `sanpham` (`MaSanPham`) ON DELETE CASCADE;
 
 --
 -- Các ràng buộc cho bảng `taikhoan`

@@ -611,6 +611,8 @@ import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -644,7 +646,6 @@ fun ProductDetail_Screen(
     var snackbarHostState = remember {
         SnackbarHostState()
     }
-
 
     var scope = rememberCoroutineScope()
 
@@ -1087,6 +1088,9 @@ fun ProductCommentSection(
     val binhLuanList by viewModel.list.observeAsState(initial = emptyList())
     val message by viewModel.message.observeAsState(initial = "")
 
+    // Định dạng ngày giờ hiện tại
+    val currentDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+
     var noiDung by remember { mutableStateOf("") }
     var soSao by remember { mutableStateOf(5) }
 
@@ -1145,11 +1149,24 @@ fun ProductCommentSection(
                         Spacer(Modifier.height(4.dp))
                         Text(text = binhLuan.NoiDung, style = MaterialTheme.typography.bodyMedium)
                         Spacer(Modifier.height(6.dp))
+                        // Định dạng ngày tháng
+                        val ngayGioFormatted = try {
+                            val dateTime = LocalDateTime.parse(binhLuan.NgayDanhGia)
+                            dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+                        } catch (e: Exception) {
+                            binhLuan.NgayDanhGia // fallback nếu sai format
+                        }
+
                         Text(
-                            "Ngày: ${binhLuan.NgayDanhGia}",
+                            "Ngày: $ngayGioFormatted",
                             style = MaterialTheme.typography.labelSmall,
                             color = Color.Gray
                         )
+//                        Text(
+//                            "Ngày: ${binhLuan.NgayDanhGia}",
+//                            style = MaterialTheme.typography.labelSmall,
+//                            color = Color.Gray
+//                        )
                     }
                 }
             }
@@ -1171,7 +1188,6 @@ fun ProductCommentSection(
                 maxLines = 4,
                 shape = RoundedCornerShape(12.dp)
             )
-
             // Chọn số sao
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -1201,11 +1217,9 @@ fun ProductCommentSection(
                         MaHoaDonBan = null,     // Nếu không cần, để null
                         SoSao = soSao,
                         NoiDung = noiDung,
-                        NgayDanhGia = LocalDate.now().toString(),
+                        NgayDanhGia = LocalDateTime.now().toString(),
                         TrangThai = "1"
                     )
-                    //Log.d("DEBUG", Gson().toJson(newBinhLuan))
-                    Log.d("DEBUG", newBinhLuan.toString())
                     viewModel.add(newBinhLuan)
                     noiDung = ""
                     soSao = 5
@@ -1237,5 +1251,3 @@ fun ProductCommentSection(
         }
     }
 }
-
-

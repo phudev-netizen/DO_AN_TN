@@ -5,13 +5,34 @@ header("Content-Type: application/json; charset=UTF-8");
 include_once '../../config/database.php';
 include_once '../../model/yeuthich.php';
 
- $database = new database();
-    $conn = $database->Connect(); 
+$database = new database();
+$conn = $database->Connect();
 
-$yeuthich = new SanPhamYeuThich($db);
+$yeuthich = new SanPhamYeuThich($conn);
 
-$MaKhachHang = isset($_GET['MaKhachHang']) ? $_GET['MaKhachHang'] : die(json_encode(["message" => "Thiếu MaKhachHang"]));
+// Nhận dữ liệu từ JSON hoặc POST truyền thống
+$data = json_decode(file_get_contents("php://input"), true);
+$MaKhachHang = isset($data['MaKhachHang']) ? intval($data['MaKhachHang']) : (isset($_POST['MaKhachHang']) ? intval($_POST['MaKhachHang']) : null);
 
-$favorites_arr = $yeuthich->readByKhachHang($MaKhachHang);
-echo json_encode($favorites_arr);
+if ($MaKhachHang) {
+    // Lấy danh sách sản phẩm yêu thích theo khách hàng từ model, trả về đầy đủ thông tin từ bảng sanpham
+    $sql = "SELECT sp.*
+            FROM sanphamyeuthich syt
+            JOIN sanpham sp ON syt.MaSanPham = sp.MaSanPham
+            WHERE syt.MaKhachHang = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $MaKhachHang);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $list = array();
+    while ($row = $result->fetch_assoc()) {
+        $list[] = $row;
+    }
+
+    echo json_encode($list);
+    $stmt->close();
+} else {
+    echo json_encode(["success" => false, "message" => "Thiếu MaKhachHang."]);
+}
 ?>

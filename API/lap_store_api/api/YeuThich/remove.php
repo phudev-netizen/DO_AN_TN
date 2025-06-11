@@ -1,13 +1,9 @@
 <?php
-// header("Access-Control-Allow-Origin: *");
-// header("Content-Type: application/json; charset=UTF-8");
-// header("Access-Control-Allow-Methods: DELETE, POST, OPTIONS");
-// header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
-  header('Access-Control-Allow-Origin:*');
-    header('Content-Type: application/json');
-    header('Access-Control-Allow-Methods: POST');
-    header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type,Access-Control-Allow-Methods,Authorization,X-Requested-With');
-    
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With');
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -16,25 +12,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 include_once '../../config/database.php';
 include_once '../../model/yeuthich.php';
 
- $database = new database();
-    $conn = $database->Connect(); 
+$database = new database();
+$conn = $database->Connect();
 
-$yeuthich = new SanPhamYeuThich($db);
-$data = json_decode(file_get_contents("php://input"));
+$yeuthich = new SanPhamYeuThich($conn);
 
-if (!empty($data->MaKhachHang) && !empty($data->MaSanPham)) {
-    $yeuthich->MaKhachHang = $data->MaKhachHang;
-    $yeuthich->MaSanPham = $data->MaSanPham;
+// Nhận dữ liệu từ JSON hoặc POST (hỗ trợ fetch/axios và form)
+$data = json_decode(file_get_contents("php://input"), true);
 
+$MaKhachHang = isset($data['MaKhachHang']) ? intval($data['MaKhachHang']) : (isset($_POST['MaKhachHang']) ? intval($_POST['MaKhachHang']) : null);
+$MaSanPham = isset($data['MaSanPham']) ? intval($data['MaSanPham']) : (isset($_POST['MaSanPham']) ? intval($_POST['MaSanPham']) : null);
+
+if ($MaKhachHang && $MaSanPham) {
+    $yeuthich->MaKhachHang = $MaKhachHang;
+    $yeuthich->MaSanPham = $MaSanPham;
     $result = $yeuthich->delete();
-    if ($result["success"]) {
-        http_response_code(200);
-    } else {
-        http_response_code(503);
-    }
-    echo json_encode(["message" => $result["message"]]);
+    echo json_encode($result);
 } else {
-    http_response_code(400);
-    echo json_encode(["message" => "Thiếu thông tin cần thiết."]);
+    echo json_encode([
+        "success" => false,
+        "message" => "Thiếu dữ liệu MaKhachHang hoặc MaSanPham."
+    ]);
 }
 ?>
