@@ -10,16 +10,15 @@ $conn = $database->Connect();
 
 $yeuthich = new SanPhamYeuThich($conn);
 
-// Nhận dữ liệu từ JSON hoặc POST truyền thống
 $data = json_decode(file_get_contents("php://input"), true);
 $MaKhachHang = isset($data['MaKhachHang']) ? intval($data['MaKhachHang']) : (isset($_POST['MaKhachHang']) ? intval($_POST['MaKhachHang']) : null);
 
 if ($MaKhachHang) {
-    // Lấy danh sách sản phẩm yêu thích theo khách hàng từ model, trả về đầy đủ thông tin từ bảng sanpham
-    $sql = "SELECT sp.*
-            FROM sanphamyeuthich syt
-            JOIN sanpham sp ON syt.MaSanPham = sp.MaSanPham
-            WHERE syt.MaKhachHang = ?";
+    // Sửa lại SELECT cho đúng model YeuThich
+    $sql = "SELECT ID, MaSanPham, MaKhachHang, NgayYeuThich
+            FROM sanphamyeuthich
+            WHERE MaKhachHang = ?
+            ORDER BY ID DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $MaKhachHang);
     $stmt->execute();

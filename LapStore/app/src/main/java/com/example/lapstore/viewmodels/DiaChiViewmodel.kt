@@ -9,8 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lapstore.api.QuanLyBanLaptopRetrofitClient
 import com.example.lapstore.models.DiaChi
-import com.example.lapstore.models.GioHang
-import com.example.lapstore.models.SanPham
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,9 +16,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class DiaChiViewmodel:ViewModel() {
+class DiaChiViewmodel: ViewModel() {
 
     var listDiacHi by mutableStateOf<List<DiaChi>>(emptyList())
+
 
     var diachi by mutableStateOf<DiaChi?>(null)
         private set
@@ -58,7 +57,7 @@ class DiaChiViewmodel:ViewModel() {
                 val response = withContext(Dispatchers.IO) {
                     QuanLyBanLaptopRetrofitClient.diaChiAPIService.getDiaChiByMaKhachHang(MaKhachHang)
                 }
-                listDiacHi = response.diachi ?: emptyList() // Gán giá trị mảng rỗng nếu response.diachi null
+                listDiacHi = response.diachi ?: emptyList()
             } catch (e: Exception) {
                 Log.e("Dia Chi Error", "Lỗi khi lấy dia chi: ${e.message}")
                 listDiacHi = emptyList()
@@ -69,7 +68,7 @@ class DiaChiViewmodel:ViewModel() {
     fun getDiaChiMacDinh(maKhachHang: Int?, macDinh: Int?) {
         if (maKhachHang == null || macDinh == null) {
             Log.e("DiaChiViewModel", "Tham số MaKhachHang hoặc MacDinh bị null")
-            return // Ngừng xử lý nếu tham số null
+            return
         }
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -85,10 +84,24 @@ class DiaChiViewmodel:ViewModel() {
         }
     }
 
-    fun addDiaChi(diachi:DiaChi) {
+    // HÀM THÊM MỚI
+    fun getDiaChiById(maDiaChi: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = QuanLyBanLaptopRetrofitClient.diaChiAPIService.getDiaChiByMaDiaChi(maDiaChi)
+                // Gán về thuộc tính diachi (giống như các hàm khác)
+                diachi = result
+                Log.d("DiaChiViewModel", "Lấy địa chỉ theo ID thành công: $diachi")
+            } catch (e: Exception) {
+                Log.e("DiaChiViewModel", "Lỗi khi lấy địa chỉ theo ID", e)
+            }
+        }
+    }
+    // HẾT HÀM MỚI
+
+    fun addDiaChi(diachi: DiaChi) {
         viewModelScope.launch {
             try {
-                // Gọi API để thêm sản phẩm vào giỏ hàng trên server
                 val response = QuanLyBanLaptopRetrofitClient.diaChiAPIService.addDiaChi(diachi)
                 diachiAddResult = if (response.success) {
                     "Cập nhật thành công: ${response.message}"
@@ -145,7 +158,6 @@ class DiaChiViewmodel:ViewModel() {
                 if (response.isSuccessful) {
                     val apiResponse = response.body()
                     if (apiResponse?.message == "Dia chi Deleted") {
-                        // Cập nhật lại giỏ hàng trong ViewModel
                         listDiacHi = listDiacHi.filter { it.MaDiaChi != madiachi }
                         Log.d("DiaChiViewModel", "Dia chi đã được xóa")
                     } else {

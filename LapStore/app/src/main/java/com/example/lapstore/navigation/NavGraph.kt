@@ -1,3 +1,4 @@
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -37,11 +38,11 @@ sealed class NavRoute(val route: String) {
     object HOADONDETAILSCREEN : NavRoute("hoadondetail_screen")
     object ADMINSCREEN : NavRoute("admin_screen")
     object REGISTERSCREEN: NavRoute("register_screen")
-    object ADDRESS_SELECTION: NavRoute("address_selection")
     object ACCESSORY: NavRoute("accessory_screen")
     object PRODUCTDETAIL_ACCESSORY  : NavRoute("productdetail_accesory")
     object FAVORITE : NavRoute("favorite_screen")
-    object BINHLUAN : NavRoute("binhluan_screen")
+    object ADDRESS_SELECTION: NavRoute("address_selection_screen")
+    object THONGKE : NavRoute("thongke_screen")
 }
 
 
@@ -56,7 +57,10 @@ fun NavgationGraph(
     NavHost(navController = navController, startDestination = NavRoute.HOME.route) {
         // HomeScreen không có tham số (Chưa đăng nhập)
         composable(NavRoute.HOME.route) {
-            HomeScreen(navController,viewmodel, null)  // Không có thông tin tài khoản
+            HomeScreen(
+                navController, viewmodel, null,
+                role = null.toString()
+            )  // Không có thông tin tài khoản
         }
 
         // HomeScreen đã đăng nhập (có tham số tentaikhoan)
@@ -67,7 +71,10 @@ fun NavgationGraph(
             )
         ) {
             val tentaikhoan = it.arguments?.getString("tentaikhoan")
-            HomeScreen(navController,viewmodel, tentaikhoan)  // Hiển thị tên tài khoản khi đăng nhập
+            HomeScreen(
+                navController, viewmodel, tentaikhoan,
+                role = taiKhoanViewModel.getRole(tentaikhoan ?: "") ?: "user"
+            )  // Hiển thị tên tài khoản khi đăng nhập
         }
 
         // Trang phụ kiện - chưa đăng nhập
@@ -213,13 +220,13 @@ fun NavgationGraph(
         }
 
 
-        //màn hình thanh toán
+//       //// màn hình thanh toán
         composable(
-            route = NavRoute.PAYSCREEN.route + "?selectedProducts={selectedProducts}&tongtien={tongtien}&tentaikhoan={tentaikhoan}",
+            route = NavRoute.PAYSCREEN.route + "?selectedProducts={selectedProducts}&tongtien={tongtien}&tentaikhoan={tentaikhoan}&makhachhang={makhachhang}&hinhanh={hinhanh}",
             arguments = listOf(
                 navArgument("selectedProducts") { type = NavType.StringType },
                 navArgument("tongtien") { nullable = true },
-                navArgument("tentaikhoan") { type = NavType.StringType }
+                navArgument("tentaikhoan") { type = NavType.StringType },
             )
         ) { backStackEntry ->
             // Lấy chuỗi selectedProducts từ tham số điều hướng
@@ -232,10 +239,21 @@ fun NavgationGraph(
             val tongtien = backStackEntry.arguments?.getString("tongtien")?.toIntOrNull() ?: 0
             val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan") ?: ""
 
+            val tensanpham = backStackEntry.arguments?.getString("tensanpham")?.let { Uri.decode(it) } ?: ""
+            val hinhanh = backStackEntry.arguments?.getString("hinhanh")?.let { Uri.decode(it) } ?: ""
+
             // Chuyển sang màn hình PayScreen với các tham số cần thiết
-            PayScreen(navController = navController, selectedProducts = selectedProducts, tongtien = tongtien,tentaikhoan)
+            PayScreen(
+                navController = navController,
+                selectedProducts = selectedProducts,
+                tongtien = tongtien,
+                tentaikhoan,
+                tensanpham = tensanpham,
+                hinhanh = hinhanh,
+            )
         }
 
+//màn hình thanh tóan thành công
         composable(
             route = "${NavRoute.PAYSUCCESS.route}?tentaikhoan={tentaikhoan}",
             arguments = listOf(navArgument("tentaikhoan") { type = NavType.StringType })
@@ -252,7 +270,7 @@ fun NavgationGraph(
             CartManagementSection(navController,makhachhang)
         }
 
-
+// màn hình địa chỉ
         composable(
             route = "${NavRoute.DIACHISCREEN.route}?makhachhang={makhachhang}",
             arguments = listOf(navArgument("makhachhang") { type = NavType.IntType })
@@ -280,7 +298,14 @@ fun NavgationGraph(
             val madiachi = backStackEntry.arguments?.getInt("madiachi") ?: 0
             UpdateDiaChiScreen(navController,makhachhang,madiachi)
         }
-
+        composable(
+            route = NavRoute.ADDRESS_SELECTION.route + "?makhachhang={makhachhang}",
+            arguments = listOf(navArgument("makhachhang") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val makhachhang = backStackEntry.arguments?.getInt("makhachhang") ?: 0
+            AddressSelectionScreen(navController, makhachhang)
+        }
+//màn hình tìm kiếm
         composable(
             route = NavRoute.SEARCHSCREEN.route + "?makhachhang={makhachhang}&tentaikhoan={tentaikhoan}",
             arguments = listOf(
@@ -296,7 +321,7 @@ fun NavgationGraph(
         composable(NavRoute.SEARCHSCREEN.route) {
             SearchScreen(navController,null,null)
         }
-
+//hoa don
         composable(
             route = "${NavRoute.HOADONDETAILSCREEN.route}?madonhang={madonhang}&tongtien={tongtien}",
             arguments = listOf(
@@ -335,6 +360,21 @@ fun NavgationGraph(
                 yeuThichViewModel = yeuThichViewModel,
                 taiKhoanViewModel = taiKhoanViewModel
             )
+        }
+        //thong ke
+        composable(
+            route = "${NavRoute.THONGKE.route}?tentaikhoan={tentaikhoan}",
+            arguments = listOf(
+                navArgument("tentaikhoan") {
+                    nullable = true
+                    defaultValue = null
+                    type = NavType.StringType
+                }
+            )
+        ) {
+            val tentaikhoan = it.arguments?.getString("tentaikhoan")
+            val thongKeViewModel: ThongKeViewModel = viewModel()
+            ThongKeScreen(viewModel = thongKeViewModel, tentaikhoan = tentaikhoan)
         }
     }
 }

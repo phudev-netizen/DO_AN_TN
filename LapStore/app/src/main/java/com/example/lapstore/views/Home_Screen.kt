@@ -1,3 +1,4 @@
+import android.widget.Toast
 import com.example.lapstore.views.ProductCard
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -41,6 +43,7 @@ fun HomeScreen(
     navController: NavHostController,
     viewModel: SanPhamViewModel,
     tentaikhoan: String?,
+    role: String
 ) {
     var isFocused by remember { mutableStateOf(false) }
     val systemUiController = rememberSystemUiController()
@@ -56,6 +59,7 @@ fun HomeScreen(
 
     val taiKhoanViewModel: TaiKhoanViewModel = viewModel()
     val taikhoan = taiKhoanViewModel.taikhoan
+
     //them vo nay
     val yeuThichViewModel: YeuThichViewModel = viewModel()
     // Lấy danh sách sản phẩm yêu thích
@@ -68,16 +72,19 @@ fun HomeScreen(
         } else {
             navController.navigate(NavRoute.SEARCHSCREEN.route)
             }
-            //            if (taikhoan != null)
-//                navController.navigate("${NavRoute.SEARCHSCREEN.route}?makhachhang=${taikhoan.MaKhachHang}&tentaikhoan=${taikhoan.TenTaiKhoan}")
-//            else
-//                navController.navigate(NavRoute.SEARCHSCREEN.route)
         }
     }
-
-    if (!tentaikhoan.isNullOrEmpty()) {
-        taiKhoanViewModel.getTaiKhoanByTentaikhoan(tentaikhoan)
+//    LaunchedEffect(taikhoan?.MaKhachHang) {
+//        taikhoan?.MaKhachHang?.let {
+//            yeuThichViewModel.loadFavorites(it)
+//        }
+//    }
+    LaunchedEffect(tentaikhoan) {
+        if (!tentaikhoan.isNullOrEmpty()) {
+            taiKhoanViewModel.getTaiKhoanByTentaikhoan(tentaikhoan)
+        }
     }
+    // Thiết lập màu sắc của thanh trạng thái
     SideEffect {
         systemUiController.setStatusBarColor(color = Color.Red, darkIcons = false)
     }
@@ -87,6 +94,7 @@ fun HomeScreen(
         viewModel.getSanPhamTheoLoaiVanPhong()
         viewModel.getAllSanPham()
     }
+
     ModalNavigationDrawer(
         modifier = Modifier.background(Color.White),
         scrimColor = DrawerDefaults.scrimColor,
@@ -325,6 +333,34 @@ fun HomeScreen(
                                     text = "Phụ kiện",
                                 )
                             }
+                            // Kiểm tra vai trò của người dùng
+                            if (role == "admin") {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center,
+                                    modifier = Modifier.padding(horizontal = 8.dp)
+                                ) {
+                                    IconButton(
+                                        modifier = Modifier.size(45.dp),
+                                        onClick = {
+                                            // Truyền tentaikhoan nếu cần
+                                            if (tentaikhoan != null) {
+                                                navController.navigate("${NavRoute.THONGKE.route}?tentaikhoan=$tentaikhoan")
+                                            } else {
+                                                navController.navigate(NavRoute.THONGKE.route)
+                                            }
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Analytics,
+                                            contentDescription = "Thống kê",
+                                            tint = Color.Red
+                                        )
+                                    }
+                                    Text(text = "Thống kê")
+                                }
+                            }
+
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.SpaceAround
@@ -378,21 +414,23 @@ fun HomeScreen(
                             contentPadding = PaddingValues(horizontal = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-//                            items(danhSachSanPham) { sanpham ->
-//                                if (taikhoan != null) {
-//                                    ProductCard(sanpham, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
-//                                } else {
-//                                    ProductCard(sanpham, null, tentaikhoan, navController)
-//                                }
-//                            }
+                            // Hiển thị danh sách sản phẩm
                             items(danhSachSanPham) { sanpham ->
                                 val isFavorite = favoriteIds.contains(sanpham.MaSanPham)
+                                val context = LocalContext.current
                                 ProductCard(
                                     sanpham = sanpham,
                                     isFavorite = isFavorite,
                                     onFavoriteClick = {
-                                        taikhoan?.MaKhachHang?.let {
-                                            yeuThichViewModel.toggleFavorite(sanpham.MaSanPham, it)
+                                        // Trong onFavoriteClick
+                                        if (taikhoan?.MaKhachHang != null) {
+                                            yeuThichViewModel.toggleFavorite(
+                                                sanpham.MaSanPham,
+                                                taikhoan.MaKhachHang!!
+                                            )
+                                        } else {
+                                            // Thông báo yêu cầu đăng nhập
+                                            Toast.makeText(context, "Bạn cần đăng nhập để sử dụng chức năng này", Toast.LENGTH_SHORT).show()
                                         }
                                     },
                                     navController = navController,
@@ -418,13 +456,6 @@ fun HomeScreen(
                             contentPadding = PaddingValues(horizontal = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-//                            items(danhSachSanPhamVanPhong.value) { sanphamvp ->
-//                                if (taikhoan != null) {
-//                                    ProductCard(sanphamvp, taikhoan.MaKhachHang.toString(), taikhoan.TenTaiKhoan, navController)
-//                                } else {
-//                                    ProductCard(sanphamvp, null, tentaikhoan, navController)
-//                                }
-//                            }
                             items(danhSachSanPhamVanPhong.value) { sanpham ->
                                 val isFavorite = favoriteIds.contains(sanpham.MaSanPham)
                                 ProductCard(
@@ -456,13 +487,6 @@ fun HomeScreen(
                             contentPadding = PaddingValues(horizontal = 8.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-//                            items(danhSachSanPhamGaming.value) { sanphamgm ->
-//                                if (taikhoan != null) {
-//                                    ProductCard(sanphamgm, taikhoan.MaKhachHang.toString(), tentaikhoan, navController)
-//                                } else {
-//                                    ProductCard(sanphamgm, null, null, navController)
-//                                }
-//                            }
                             items(danhSachSanPhamGaming.value) { sanpham ->
                                 val isFavorite = favoriteIds.contains(sanpham.MaSanPham)
                                 ProductCard(
@@ -486,6 +510,7 @@ fun HomeScreen(
         }
     }
 }
+
 
 @Composable
 fun BannerAuto() {
@@ -567,5 +592,4 @@ fun BannerAuto() {
     }
 }
 
-//code dang lỗi yêu thích
 

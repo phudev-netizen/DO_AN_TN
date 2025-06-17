@@ -115,4 +115,13 @@ class TaiKhoanViewModel:ViewModel() {
             }
         }
     }
+
+    fun getRole(s: String): String? {
+        return when (s) {
+            "admin" -> "admin"
+            "user" -> "user"
+            "nhanvien" -> "nhanvien"
+            else -> null
+        }
+    }
 }

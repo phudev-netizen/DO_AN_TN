@@ -27,7 +27,7 @@
     $binhluan->MaBinhLuan = $data->MaBinhLuan;
     $binhluan->MaKhachHang = $data->MaKhachHang;
     $binhluan->MaSanPham = $data->MaSanPham;
-    $binhluan->MaDonHang = $data->MaDonHang;
+    $binhluan->MaHoaDonBan = $data->MaHoaDonBan; 
     $binhluan->SoSao = $data->SoSao;
     $binhluan->NoiDung = $data->NoiDung;
     $binhluan->NgayDanhGia = $data->NgayDanhGia;

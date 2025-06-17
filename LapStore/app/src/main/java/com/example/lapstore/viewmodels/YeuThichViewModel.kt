@@ -45,4 +45,17 @@ class YeuThichViewModel : ViewModel() {
             }
         }
     }
+
+    fun loadFavorites(it: Int) {
+        viewModelScope.launch {
+            try {
+                getFavoritesByKhachHang(it)
+            } catch (e: Exception) {
+                _errorMessage.value = "Lỗi khi tải danh sách yêu thích: ${e.message}"
+            }
+        }
+
+    }
+
+
 }

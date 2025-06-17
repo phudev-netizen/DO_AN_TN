@@ -12,12 +12,14 @@ $conn = $database->Connect();
 
 $yeuthich = new SanPhamYeuThich($conn);
 
-// Nhận dữ liệu từ JSON hoặc POST (hỗ trợ cả fetch/axios và form)
+// Lấy dữ liệu JSON gửi lên
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Ưu tiên lấy từ JSON
-$MaKhachHang = isset($data['MaKhachHang']) ? intval($data['MaKhachHang']) : (isset($_POST['MaKhachHang']) ? intval($_POST['MaKhachHang']) : null);
-$MaSanPham = isset($data['MaSanPham']) ? intval($data['MaSanPham']) : (isset($_POST['MaSanPham']) ? intval($_POST['MaSanPham']) : null);
+// Ghi log để debug (xem app gửi gì lên)
+//file_put_contents("debug.log", print_r($data, true));
+
+$MaKhachHang = isset($data['MaKhachHang']) ? intval($data['MaKhachHang']) : null;
+$MaSanPham = isset($data['MaSanPham']) ? intval($data['MaSanPham']) : null;
 
 if ($MaKhachHang && $MaSanPham) {
     $yeuthich->MaKhachHang = $MaKhachHang;

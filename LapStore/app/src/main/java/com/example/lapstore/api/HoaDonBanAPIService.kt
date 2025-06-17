@@ -24,7 +24,11 @@ data class MaHoaDonBanResponse(
 data class HoaDonDeleteRequest(
     val MaHoaDonBan: Int
 )
-
+data class AddHoaDonBanAndGetIdResponse(
+    val success: Boolean,
+    val message: String,
+    val MaHoaDonBan: Int? // chú ý tên trùng với key JSON backend trả về
+)
 
 interface HoaDonBanAPIService{
     @POST("HoaDonBan/create.php")
@@ -57,4 +61,10 @@ interface HoaDonBanAPIService{
     suspend fun getHoaDonTheoTrangThai(
         @Query("TrangThai") TrangThai: Int
     ): HoaDonBanResponse
+
+    // Thêm mới:
+    @POST("HoaDonBan/create.php")
+    suspend fun addHoaDonBanAndGetId(
+        @Body hoadon: HoaDonBan
+    ): AddHoaDonBanAndGetIdResponse
 }
