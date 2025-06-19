@@ -5,17 +5,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.lapstore.models.ThongKeScreen
 import com.example.lapstore.viewmodels.KhachHangViewModel
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
-import com.example.lapstore.viewmodels.YeuThichViewModel
 import com.example.lapstore.views.AcccountScreen
 import com.example.lapstore.views.AccessoryScreen
 import com.example.lapstore.views.AddDiaChiScreen
 import com.example.lapstore.views.AddressManagementScreen
 import com.example.lapstore.views.AdminScreen
 import com.example.lapstore.views.CartManagementSection
-import com.example.lapstore.views.FavoriteProductsScreen
+import com.example.lapstore.views.FavoriteScreen
 import com.example.lapstore.views.LoginScreen
 import com.example.lapstore.views.ProductDetail_AccessoryScreen
 import com.example.lapstore.views.ProductDetail_Screen
@@ -345,22 +346,43 @@ fun NavgationGraph(
                 khachHangViewModel
             )
         }
-//        //yeu thích
+//composable(
+//        route = NavRoute.FAVORITE.route + "?tentaikhoan={tentaikhoan}",
+//        arguments = listOf(
+//            navArgument("tentaikhoan") { nullable = true; type = NavType.StringType }
+//        )
+//    ) { backStackEntry ->
+//        val navController = rememberNavController()
+//        val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan")
+//        // Lấy makhachhang từ ViewModel (nếu bạn đã có ViewModel toàn cục), ví dụ:
+//        val taiKhoanViewModel: TaiKhoanViewModel = viewModel()
+//        val taikhoan = taiKhoanViewModel.taikhoan
+//        val makhachhang = taikhoan?.MaKhachHang?.toString() ?: ""
+//        FavoriteScreen(
+//            navController = navController,
+//            makhachhang = makhachhang,
+//            tentaikhoan = tentaikhoan,
+//        )
+//    }
         composable(
             route = NavRoute.FAVORITE.route + "?tentaikhoan={tentaikhoan}",
             arguments = listOf(
                 navArgument("tentaikhoan") { nullable = true; type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val yeuThichViewModel: YeuThichViewModel = viewModel()
-            val allProducts = viewmodel.danhSachAllSanPham
-            FavoriteProductsScreen(
+            val navController = rememberNavController()
+            val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan")
+            val taiKhoanViewModel: TaiKhoanViewModel = viewModel()
+            val taikhoan = taiKhoanViewModel.taikhoan
+            val makhachhang = taikhoan?.MaKhachHang ?: -1 // SỬA: để Int
+
+            FavoriteScreen(
                 navController = navController,
-                allProducts = allProducts,
-                yeuThichViewModel = yeuThichViewModel,
-                taiKhoanViewModel = taiKhoanViewModel
+                makhachhang = makhachhang, // SỬA: truyền Int
+                tentaikhoan = tentaikhoan,
             )
         }
+
         //thong ke
         composable(
             route = "${NavRoute.THONGKE.route}?tentaikhoan={tentaikhoan}",

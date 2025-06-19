@@ -20,10 +20,14 @@ class ThongKeModel {
     }
 
     public function getTotalRevenue() {
-        $stmt = $this->conn->prepare("SELECT SUM(tongtien) AS total FROM hoadonban WHERE trangthai = 'Đã giao'");
+        $stmt = $this->conn->prepare("SELECT SUM(tongtien) AS total FROM hoadonban "); // WHERE trangthai = 'Đã giao'
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+        //return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['total'] ?? 0;
+
     }
+
 
     public function getTotalUsers() {
         $stmt = $this->conn->prepare("SELECT COUNT(*) AS total FROM khachhang");
@@ -35,13 +39,16 @@ class ThongKeModel {
     $sql = "
         SELECT MONTH(NgayDatHang) AS month, SUM(TongTien) AS revenue
         FROM hoadonban
-        WHERE TrangThai = 'Đã giao'
         GROUP BY MONTH(NgayDatHang)
         ORDER BY MONTH(NgayDatHang)
-    ";
+    "; // WHERE TrangThai = 'Đã giao'
+
     $stmt = $this->conn->prepare($sql);
     $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    //return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $result ?: [];
+
 }
 
 }

@@ -15,11 +15,14 @@ class ThongKeViewModel : ViewModel() {
 
     private val api = QuanLyBanLaptopRetrofitClient.apiService
 
+
     fun fetchThongKe() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val response = api.getThongKeBaoCao()
+                val response = api.getThongKeBaoCao(role = "admin")
+
+                Log.d("ThongKe", "Response body: ${response.body()}")
                 if (response.isSuccessful && response.body()?.success == true) {
                     _thongKe.value = response.body()!!.data
                 }

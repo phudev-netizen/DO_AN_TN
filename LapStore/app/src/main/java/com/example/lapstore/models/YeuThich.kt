@@ -1,8 +1,14 @@
-package com.example.lapstore.models
+import com.google.gson.annotations.SerializedName
+
 
 data class YeuThich(
-    val id: Int? = null,
-    val MaSanPham: Int,
-    val MaKhachHang: Int,
-    val NgayYeuThich: String? = null // add this if you want to display favorited date
+    @SerializedName("ID") val id: String,
+    @SerializedName("MaKhachHang") val maKhachHang: Int,
+    @SerializedName("MaSanPham") val maSanPham: Int,
+    @SerializedName("NgayYeuThich") val ngayYeuThich: String
+)
+data class DanhSachYeuThichResponse(
+    val success: Boolean,
+    val data: List<YeuThich>?,
+    val message: String?
 )

@@ -1,61 +1,139 @@
-package com.example.lapstore.viewmodels
-
+//
+//import android.util.Log
+//import androidx.lifecycle.MutableLiveData
+//import androidx.lifecycle.ViewModel
+//import com.example.lapstore.api.QuanLyBanLaptopRetrofitClient
+//import retrofit2.Call
+//import retrofit2.Callback
+//import retrofit2.Response
+//
+//class YeuThichViewModel : ViewModel() {
+//
+//    val danhSachYeuThich = MutableLiveData<List<YeuThich>>()
+//
+//    val message = MutableLiveData<String>()
+//
+//    fun xoaYeuThich(maKhachHang: Int, maSanPham: String) {
+//        QuanLyBanLaptopRetrofitClient.api.xoaYeuThich(maKhachHang.toString(), maSanPham)
+//            .enqueue(object : Callback<String> {
+//                override fun onResponse(call: Call<String>, response: Response<String>) {
+//                    message.value = response.body() ?: "Xóa thất bại"
+//                    loadDanhSach(maKhachHang)
+//                }
+//                override fun onFailure(call: Call<String>, t: Throwable) {
+//                    message.value = "Lỗi: ${t.message}"
+//                }
+//            })
+//    }
+//fun themYeuThich(maKhachHang: Int, maSanPham: String) {
+//    QuanLyBanLaptopRetrofitClient.api.themYeuThich(maKhachHang.toString(), maSanPham)
+//        .enqueue(object : Callback<ApiResponse> {
+//            override fun onResponse(call: Call<ApiResponse>, response: Response<ApiResponse>) {
+//                Log.d("YEU_THICH", "API add favorite response: ${response.body()} | Success: ${response.isSuccessful}")
+//                val body = response.body()
+//                if (body != null && body.success == true) {
+//                    message.value = "Thêm thành công"
+//                    loadDanhSach(maKhachHang)
+//                } else {
+//                    message.value = body?.message ?: "Thêm thất bại"
+//                }
+//            }
+//            override fun onFailure(call: Call<ApiResponse>, t: Throwable) {
+//                message.value = "Lỗi: ${t.message}"
+//            }
+//        })
+//}
+//
+//fun loadDanhSach(maKhachHang: Int) {
+//    QuanLyBanLaptopRetrofitClient.api.getDanhSachYeuThich(maKhachHang)
+//        .enqueue(object : Callback<DanhSachYeuThichResponse> {
+//            override fun onResponse(call: Call<DanhSachYeuThichResponse>, response: Response<DanhSachYeuThichResponse>) {
+//                Log.d("YEU_THICH", "API get favorites: ${response.body()} | Success: ${response.isSuccessful}")
+//                val body = response.body()
+//                if (response.isSuccessful && body != null && body.success) {
+//                    danhSachYeuThich.value = body.data ?: emptyList()
+//                } else {
+//                    message.value = "Tải danh sách yêu thích thất bại"
+//                }
+//            }
+//            override fun onFailure(call: Call<DanhSachYeuThichResponse>, t: Throwable) {
+//                message.value = "Lỗi: ${t.message}"
+//            }
+//        })
+//}
+//
+//}
+import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.lapstore.api.KhachHangRequest
 import com.example.lapstore.api.QuanLyBanLaptopRetrofitClient
-import com.example.lapstore.models.YeuThich
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class YeuThichViewModel : ViewModel() {
-    private val _favoriteIds = MutableStateFlow<List<Int>>(emptyList())
-    val favoriteIds: StateFlow<List<Int>> = _favoriteIds
 
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage
+    val danhSachYeuThich = MutableLiveData<List<YeuThich>>()
+    val message = MutableLiveData<String>()
 
-    fun getFavoritesByKhachHang(maKhachHang: Int) {
-        viewModelScope.launch {
-            try {
-                val result = QuanLyBanLaptopRetrofitClient.SanPhamYeuThichAPIService.getFavoritesByKhachHang(
-                    KhachHangRequest(maKhachHang)
-                )
-                _favoriteIds.value = result.map { it.MaSanPham }
-            } catch (e: Exception) {
-                _errorMessage.value = "Lỗi lấy danh sách yêu thích: ${e.message}"
-            }
-        }
-    }
-
-    fun toggleFavorite(maSanPham: Int, maKhachHang: Int) {
-        viewModelScope.launch {
-            try {
-                val isFavorite = _favoriteIds.value.contains(maSanPham)
-                val model = YeuThich(MaSanPham = maSanPham, MaKhachHang = maKhachHang)
-                if (isFavorite) {
-                    QuanLyBanLaptopRetrofitClient.SanPhamYeuThichAPIService.removeFavorite(model)
-                } else {
-                    QuanLyBanLaptopRetrofitClient.SanPhamYeuThichAPIService.addFavorite(model)
+    fun xoaYeuThich(maKhachHang: Int, maSanPham: String) {
+        QuanLyBanLaptopRetrofitClient.api.xoaYeuThich(maKhachHang.toString(), maSanPham)
+            .enqueue(object : Callback<String> {
+                override fun onResponse(call: Call<String>, response: Response<String>) {
+                    val msg = response.body() ?: "Xóa thất bại"
+                    message.value = msg
+                    Log.d("YEU_THICH", "Xóa yêu thích: $msg")
+                    loadDanhSach(maKhachHang)
                 }
-                getFavoritesByKhachHang(maKhachHang)
-            } catch (e: Exception) {
-                _errorMessage.value = "Lỗi khi thay đổi yêu thích: ${e.message}"
-            }
-        }
+
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    val error = "Lỗi khi xoá yêu thích: ${t.message}"
+                    message.value = error
+                    Log.e("YEU_THICH", error)
+                }
+            })
     }
 
-    fun loadFavorites(it: Int) {
-        viewModelScope.launch {
-            try {
-                getFavoritesByKhachHang(it)
-            } catch (e: Exception) {
-                _errorMessage.value = "Lỗi khi tải danh sách yêu thích: ${e.message}"
-            }
-        }
+    fun themYeuThich(maKhachHang: Int, maSanPham: String) {
+        QuanLyBanLaptopRetrofitClient.api.themYeuThich(maKhachHang.toString(), maSanPham)
+            .enqueue(object : Callback<ApiResponse3> {
+                override fun onResponse(call: Call<ApiResponse3>, response: Response<ApiResponse3>) {
+                    Log.d("YEU_THICH", "API add favorite response: ${response.body()} | Success: ${response.isSuccessful}")
+                    val body = response.body()
+                    if (response.isSuccessful && body != null && body.success) {
+                        message.value = body.message
+                        loadDanhSach(maKhachHang)
+                    } else {
+                        message.value = body?.message ?: "Thêm thất bại"
+                    }
+                }
 
+                override fun onFailure(call: Call<ApiResponse3>, t: Throwable) {
+                    val error = "Lỗi khi thêm yêu thích: ${t.message}"
+                    message.value = error
+                    Log.e("YEU_THICH", error)
+                }
+            })
     }
 
+    fun loadDanhSach(maKhachHang: Int) {
+        QuanLyBanLaptopRetrofitClient.api.getDanhSachYeuThich(maKhachHang)
+            .enqueue(object : Callback<DanhSachYeuThichResponse> {
+                override fun onResponse(call: Call<DanhSachYeuThichResponse>, response: Response<DanhSachYeuThichResponse>) {
+                    Log.d("YEU_THICH", "API get favorites: ${response.body()} | Success: ${response.isSuccessful}")
+                    val body = response.body()
+                    if (response.isSuccessful && body != null && body.success) {
+                        danhSachYeuThich.value = body.data ?: emptyList()
+                    } else {
+                        message.value = body?.message ?: "Tải danh sách yêu thích thất bại"
+                    }
+                }
 
+                override fun onFailure(call: Call<DanhSachYeuThichResponse>, t: Throwable) {
+                    val error = "Lỗi khi tải danh sách: ${t.message}"
+                    message.value = error
+                    Log.e("YEU_THICH", error)
+                }
+            })
+    }
 }

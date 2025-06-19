@@ -693,7 +693,6 @@ fun ChoXacNhanScreen(navController: NavHostController,makhachhang: Int?) {
     }
 }
 
-
 @Composable
 fun formatDate(inputDate: String): String {
     return try {
@@ -705,3 +704,4 @@ fun formatDate(inputDate: String): String {
         "Ngày không hợp lệ"
     }
 }
+

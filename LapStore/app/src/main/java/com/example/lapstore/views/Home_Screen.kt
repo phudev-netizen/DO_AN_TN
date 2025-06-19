@@ -1,3 +1,4 @@
+import android.util.Log
 import android.widget.Toast
 import com.example.lapstore.views.ProductCard
 import androidx.compose.foundation.Image
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,7 +34,6 @@ import androidx.navigation.NavHostController
 import com.example.lapstore.CategoryMenuMain
 import com.example.lapstore.R
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
-import com.example.lapstore.viewmodels.YeuThichViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -60,10 +61,19 @@ fun HomeScreen(
     val taiKhoanViewModel: TaiKhoanViewModel = viewModel()
     val taikhoan = taiKhoanViewModel.taikhoan
 
-    //them vo nay
+
+    val context = LocalContext.current
     val yeuThichViewModel: YeuThichViewModel = viewModel()
-    // Lấy danh sách sản phẩm yêu thích
-    val favoriteIds by yeuThichViewModel.favoriteIds.collectAsState()
+    val danhSachYeuThich by yeuThichViewModel.danhSachYeuThich.observeAsState(emptyList())
+
+    LaunchedEffect(taikhoan?.MaKhachHang) {
+        taikhoan?.MaKhachHang?.let { maKH ->
+            yeuThichViewModel.loadDanhSach(maKH)
+        }
+    }
+
+
+    // Điều hướng đến SearchScreen khi trường tìm kiếm được focus
 
     LaunchedEffect(isFocused) {
         if (isFocused) {
@@ -74,11 +84,7 @@ fun HomeScreen(
             }
         }
     }
-//    LaunchedEffect(taikhoan?.MaKhachHang) {
-//        taikhoan?.MaKhachHang?.let {
-//            yeuThichViewModel.loadFavorites(it)
-//        }
-//    }
+    // Lấy thông tin tài khoản khi có tentaikhoan
     LaunchedEffect(tentaikhoan) {
         if (!tentaikhoan.isNullOrEmpty()) {
             taiKhoanViewModel.getTaiKhoanByTentaikhoan(tentaikhoan)
@@ -416,29 +422,35 @@ fun HomeScreen(
                         ) {
                             // Hiển thị danh sách sản phẩm
                             items(danhSachSanPham) { sanpham ->
-                                val isFavorite = favoriteIds.contains(sanpham.MaSanPham)
+
                                 val context = LocalContext.current
+                                val isFavorite = danhSachYeuThich.any { it.maSanPham == sanpham.MaSanPham }
+                                Log.d("YEU_THICH", "sanpham.MaSanPham=${sanpham.MaSanPham}, isFavorite=$isFavorite, danhSachYeuThich=$danhSachYeuThich")
                                 ProductCard(
                                     sanpham = sanpham,
                                     isFavorite = isFavorite,
                                     onFavoriteClick = {
-                                        // Trong onFavoriteClick
-                                        if (taikhoan?.MaKhachHang != null) {
-                                            yeuThichViewModel.toggleFavorite(
-                                                sanpham.MaSanPham,
-                                                taikhoan.MaKhachHang!!
-                                            )
+                                        val maKH = taikhoan?.MaKhachHang
+                                        if (maKH != null) {
+                                            if (isFavorite) {
+                                                yeuThichViewModel.xoaYeuThich(maKH,
+                                                    sanpham.MaSanPham.toString()
+                                                )
+                                            } else {
+                                                yeuThichViewModel.themYeuThich(maKH,
+                                                    sanpham.MaSanPham.toString()
+                                                )
+                                            }
+                                            yeuThichViewModel.loadDanhSach(maKH)
                                         } else {
-                                            // Thông báo yêu cầu đăng nhập
                                             Toast.makeText(context, "Bạn cần đăng nhập để sử dụng chức năng này", Toast.LENGTH_SHORT).show()
                                         }
                                     },
                                     navController = navController,
-                                    makhachhang = taikhoan?.MaKhachHang?.toString(),
+                                    makhachhang = taikhoan?.MaKhachHang?.toString(), // chỉ để truyền xuống UI nếu cần
                                     tentaikhoan = taikhoan?.TenTaiKhoan
                                 )
                             }
-
                         }
                     }
                     // LazyRow cho Laptop Văn Phòng
@@ -457,21 +469,33 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(danhSachSanPhamVanPhong.value) { sanpham ->
-                                val isFavorite = favoriteIds.contains(sanpham.MaSanPham)
+                                val context = LocalContext.current
+                                val isFavorite = danhSachYeuThich.any { it.maSanPham == sanpham.MaSanPham }
                                 ProductCard(
                                     sanpham = sanpham,
                                     isFavorite = isFavorite,
                                     onFavoriteClick = {
-                                        taikhoan?.MaKhachHang?.let {
-                                            yeuThichViewModel.toggleFavorite(sanpham.MaSanPham, it)
+                                        val maKH = taikhoan?.MaKhachHang
+                                        if (maKH != null) {
+                                            if (isFavorite) {
+                                                yeuThichViewModel.xoaYeuThich(maKH,
+                                                    sanpham.MaSanPham.toString()
+                                                )
+                                            } else {
+                                                yeuThichViewModel.themYeuThich(maKH,
+                                                    sanpham.MaSanPham.toString()
+                                                )
+                                            }
+                                            yeuThichViewModel.loadDanhSach(maKH)
+                                        } else {
+                                            Toast.makeText(context, "Bạn cần đăng nhập để sử dụng chức năng này", Toast.LENGTH_SHORT).show()
                                         }
                                     },
                                     navController = navController,
-                                    makhachhang = taikhoan?.MaKhachHang?.toString(),
+                                    makhachhang = taikhoan?.MaKhachHang?.toString(), // chỉ để truyền xuống UI nếu cần
                                     tentaikhoan = taikhoan?.TenTaiKhoan
                                 )
                             }
-
                         }
                     }
                     // LazyRow cho Laptop Gaming
@@ -488,17 +512,32 @@ fun HomeScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(danhSachSanPhamGaming.value) { sanpham ->
-                                val isFavorite = favoriteIds.contains(sanpham.MaSanPham)
+                                val context = LocalContext.current
+
+                                val isFavorite = danhSachYeuThich.any { it.maSanPham == sanpham.MaSanPham }
+
                                 ProductCard(
                                     sanpham = sanpham,
                                     isFavorite = isFavorite,
                                     onFavoriteClick = {
-                                        taikhoan?.MaKhachHang?.let {
-                                            yeuThichViewModel.toggleFavorite(sanpham.MaSanPham, it)
+                                        val maKH = taikhoan?.MaKhachHang
+                                        if (maKH != null) {
+                                            if (isFavorite) {
+                                                yeuThichViewModel.xoaYeuThich(maKH,
+                                                    sanpham.MaSanPham.toString()
+                                                )
+                                            } else {
+                                                yeuThichViewModel.themYeuThich(maKH,
+                                                    sanpham.MaSanPham.toString()
+                                                )
+                                            }
+                                            yeuThichViewModel.loadDanhSach(maKH)
+                                        } else {
+                                            Toast.makeText(context, "Bạn cần đăng nhập để sử dụng chức năng này", Toast.LENGTH_SHORT).show()
                                         }
                                     },
                                     navController = navController,
-                                    makhachhang = taikhoan?.MaKhachHang?.toString(),
+                                    makhachhang = taikhoan?.MaKhachHang?.toString(), // chỉ để truyền xuống UI nếu cần
                                     tentaikhoan = taikhoan?.TenTaiKhoan
                                 )
                             }
@@ -510,6 +549,7 @@ fun HomeScreen(
         }
     }
 }
+
 
 
 @Composable

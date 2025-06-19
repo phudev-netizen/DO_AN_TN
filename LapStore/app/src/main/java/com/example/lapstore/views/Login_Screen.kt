@@ -1,5 +1,4 @@
-// File: Register_Screen.kt
-//code lại giao điện
+
 package com.example.lapstore.views
 
 import NavRoute

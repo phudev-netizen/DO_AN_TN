@@ -119,6 +119,7 @@ fun ProductCard(
                     tint = if (isFavorite) Color.Red else Color.Gray
                 )
             }
+
         }
     }
 }

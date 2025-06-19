@@ -11,10 +11,10 @@ import HoaDonBanAPIService
 import KhachHangAPIService
 import SanPhamAPIService
 import TaiKhoanAPIService
+import YeuThichApi
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import com.example.lapstore.api.SanPhamYeuThichAPIService
 object Constants {
     //const val BASE_URL = "http://10.0.2.2/lap_store_api/api/"
    const val BASE_URL = "http://192.168.3.49/lap_store_api/api/"
@@ -84,13 +84,6 @@ object QuanLyBanLaptopRetrofitClient {
             .build()
             .create(ChiTietHoaDonBanAPIService::class.java)
     }
-    val SanPhamYeuThichAPIService: SanPhamYeuThichAPIService by lazy {
-        Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-            .build()
-            .create(SanPhamYeuThichAPIService::class.java)
-    }
 
     val binhLuanAPIService: BinhLuanApiService by lazy {
         Retrofit.Builder()
@@ -106,4 +99,20 @@ object QuanLyBanLaptopRetrofitClient {
             .build()
             .create(ApiService::class.java)
     }
+
+//    val SanPhamYeuThichAPIService: SanPhamYeuThichAPIService by lazy {
+//        Retrofit.Builder()
+//            .baseUrl(Constants.BASE_URL)
+//            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+//            .build()
+//            .create(SanPhamYeuThichAPIService::class.java)
+//    }
+val api: YeuThichApi by lazy {
+    Retrofit.Builder()
+        .baseUrl(Constants.BASE_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(YeuThichApi::class.java)
+}
+
 }

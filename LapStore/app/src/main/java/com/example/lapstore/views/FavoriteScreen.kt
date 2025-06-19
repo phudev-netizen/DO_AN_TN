@@ -1,118 +1,88 @@
 package com.example.lapstore.views
 
+import SanPhamViewModel
+import YeuThichViewModel
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.lapstore.models.SanPham
-import com.example.lapstore.viewmodels.YeuThichViewModel
-import com.example.lapstore.viewmodels.TaiKhoanViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoriteProductsScreen(
+fun FavoriteScreen(
     navController: NavHostController,
-    allProducts: List<SanPham>,
-    yeuThichViewModel: YeuThichViewModel,
-    taiKhoanViewModel: TaiKhoanViewModel
+    makhachhang: Int, // SỬA thành Int
+    tentaikhoan: String?,
+    sanPhamViewModel: SanPhamViewModel = viewModel(),
+    yeuThichViewModel: YeuThichViewModel = viewModel()
 ) {
-    val favoriteIds by yeuThichViewModel.favoriteIds.collectAsState()
-    val taikhoan = taiKhoanViewModel.taikhoan
-    val errorMessage by yeuThichViewModel.errorMessage.collectAsState()
-    val favoriteProducts = remember(favoriteIds, allProducts) {
-        allProducts.filter { it.MaSanPham in favoriteIds }
-    }
+    val context = LocalContext.current
+    val danhSachYeuThich by yeuThichViewModel.danhSachYeuThich.observeAsState(emptyList())
+    val danhSachSanPham = sanPhamViewModel.danhSachAllSanPham
+    var isRefreshing by remember { mutableStateOf(false) }
 
-    // Lấy danh sách yêu thích khi có MaKhachHang
-    LaunchedEffect(taikhoan?.MaKhachHang) {
-        taikhoan?.MaKhachHang?.let {
-            yeuThichViewModel.getFavoritesByKhachHang(it)
-        }
+    LaunchedEffect(makhachhang) {
+        yeuThichViewModel.loadDanhSach(makhachhang)
     }
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Sản phẩm yêu thích") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Quay lại"
-                        )
-                    }
-                }
+            TopAppBar(
+                title = { Text("Sản phẩm yêu thích") }
             )
         }
-    ) { padding ->
-        Column(
+    ) { paddingValues ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(paddingValues)
         ) {
-            if (taikhoan == null) {
-                Box(
+            if (danhSachYeuThich.isEmpty()) {
+                Column(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        "Bạn cần đăng nhập để xem Sản phẩm yêu thích.",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    Text("Bạn chưa có sản phẩm nào trong danh sách yêu thích.")
                 }
             } else {
-                if (errorMessage != null) {
-                    Text(
-                        text = "Lỗi: $errorMessage",
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(8.dp)
-                    )
-                }
-                if (favoriteProducts.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            "Bạn chưa có sản phẩm yêu thích nào.",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
+                val sanPhamYeuThich = remember(danhSachYeuThich, danhSachSanPham) {
+                    danhSachYeuThich.mapNotNull { yeuThich ->
+                        danhSachSanPham.find { it.MaSanPham == yeuThich.maSanPham }
                     }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(vertical = 12.dp)
-                    ) {
-                        items(favoriteProducts) { sanpham ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = MaterialTheme.shapes.medium,
-                                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                            ) {
-                                ProductCard(
-                                    sanpham = sanpham,
-                                    isFavorite = true,
-                                    onFavoriteClick = {
-                                        taikhoan.MaKhachHang?.let {
-                                            yeuThichViewModel.toggleFavorite(sanpham.MaSanPham, it)
-                                        }
-                                    },
-                                    navController = navController,
-                                    makhachhang = taikhoan.MaKhachHang.toString(),
-                                    tentaikhoan = taikhoan.TenTaiKhoan
+                }
+
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(sanPhamYeuThich, key = { it.MaSanPham }) { sanpham ->
+                        ProductCard(
+                            sanpham = sanpham,
+                            isFavorite = true,
+                            onFavoriteClick = {
+                                yeuThichViewModel.xoaYeuThich(
+                                    makhachhang, // Đã là Int
+                                    sanpham.MaSanPham.toString()
                                 )
-                            }
-                        }
+                                Toast.makeText(context, "Đã xoá khỏi danh sách yêu thích", Toast.LENGTH_SHORT).show()
+                                yeuThichViewModel.loadDanhSach(makhachhang)
+                            },
+                            navController = navController,
+                            makhachhang = makhachhang.toString(), // Nếu ProductCard yêu cầu String
+                            tentaikhoan = tentaikhoan
+                        )
                     }
                 }
             }
