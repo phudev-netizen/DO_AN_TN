@@ -39,9 +39,6 @@ if (!$maKhachHang || !$maSanPham || !is_numeric($maKhachHang) || !is_numeric($ma
 $model = new YeuThich($db);
 $result = $model->them($maKhachHang, $maSanPham);
 
-// Log kết quả để debug nếu cần
-// file_put_contents("debug_result.txt", json_encode($result));
-
 // Trả phản hồi đúng theo kết quả
 if (isset($result['success'])) {
     http_response_code($result['success'] ? 200 : 400);

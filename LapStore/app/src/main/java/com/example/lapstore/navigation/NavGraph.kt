@@ -1,5 +1,8 @@
 import android.net.Uri
+import android.util.Log
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -16,7 +19,6 @@ import com.example.lapstore.views.AddDiaChiScreen
 import com.example.lapstore.views.AddressManagementScreen
 import com.example.lapstore.views.AdminScreen
 import com.example.lapstore.views.CartManagementSection
-import com.example.lapstore.views.FavoriteScreen
 import com.example.lapstore.views.LoginScreen
 import com.example.lapstore.views.ProductDetail_AccessoryScreen
 import com.example.lapstore.views.ProductDetail_Screen
@@ -346,41 +348,38 @@ fun NavgationGraph(
                 khachHangViewModel
             )
         }
-//composable(
-//        route = NavRoute.FAVORITE.route + "?tentaikhoan={tentaikhoan}",
-//        arguments = listOf(
-//            navArgument("tentaikhoan") { nullable = true; type = NavType.StringType }
-//        )
-//    ) { backStackEntry ->
-//        val navController = rememberNavController()
-//        val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan")
-//        // Lấy makhachhang từ ViewModel (nếu bạn đã có ViewModel toàn cục), ví dụ:
-//        val taiKhoanViewModel: TaiKhoanViewModel = viewModel()
-//        val taikhoan = taiKhoanViewModel.taikhoan
-//        val makhachhang = taikhoan?.MaKhachHang?.toString() ?: ""
-//        FavoriteScreen(
-//            navController = navController,
-//            makhachhang = makhachhang,
-//            tentaikhoan = tentaikhoan,
-//        )
-//    }
+////        //yêu thích
         composable(
             route = NavRoute.FAVORITE.route + "?tentaikhoan={tentaikhoan}",
             arguments = listOf(
                 navArgument("tentaikhoan") { nullable = true; type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val navController = rememberNavController()
+
             val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan")
             val taiKhoanViewModel: TaiKhoanViewModel = viewModel()
             val taikhoan = taiKhoanViewModel.taikhoan
-            val makhachhang = taikhoan?.MaKhachHang ?: -1 // SỬA: để Int
 
-            FavoriteScreen(
-                navController = navController,
-                makhachhang = makhachhang, // SỬA: truyền Int
-                tentaikhoan = tentaikhoan,
-            )
+            // Gọi API lấy tài khoản nếu chưa có
+            LaunchedEffect(tentaikhoan) {
+                if (tentaikhoan != null && taiKhoanViewModel.taikhoan == null) {
+                    taiKhoanViewModel.getTaiKhoanByTentaikhoan(tentaikhoan)
+                }
+            }
+
+            // Chờ đến khi có tài khoản mới hiển thị
+            if (taikhoan != null) {
+                taikhoan.MaKhachHang?.let {
+                    FavoriteScreen(
+                        navController = navController,
+                        makhachhang = it,
+                        tentaikhoan = tentaikhoan
+                    )
+                }
+            } else {
+                // Có thể cho loading hoặc text
+                Text("🔒 Đang tải tài khoản...")
+            }
         }
 
         //thong ke

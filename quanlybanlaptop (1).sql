@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th6 19, 2025 lúc 02:54 PM
+-- Thời gian đã tạo: Th6 22, 2025 lúc 06:19 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.1.25
 
@@ -107,7 +107,8 @@ INSERT INTO `chitiethoadonban` (`MaChiTietHoaDonBan`, `MaHoaDonBan`, `MaSanPham`
 (87, 64, 6, 1, 73990000, 0),
 (88, 65, 5, 1, 13399000, 0),
 (89, 67, 4, 1, 17390000, 0),
-(90, 67, 2, 1, 8990000, 0);
+(90, 67, 2, 1, 8990000, 0),
+(91, 68, 6, 1, 73990000, 0);
 
 -- --------------------------------------------------------
 
@@ -161,7 +162,6 @@ CREATE TABLE `giohang` (
 --
 
 INSERT INTO `giohang` (`MaGioHang`, `MaKhachHang`, `MaSanPham`, `SoLuong`, `TrangThai`) VALUES
-(238, 12, 6, 1, 1),
 (241, 12, 5, 1, 1),
 (244, 12, 1, 1, 1);
 
@@ -265,13 +265,14 @@ INSERT INTO `hoadonban` (`MaHoaDonBan`, `MaKhachHang`, `NgayDatHang`, `MaDiaChi`
 (58, 12, '2025-05-14', 34, 119990000, 'Chuyển khoản ngân hàng', '6'),
 (59, 12, '2025-05-25', 34, 74020000, 'Thanh toán khi nhận hàng', '6'),
 (60, 12, '2025-06-09', 34, 880000, 'Chuyển khoản ngân hàng', '6'),
-(61, 12, '2025-06-10', 34, 13429000, 'Thanh toán khi nhận hàng', '3'),
+(61, 12, '2025-06-10', 34, 13429000, 'Thanh toán khi nhận hàng', '4'),
 (62, 12, '2025-06-10', 34, 60010000, 'Thanh toán khi nhận hàng', '6'),
 (63, 12, '2025-06-11', 34, 30020000, 'Chuyển khoản ngân hàng', '6'),
 (64, 12, '2025-06-12', 35, 74020000, 'Thanh toán khi nhận hàng', '6'),
 (65, 12, '2025-06-12', 34, 13429000, 'Thanh toán khi nhận hàng', '6'),
 (66, 12, '2025-06-17', 34, 13429000, 'Thanh toán khi nhận hàng', '4'),
-(67, 13, '2025-06-18', 37, 26410000, 'Thanh toán khi nhận hàng', '4');
+(67, 13, '2025-06-18', 37, 26410000, 'Thanh toán khi nhận hàng', '4'),
+(68, 12, '2025-06-22', 34, 74020000, 'Thanh toán khi nhận hàng', '1');
 
 -- --------------------------------------------------------
 
@@ -433,7 +434,9 @@ CREATE TABLE `yeuthich` (
 
 INSERT INTO `yeuthich` (`ID`, `MaKhachHang`, `MaSanPham`, `NgayYeuThich`) VALUES
 (1, 10, 3, '2025-06-19 11:00:21'),
-(2, 12, 8, '2025-06-19 11:00:27');
+(7, 12, 6, '2025-06-22 21:29:59'),
+(8, 12, 2, '2025-06-22 22:05:34'),
+(10, 12, 1, '2025-06-22 22:20:59');
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -538,7 +541,7 @@ ALTER TABLE `binhluandanhgia`
 -- AUTO_INCREMENT cho bảng `chitiethoadonban`
 --
 ALTER TABLE `chitiethoadonban`
-  MODIFY `MaChiTietHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
+  MODIFY `MaChiTietHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
 
 --
 -- AUTO_INCREMENT cho bảng `diachi`
@@ -562,7 +565,7 @@ ALTER TABLE `hinhanh`
 -- AUTO_INCREMENT cho bảng `hoadonban`
 --
 ALTER TABLE `hoadonban`
-  MODIFY `MaHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
+  MODIFY `MaHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT cho bảng `khachhang`
@@ -592,7 +595,7 @@ ALTER TABLE `sanpham`
 -- AUTO_INCREMENT cho bảng `yeuthich`
 --
 ALTER TABLE `yeuthich`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Các ràng buộc cho các bảng đã đổ

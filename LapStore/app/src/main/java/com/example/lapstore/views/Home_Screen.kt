@@ -422,10 +422,9 @@ fun HomeScreen(
                         ) {
                             // Hiển thị danh sách sản phẩm
                             items(danhSachSanPham) { sanpham ->
-
                                 val context = LocalContext.current
-                                val isFavorite = danhSachYeuThich.any { it.maSanPham == sanpham.MaSanPham }
-                                Log.d("YEU_THICH", "sanpham.MaSanPham=${sanpham.MaSanPham}, isFavorite=$isFavorite, danhSachYeuThich=$danhSachYeuThich")
+                                val isFavorite =
+                                    danhSachYeuThich.any { it.maSanPham == sanpham.MaSanPham }
                                 ProductCard(
                                     sanpham = sanpham,
                                     isFavorite = isFavorite,
@@ -433,24 +432,25 @@ fun HomeScreen(
                                         val maKH = taikhoan?.MaKhachHang
                                         if (maKH != null) {
                                             if (isFavorite) {
-                                                yeuThichViewModel.xoaYeuThich(maKH,
-                                                    sanpham.MaSanPham.toString()
-                                                )
+                                                yeuThichViewModel.xoaYeuThich(maKH, sanpham.MaSanPham) {
+                                                    Toast.makeText(context, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show()
+                                                }
                                             } else {
-                                                yeuThichViewModel.themYeuThich(maKH,
-                                                    sanpham.MaSanPham.toString()
-                                                )
+                                                yeuThichViewModel.themYeuThich(maKH, sanpham.MaSanPham) {
+                                                    Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show()
+                                                }
                                             }
-                                            yeuThichViewModel.loadDanhSach(maKH)
                                         } else {
-                                            Toast.makeText(context, "Bạn cần đăng nhập để sử dụng chức năng này", Toast.LENGTH_SHORT).show()
+                                            // ✅ Hiển thị thông báo yêu cầu đăng nhập
+                                            Toast.makeText(context, "Vui lòng đăng nhập để sử dụng chức năng yêu thích", Toast.LENGTH_SHORT).show()
                                         }
                                     },
                                     navController = navController,
-                                    makhachhang = taikhoan?.MaKhachHang?.toString(), // chỉ để truyền xuống UI nếu cần
+                                    makhachhang = taikhoan?.MaKhachHang?.toString(),
                                     tentaikhoan = taikhoan?.TenTaiKhoan
                                 )
                             }
+
                         }
                     }
                     // LazyRow cho Laptop Văn Phòng
@@ -478,23 +478,25 @@ fun HomeScreen(
                                         val maKH = taikhoan?.MaKhachHang
                                         if (maKH != null) {
                                             if (isFavorite) {
-                                                yeuThichViewModel.xoaYeuThich(maKH,
-                                                    sanpham.MaSanPham.toString()
-                                                )
+                                                yeuThichViewModel.xoaYeuThich(maKH, sanpham.MaSanPham) {
+                                                    Toast.makeText(context, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show()
+                                                }
                                             } else {
-                                                yeuThichViewModel.themYeuThich(maKH,
-                                                    sanpham.MaSanPham.toString()
-                                                )
+                                                yeuThichViewModel.themYeuThich(maKH, sanpham.MaSanPham) {
+                                                    Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show()
+                                                }
                                             }
-                                            yeuThichViewModel.loadDanhSach(maKH)
                                         } else {
-                                            Toast.makeText(context, "Bạn cần đăng nhập để sử dụng chức năng này", Toast.LENGTH_SHORT).show()
+                                            // ✅ Hiển thị thông báo yêu cầu đăng nhập
+                                            Toast.makeText(context, "Vui lòng đăng nhập để sử dụng chức năng yêu thích", Toast.LENGTH_SHORT).show()
                                         }
                                     },
                                     navController = navController,
-                                    makhachhang = taikhoan?.MaKhachHang?.toString(), // chỉ để truyền xuống UI nếu cần
+                                    makhachhang = taikhoan?.MaKhachHang?.toString(),
                                     tentaikhoan = taikhoan?.TenTaiKhoan
                                 )
+
+
                             }
                         }
                     }
@@ -515,7 +517,6 @@ fun HomeScreen(
                                 val context = LocalContext.current
 
                                 val isFavorite = danhSachYeuThich.any { it.maSanPham == sanpham.MaSanPham }
-
                                 ProductCard(
                                     sanpham = sanpham,
                                     isFavorite = isFavorite,
@@ -523,23 +524,24 @@ fun HomeScreen(
                                         val maKH = taikhoan?.MaKhachHang
                                         if (maKH != null) {
                                             if (isFavorite) {
-                                                yeuThichViewModel.xoaYeuThich(maKH,
-                                                    sanpham.MaSanPham.toString()
-                                                )
+                                                yeuThichViewModel.xoaYeuThich(maKH, sanpham.MaSanPham) {
+                                                    Toast.makeText(context, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show()
+                                                }
                                             } else {
-                                                yeuThichViewModel.themYeuThich(maKH,
-                                                    sanpham.MaSanPham.toString()
-                                                )
+                                                yeuThichViewModel.themYeuThich(maKH, sanpham.MaSanPham) {
+                                                    Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show()
+                                                }
                                             }
-                                            yeuThichViewModel.loadDanhSach(maKH)
                                         } else {
-                                            Toast.makeText(context, "Bạn cần đăng nhập để sử dụng chức năng này", Toast.LENGTH_SHORT).show()
+                                            // ✅ Hiển thị thông báo yêu cầu đăng nhập
+                                            Toast.makeText(context, "Vui lòng đăng nhập để sử dụng chức năng yêu thích", Toast.LENGTH_SHORT).show()
                                         }
                                     },
                                     navController = navController,
-                                    makhachhang = taikhoan?.MaKhachHang?.toString(), // chỉ để truyền xuống UI nếu cần
+                                    makhachhang = taikhoan?.MaKhachHang?.toString(),
                                     tentaikhoan = taikhoan?.TenTaiKhoan
                                 )
+
                             }
 
                         }

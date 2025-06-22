@@ -50,8 +50,6 @@ class SanPhamViewModel : ViewModel() {
 
     // SanPhamViewModel.kt
     val taikhoan = MutableStateFlow<TaiKhoan?>(null)
-    // hoặc nếu là StateFlow
-    //val taikhoan: StateFlow<TaiKhoan?> = _taikhoan
 
     private val _danhsachSanPham = MutableStateFlow<List<SanPham>>(emptyList())
     val danhsachSanPham: StateFlow<List<SanPham>> get() = _danhsachSanPham
@@ -80,6 +78,7 @@ class SanPhamViewModel : ViewModel() {
             }
         }
     }
+
 
     //    fun getSanPhamTheoLoaiPhuKien() {
 //        viewModelScope.launch {
@@ -246,6 +245,8 @@ class SanPhamViewModel : ViewModel() {
         }
     }
 
+    fun getSanPhamByMaSanPham(maSanPham: Int): SanPham? {
+        return danhSachAllSanPham.find { it.MaSanPham == maSanPham }
+    }
+
 }
-
-

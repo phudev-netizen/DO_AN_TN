@@ -2,11 +2,11 @@
 class YeuThich {
     private $db;
 
-private $table = 'yeuthich';
-private $id = 'ID';
-private $maKhachHang = 'MaKhachHang';
-private $maSanPham = 'MaSanPham';   
-private $ngayYeuThich = 'NgayYeuThich';
+    private $table = 'yeuthich';
+    private $id = 'ID';
+    private $maKhachHang = 'MaKhachHang';
+    private $maSanPham = 'MaSanPham';   
+    private $ngayYeuThich = 'NgayYeuThich';
 
     public function __construct($db) {
         $this->db = $db;
@@ -35,9 +35,9 @@ private $ngayYeuThich = 'NgayYeuThich';
         return ['success' => false, 'message' => 'Lỗi khi xoá'];
     }
 
-    // Lấy danh sách yêu thích theo khách hàng
+    // ✅ Lấy danh sách yêu thích theo khách hàng (trả thêm ID để Android parse được)
     public function layDanhSach($maKhachHang) {
-        $stmt = $this->db->prepare("SELECT MaKhachHang, MaSanPham, NgayYeuThich FROM yeuthich WHERE MaKhachHang = ? ORDER BY NgayYeuThich DESC");
+        $stmt = $this->db->prepare("SELECT ID, MaKhachHang, MaSanPham, NgayYeuThich FROM yeuthich WHERE MaKhachHang = ? ORDER BY NgayYeuThich DESC");
         $stmt->execute([$maKhachHang]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

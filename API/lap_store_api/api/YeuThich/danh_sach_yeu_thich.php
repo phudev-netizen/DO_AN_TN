@@ -12,20 +12,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 include_once '../../config/database.php';
 include_once '../../model/YeuThich.php';
 
+// Kết nối database
 $dbClass = new database();
 $db = $dbClass->Connect();
 
 if (!$db) {
-    echo json_encode(['success' => false, 'message' => 'Không thể kết nối database']);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Không thể kết nối database'
+    ]);
     exit;
 }
 
+// Lấy mã khách hàng từ query
 $maKhachHang = isset($_GET['MaKhachHang']) ? intval($_GET['MaKhachHang']) : null;
 
-if (!$maKhachHang) {
+if (!$maKhachHang || $maKhachHang <= 0) {
     echo json_encode([
         'success' => false,
-        'message' => 'Thiếu MaKhachHang'
+        'message' => 'Thiếu hoặc sai mã khách hàng'
     ]);
     exit;
 }
@@ -33,9 +38,18 @@ if (!$maKhachHang) {
 $model = new YeuThich($db);
 $data = $model->layDanhSach($maKhachHang);
 
-echo json_encode([
-    'success' => true,
-    'data' => $data
-]);
+if ($data && is_array($data)) {
+    echo json_encode([
+        'success' => true,
+        'data' => $data,
+        'message' => 'Lấy danh sách yêu thích thành công'
+    ]);
+} else {
+    echo json_encode([
+        'success' => true,
+        'data' => [],
+        'message' => 'Không có sản phẩm yêu thích nào'
+    ]);
+}
 exit;
 ?>

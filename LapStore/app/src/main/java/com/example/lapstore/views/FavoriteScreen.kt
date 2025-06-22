@@ -1,7 +1,3 @@
-package com.example.lapstore.views
-
-import SanPhamViewModel
-import YeuThichViewModel
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,14 +9,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.example.lapstore.models.SanPham
+import com.example.lapstore.views.ProductCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteScreen(
     navController: NavHostController,
-    makhachhang: Int, // SỬA thành Int
+    makhachhang: Int,
     tentaikhoan: String?,
     sanPhamViewModel: SanPhamViewModel = viewModel(),
     yeuThichViewModel: YeuThichViewModel = viewModel()
@@ -28,64 +26,108 @@ fun FavoriteScreen(
     val context = LocalContext.current
     val danhSachYeuThich by yeuThichViewModel.danhSachYeuThich.observeAsState(emptyList())
     val danhSachSanPham = sanPhamViewModel.danhSachAllSanPham
-    var isRefreshing by remember { mutableStateOf(false) }
 
-    LaunchedEffect(makhachhang) {
-        yeuThichViewModel.loadDanhSach(makhachhang)
+    LaunchedEffect(Unit) {
+        if (makhachhang > 0) {
+            sanPhamViewModel.getAllSanPham()
+            yeuThichViewModel.loadDanhSach(makhachhang)
+        }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Sản phẩm yêu thích") }
+                title = {
+                    Text("❤️ Yêu Thích", style = MaterialTheme.typography.titleLarge)
+                }
             )
         }
-    ) { paddingValues ->
+    ) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(padding)
+                .padding(horizontal = 16.dp)
         ) {
-            if (danhSachYeuThich.isEmpty()) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("Bạn chưa có sản phẩm nào trong danh sách yêu thích.")
-                }
-            } else {
-                val sanPhamYeuThich = remember(danhSachYeuThich, danhSachSanPham) {
-                    danhSachYeuThich.mapNotNull { yeuThich ->
-                        danhSachSanPham.find { it.MaSanPham == yeuThich.maSanPham }
-                    }
+            when {
+                makhachhang <= 0 -> {
+                    EmptyState(
+                        emoji = "🔒",
+                        title = "Bạn chưa đăng nhập",
+                        message = "Vui lòng đăng nhập để xem danh sách yêu thích."
+                    )
                 }
 
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(sanPhamYeuThich, key = { it.MaSanPham }) { sanpham ->
-                        ProductCard(
-                            sanpham = sanpham,
-                            isFavorite = true,
-                            onFavoriteClick = {
-                                yeuThichViewModel.xoaYeuThich(
-                                    makhachhang, // Đã là Int
-                                    sanpham.MaSanPham.toString()
+                danhSachYeuThich.isEmpty() -> {
+                    EmptyState(
+                        emoji = "🧐",
+                        title = "Danh sách trống",
+                        message = "Bạn chưa thêm sản phẩm nào vào yêu thích."
+                    )
+                }
+
+                else -> {
+                    val sanPhamYeuThich = remember(danhSachSanPham, danhSachYeuThich) {
+                        danhSachSanPham.filter { sp ->
+                            danhSachYeuThich.any { it.maSanPham == sp.MaSanPham }
+                        }
+                    }
+
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(vertical = 12.dp)
+                    ) {
+                        items(sanPhamYeuThich, key = { it.MaSanPham }) { sanpham ->
+                            Card(
+                                shape = MaterialTheme.shapes.extraLarge,
+                                elevation = CardDefaults.cardElevation(4.dp),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                            ) {
+                                ProductCard(
+                                    sanpham = sanpham,
+                                    isFavorite = true,
+                                    onFavoriteClick = {
+                                        yeuThichViewModel.xoaYeuThich(
+                                            makhachhang,
+                                            sanpham.MaSanPham
+                                        ) {
+                                            Toast.makeText(
+                                                context,
+                                                "Đã xoá khỏi danh sách yêu thích",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            yeuThichViewModel.loadDanhSach(makhachhang)
+                                        }
+                                    },
+                                    navController = navController,
+                                    makhachhang = makhachhang.toString(),
+                                    tentaikhoan = tentaikhoan
                                 )
-                                Toast.makeText(context, "Đã xoá khỏi danh sách yêu thích", Toast.LENGTH_SHORT).show()
-                                yeuThichViewModel.loadDanhSach(makhachhang)
-                            },
-                            navController = navController,
-                            makhachhang = makhachhang.toString(), // Nếu ProductCard yêu cầu String
-                            tentaikhoan = tentaikhoan
-                        )
+                            }
+                        }
                     }
                 }
             }
         }
+    }
+}
+@Composable
+fun EmptyState(
+    emoji: String,
+    title: String,
+    message: String
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(emoji, fontSize = MaterialTheme.typography.headlineLarge.fontSize)
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(message, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
