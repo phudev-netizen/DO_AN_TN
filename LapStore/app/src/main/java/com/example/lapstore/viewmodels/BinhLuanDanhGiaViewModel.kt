@@ -1,9 +1,15 @@
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.*
 import com.example.lapstore.api.QuanLyBanLaptopRetrofitClient
+import com.example.lapstore.models.ChiTietHoaDonBan
+import com.example.lapstore.models.HoaDonBan
 import kotlinx.coroutines.launch
 
 class BinhLuanDanhGiaViewModel : ViewModel() {
+
 
     private val _list = MutableLiveData<List<BinhLuanDanhGia>>()
     val list: LiveData<List<BinhLuanDanhGia>> = _list
@@ -30,9 +36,6 @@ class BinhLuanDanhGiaViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val res = QuanLyBanLaptopRetrofitClient.binhLuanAPIService.add(binhLuan)
-                // In ra body raw để kiểm tra
-                val rawString = res.errorBody()?.string() ?: res.body()?.message ?: "null"
-                Log.d("BinhLuanAPI", "Raw response: $rawString")
                 _message.value = res.body()?.message ?: "Lỗi thêm"
                 fetchAll()
             } catch (e: Exception) {
@@ -82,7 +85,6 @@ fun hideOrShow(maBinhLuan: Int, newTrangThai: String) {
             }
         } catch (e: Exception) {
             _message.value = "Lỗi mạng khi cập nhật trạng thái: ${e.message}"
-//            Log.e("BinhLuan", "Lỗi cập nhật trạng thái", e)
         }
     }
  }

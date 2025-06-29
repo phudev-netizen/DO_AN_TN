@@ -44,6 +44,18 @@ interface SanPhamAPIService{
     @PUT("SanPham/update.php")
     suspend fun updateSanPham(
         @Body sanpham: SanPham
-    ): KhachHangUpdateResponse
+    ): ApiResponse5
+
+    @POST("SanPham/create.php")
+    suspend fun createSanPham(@Body sanPham: SanPham): ApiResponse5
+
+    @DELETE("SanPham/delete.php")
+    suspend fun deleteSanPham(
+        @Query("MaSanPham") MaSanPham: Int
+    ): ApiResponse5
 
 }
+data class ApiResponse5(
+    val success: Boolean,
+    val message: String
+)

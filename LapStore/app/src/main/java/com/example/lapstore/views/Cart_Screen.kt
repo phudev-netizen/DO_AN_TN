@@ -1,6 +1,9 @@
+import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,9 +48,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,6 +63,7 @@ import com.example.lapstore.models.DiaChi
 import com.example.lapstore.ui.formatGiaTien
 import com.example.lapstore.viewmodels.DiaChiViewmodel
 import com.example.lapstore.viewmodels.GioHangViewModel
+import com.example.lapstore.viewmodels.KhuyenMaiViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 
@@ -78,7 +85,15 @@ fun CartScreen(
     }
 
     var openDialog by remember { mutableStateOf(false) }
+    //khuyến mãi
+    val khuyenMaiViewModel: KhuyenMaiViewModel = viewModel()
+    val listKhuyenMai = khuyenMaiViewModel.khuyenMaiList
 
+    // Lấy danh sách khuyến mãi
+    LaunchedEffect(Unit) {
+        khuyenMaiViewModel.fetchTatCaKhuyenMai() // Lấy tất cả khuyến mãi
+        Log.d("KhuyenMaiScreen", "Danh sách khuyến mãi: ${khuyenMaiViewModel.khuyenMaiList}")
+    }
 
     // Lấy danh sách giỏ hàng và sản phẩm
     val listGioHang = gioHangViewModel.listGioHang
@@ -94,20 +109,19 @@ fun CartScreen(
 
     var showDialog by remember { mutableStateOf(false) }
 
-    // Hàm tính tổng tiền
-    fun calculateTotalPrice() {
-        if (listGioHang.isEmpty()) {
-            totalPrice = 0
-        } else {
-            totalPrice =
-                listGioHang.filter { selectedItems[it.MaGioHang] == true }.sumOf { giohang ->
-                    val sanPham =
-                        sanPhamViewModel.danhSachSanPhamCuaKhachHang.find { it.MaSanPham == giohang.MaSanPham }
-                    val gia = sanPham?.Gia ?: 0
-                    gia * giohang.SoLuong
-                }
+
+fun calculateTotalPrice() {
+    if (listGioHang.isEmpty()) {
+        totalPrice = 0
+    } else {
+        totalPrice = listGioHang.filter { selectedItems[it.MaGioHang] == true }.sumOf { giohang ->
+            val sanPham = sanPhamViewModel.danhSachSanPhamCuaKhachHang.find { it.MaSanPham == giohang.MaSanPham }
+            val khuyenMai = listKhuyenMai.find { it.MaSanPham == giohang.MaSanPham }
+            val gia = getGiaSauGiam(sanPham?.Gia ?: 0, khuyenMai?.PhanTramGiam)
+            gia * giohang.SoLuong
         }
     }
+}
 
     // Lấy dữ liệu và tính tổng tiền ban đầu
     LaunchedEffect(makhachhang) {
@@ -160,9 +174,6 @@ fun CartScreen(
                         color = Color.Red,
                         fontSize = 20.sp
                     )
-                    val selectedProductsString =
-                        selectedProducts.joinToString(",") { "${it.first}:${it.second}:${it.third}" }
-
                     Button(
                         onClick = {
                             if (selectedProducts.isEmpty()) {
@@ -170,11 +181,17 @@ fun CartScreen(
                             } else if (diaChiViewmodel.listDiacHi.isEmpty()) { // Kiểm tra danh sách địa chỉ rỗng
                                 openDialog = true // Hiển thị dialog thông báo thêm địa chỉ
                             } else {
-                                val selectedProductsString =
-                                    selectedProducts.joinToString(",") { "${it.first}:${it.second}:${it.third}" }
+                                val selectedProductsString = selectedProducts.joinToString("\n") { "${it.first},${it.second},${it.third}" }
+                                val encodedProducts = Uri.encode(selectedProductsString)
                                 navController.navigate(
-                                    "${NavRoute.PAYSCREEN.route}?selectedProducts=${selectedProductsString}&tongtien=${totalPrice}&tentaikhoan=${tentaikhoan}"
+                                    "${NavRoute.PAYSCREEN.route}?selectedProducts=${encodedProducts}&tongtien=${totalPrice}&tentaikhoan=${tentaikhoan}"
                                 )
+//                                val selectedProductsString = selectedProducts.joinToString(",") { "${it.first}:${it.second}:${it.third}" }
+//                                val encodedProducts = Uri.encode(selectedProductsString)
+//                                navController.navigate(
+//                                    "${NavRoute.PAYSCREEN.route}?selectedProducts=${encodedProducts}&tongtien=${totalPrice}&tentaikhoan=${tentaikhoan}"
+//                                )
+                                
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
@@ -298,39 +315,78 @@ fun CartScreen(
                                     calculateTotalPrice()
                                 },
                             )
-
-                            AsyncImage(
-                                model = sanPham.HinhAnh,
-                                contentDescription = null,
+                            Row(
                                 modifier = Modifier
-                                    .size(120.dp),
-                                contentScale = ContentScale.Fit
-                            )
-                            Column(
-                                horizontalAlignment = Alignment.Start,
-                                verticalArrangement = Arrangement.Center
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                                    .background(Color.White, shape = RoundedCornerShape(16.dp)),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    sanPham.TenSanPham,
-                                    fontWeight = FontWeight.Bold,
-                                    lineHeight = 25.sp,
+                                // Ảnh sản phẩm
+                                AsyncImage(
+                                    model = sanPham.HinhAnh,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(90.dp)
+                                        .clip(RoundedCornerShape(12.dp)),
+                                    contentScale = ContentScale.Fit
                                 )
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
+
+                                Spacer(Modifier.width(12.dp))
+
+                                // Thông tin bên phải
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(vertical = 8.dp)
                                 ) {
                                     Text(
-                                        "${formatGiaTien(sanPham.Gia)}",
-                                        color = Color.Red,
-                                        fontSize = 17.sp
+                                        sanPham.TenSanPham,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp,
+                                        maxLines = 2
                                     )
 
+                                    Spacer(Modifier.height(4.dp))
+
+                                    // Giá
+                                    val khuyenMai = listKhuyenMai.find { it.MaSanPham == sanPham.MaSanPham }
+                                    val giaHienThi = getGiaSauGiam(sanPham.Gia, khuyenMai?.PhanTramGiam)
+                                    if (khuyenMai != null && khuyenMai.PhanTramGiam > 0) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Text(
+                                                formatGiaTien(sanPham.Gia),
+                                                color = Color.Gray,
+                                                fontSize = 13.sp,
+                                                textDecoration = TextDecoration.LineThrough,
+                                            )
+                                            Spacer(Modifier.width(6.dp))
+                                            Text(
+                                                formatGiaTien(giaHienThi),
+                                                color = Color.Red,
+                                                fontSize = 17.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    } else {
+                                        Text(
+                                            formatGiaTien(sanPham.Gia),
+                                            color = Color.Red,
+                                            fontSize = 17.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+
+                                    Spacer(Modifier.height(8.dp))
+
+                                    // Nút tăng giảm và xóa
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Start
                                     ) {
                                         IconButton(
+
                                             onClick = {
                                                 if (soLuong > 1) {
                                                     soLuong-- // Giảm số lượng
@@ -350,21 +406,23 @@ fun CartScreen(
                                                     calculateTotalPrice()
                                                     gioHangViewModel.updateAllGioHang()// Tính lại tổng tiền
                                                 }
-                                            }
+                                            },
+                                            modifier = Modifier.size(30.dp)
                                         ) {
-                                            Icon(
-                                                Icons.Filled.RemoveCircleOutline,
-                                                contentDescription = null
-                                            )
+                                            Icon(Icons.Filled.RemoveCircleOutline, contentDescription = "Giảm")
                                         }
-                                        Text(soLuong.toString())
+                                        Text(
+                                            soLuong.toString(),
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 16.sp,
+                                            modifier = Modifier.width(24.dp),
+                                            textAlign = TextAlign.Center
+                                        )
                                         IconButton(
                                             onClick = {
                                                 if (soLuong < sanPham.SoLuong) {
-                                                    soLuong++ // Tăng số lượng
+                                                    soLuong++
                                                     giohang.SoLuong = soLuong
-
-                                                    // Cập nhật lại số lượng trong selectedProducts
                                                     val index =
                                                         selectedProducts.indexOfFirst { it.first == giohang.MaSanPham }
                                                     if (index != -1) {
@@ -374,62 +432,43 @@ fun CartScreen(
                                                             giohang.MaGioHang
                                                         )
                                                     }
-
                                                     calculateTotalPrice()
-                                                    gioHangViewModel.updateAllGioHang()// Tính lại tổng tiền
+                                                    gioHangViewModel.updateAllGioHang()
                                                 }
-                                            }
+                                            },
+                                            modifier = Modifier.size(30.dp)
                                         ) {
-                                            Icon(
-                                                Icons.Filled.AddCircleOutline,
-                                                contentDescription = null
-                                            )
+                                            Icon(Icons.Filled.AddCircleOutline, contentDescription = "Tăng")
                                         }
-                                    }
-
-                                }
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    if (sanPham.SoLuong==0) {
-                                        Text(
-                                            "(Hết hàng)",
-                                            color = Color.Red
-                                        )
-                                    } else if (soLuong == sanPham.SoLuong) {
-                                        Text(
-                                            "Chỉ còn ${sanPham.SoLuong} sp",
-                                            color = Color.Red
-                                        )
-                                    } else if(sanPham.SoLuong<=5){
-                                        Text(
-                                            "Còn ${sanPham.SoLuong} sp",
-                                            color = Color.Red
-                                        )
-                                    }else {
-                                        Spacer(modifier = Modifier.width(20.dp))
-                                    }
-                                    Button(
-                                        onClick = {
+                                        Spacer(Modifier.width(14.dp))
+                                        Button(
+                                            onClick = {
                                             gioHangViewModel.deleteGioHang(giohang.MaGioHang)
                                             gioHangViewModel.listGioHang =
                                                 gioHangViewModel.listGioHang.filter { it.MaGioHang != giohang.MaGioHang }
                                             calculateTotalPrice()
                                         },
-                                        modifier = Modifier
-                                            .padding(11.dp)
-                                            .width(65.dp)
-                                            .height(35.dp),
-                                        colors = ButtonDefaults.buttonColors(Color.Red),
-                                        shape = RoundedCornerShape(12.dp)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Delete,
-                                            contentDescription = "",
-                                            tint = Color.White,
+                                            modifier = Modifier
+                                                .height(34.dp)
+                                                .width(50.dp),
+                                            contentPadding = PaddingValues(0.dp),
+                                            colors = ButtonDefaults.buttonColors(Color.Red),
+                                            shape = RoundedCornerShape(10.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Delete,
+                                                contentDescription = "Xóa",
+                                                tint = Color.White,
+                                            )
+                                        }
+                                    }
+                                    // Tồn kho/Thông báo (nếu muốn)
+                                    if (sanPham.SoLuong <= 5) {
+                                        Text(
+                                            "Còn ${sanPham.SoLuong} sp",
+                                            color = Color.Red,
+                                            fontSize = 13.sp,
+                                            modifier = Modifier.padding(top = 2.dp)
                                         )
                                     }
                                 }
@@ -441,39 +480,8 @@ fun CartScreen(
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+fun getGiaSauGiam(giaGoc: Int, phanTramGiam: Int?): Int {
+    return if (phanTramGiam != null && phanTramGiam > 0) {
+        (giaGoc * (100 - phanTramGiam) / 100)
+    } else giaGoc
+}

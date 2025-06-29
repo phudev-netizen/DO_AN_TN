@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.ManageAccounts
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.AlertDialog
@@ -156,10 +157,14 @@ fun AcccountScreen(
 
                     when (currentTab) {
                         "duyetdonhang" -> navController.navigate(NavRoute.ADMINSCREEN.route)
+                        "duyetkhuyenmai" -> navController.navigate("${NavRoute.ADMIN_KHUYENMAI.route}?tentaikhoan=${taikhoan.TenTaiKhoan}") // Thêm route này
+                        "quanLySanPham" -> navController.navigate(NavRoute.PRODUCT_MANAGEMENT.route)
+                        "thongke" -> navController.navigate(NavRoute.THONGKE.route)
                         "accountInfo" -> AccountInfoSection(tentaikhoan)
                         "cartManagement" -> navController.navigate("${NavRoute.QUANLYDONHANG.route}?makhachhang=${taikhoan.MaKhachHang}")
                         "changePassword" -> ChangePasswordSection(tentaikhoan)
                         "addresses" -> navController.navigate("${NavRoute.DIACHISCREEN.route}?makhachhang=${taikhoan.MaKhachHang}")
+
                     }
                 }
             }
@@ -529,8 +534,25 @@ fun AccountOptionsSection(
                     isSelected = currentTab == "duyetdonhang",
                     onClick = { onOptionSelected("duyetdonhang") }
                 )
+                AccountOptionItem(
+                    iconRes = Icons.Filled.AdminPanelSettings,
+                    label = "Duyệt khuyến mãi",
+                    isSelected = currentTab == "duyetkhuyenmai",
+                    onClick = { onOptionSelected("duyetkhuyenmai") }
+                )
+                AccountOptionItem(
+                    iconRes = Icons.Filled.ManageAccounts,
+                    label = "QUẢN LÝ SẢN PHẨM",
+                    isSelected = currentTab == "quanLySanPham",
+                    onClick = { onOptionSelected("quanLySanPham") }
+                )
+                AccountOptionItem(
+                    iconRes = Icons.Filled.ManageAccounts,
+                    label = "Thống Kê",
+                    isSelected = currentTab == "thongke",
+                    onClick = { onOptionSelected("thongke") }
+                )
             }
-
             AccountOptionItem(
                 iconRes = Icons.Filled.Person,
                 label = "Thông tin tài khoản",

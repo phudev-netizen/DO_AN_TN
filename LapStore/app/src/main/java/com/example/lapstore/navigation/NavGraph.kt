@@ -1,5 +1,4 @@
 import android.net.Uri
-import android.util.Log
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -8,10 +7,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.lapstore.models.ThongKeScreen
 import com.example.lapstore.viewmodels.KhachHangViewModel
+import com.example.lapstore.viewmodels.KhuyenMaiViewModel
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
 import com.example.lapstore.views.AcccountScreen
 import com.example.lapstore.views.AccessoryScreen
@@ -46,7 +45,10 @@ sealed class NavRoute(val route: String) {
     object FAVORITE : NavRoute("favorite_screen")
     object ADDRESS_SELECTION: NavRoute("address_selection_screen")
     object THONGKE : NavRoute("thongke_screen")
-}
+    object KHUYENMAI : NavRoute("khuyenmai_screen")
+    object  ADMIN_KHUYENMAI : NavRoute("admin_khuyenmai_screen")
+    object PRODUCT_MANAGEMENT : NavRoute("product_management_screen")
+    object UPDATEPRODUCT : NavRoute("update_product_screen")
 
 
 @Composable
@@ -58,8 +60,8 @@ fun NavgationGraph(
     taiKhoanViewModel: TaiKhoanViewModel
 ) {
     NavHost(navController = navController, startDestination = NavRoute.HOME.route) {
-        // HomeScreen không có tham số (Chưa đăng nhập)
-        composable(NavRoute.HOME.route) {
+    // HomeScreen không có tham số (Chưa đăng nhập)
+        composable(HOME.route) {
             HomeScreen(
                 navController, viewmodel, null,
                 role = null.toString()
@@ -68,7 +70,7 @@ fun NavgationGraph(
 
         // HomeScreen đã đăng nhập (có tham số tentaikhoan)
         composable(
-            route = NavRoute.HOME.route + "?tentaikhoan={tentaikhoan}",
+            route = HOME.route + "?tentaikhoan={tentaikhoan}",
             arguments = listOf(
                 navArgument("tentaikhoan") { type = NavType.StringType }
             )
@@ -79,9 +81,18 @@ fun NavgationGraph(
                 role = taiKhoanViewModel.getRole(tentaikhoan ?: "") ?: "user"
             )  // Hiển thị tên tài khoản khi đăng nhập
         }
+        composable(PRODUCT_MANAGEMENT.route) {
+            ProductManagementScreen(
+                viewModel = viewmodel,
+                navController = navController
+            )
+        }
+//        composable(NavRoute.UPDATEPRODUCT.route) {
+//            UpdateProductScreen(viewModel = viewmodel)
+//        }
 
         // Trang phụ kiện - chưa đăng nhập
-        composable(NavRoute.ACCESSORY.route) {
+        composable(ACCESSORY.route) {
             AccessoryScreen(
                 navController = navController,
                 viewModel = viewmodel,
@@ -90,7 +101,7 @@ fun NavgationGraph(
         }
         // Trang phụ kiện - đã đăng nhập
         composable(
-            route = NavRoute.ACCESSORY.route + "?tentaikhoan={tentaikhoan}",
+            route = ACCESSORY.route + "?tentaikhoan={tentaikhoan}",
             arguments = listOf(
                 navArgument("tentaikhoan") { type = NavType.StringType }
             )
@@ -105,16 +116,16 @@ fun NavgationGraph(
 
         // Màn hình tài khoản
         composable(
-            route = "${NavRoute.ACCOUNT.route}?tentaikhoan={tentaikhoan}",
+            route = "${ACCOUNT.route}?tentaikhoan={tentaikhoan}",
             arguments = listOf(navArgument("tentaikhoan") { type = NavType.StringType })
         ) { backStackEntry ->
             val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan") ?: ""
-            AcccountScreen(navController,tentaikhoan)
+            AcccountScreen(navController, tentaikhoan)
         }
 
         // Màn hình giỏ hàng
         composable(
-            route = "${NavRoute.CART.route}?makhachhang={makhachhang}&tentaikhoan={tentaikhoan}",
+            route = "${CART.route}?makhachhang={makhachhang}&tentaikhoan={tentaikhoan}",
             arguments = listOf(
                 navArgument("makhachhang") { type = NavType.StringType },
                 navArgument("tentaikhoan") { type = NavType.StringType }
@@ -122,62 +133,44 @@ fun NavgationGraph(
         ) { backStackEntry ->
             val makhachhang = backStackEntry.arguments?.getString("makhachhang") ?: ""
             val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan") ?: ""
-            CartScreen(navController,makhachhang,tentaikhoan)
+            CartScreen(navController, makhachhang, tentaikhoan)
         }
 
-        composable(NavRoute.LOGINSCREEN.route) {
-            LoginScreen(navController,taiKhoanViewModel)
+        composable(LOGINSCREEN.route) {
+            LoginScreen(navController, taiKhoanViewModel)
         }
 
-        //màn hình chi tiết trang chủ
+//        //màn hình chi tiết trang chủ
+
         composable(
-            route = NavRoute.PRODUCTDETAILSCREEN.route + "?id={id}&makhachhang={makhachhang}",
+            route = PRODUCTDETAILSCREEN.route +
+                    "?id={id}&makhachhang={makhachhang}&tentaikhoan={tentaikhoan}",
             arguments = listOf(
-                navArgument("id") { nullable = true },
-                navArgument("makhachhang") { nullable = true },
+                navArgument("id") { type = NavType.StringType; nullable = true },
+                navArgument("makhachhang") { type = NavType.StringType; nullable = true },
+                navArgument("tentaikhoan") { type = NavType.StringType; nullable = true }
             )
-        ) {
-            val id = it.arguments?.getString("id")
-            val makhachhang = it.arguments?.getString("makhachhang")
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id")
+            val makhachhang = backStackEntry.arguments?.getString("makhachhang")
+            val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan")
 
             if (id != null) {
                 ProductDetail_Screen(
                     navController = navController,
                     id = id,
                     makhachhang = makhachhang,
-                    tentaikhoan = null,
+                    tentaikhoan = tentaikhoan,
                     viewModel = viewmodel,
-                    hinhAnhViewModel = hinhAnhViewModel
-                )
-            }
-        }
-
-        composable(
-            route = NavRoute.PRODUCTDETAILSCREEN.route + "?id={id}&makhachhang={makhachhang}&tentaikhoan={tentaikhoan}",
-            arguments = listOf(
-                navArgument("id") { nullable = true },
-                navArgument("makhachhang") { nullable = true },
-                navArgument("tentaikhoan") { type = NavType.StringType }
-            )
-        ) {
-            val id = it.arguments?.getString("id")
-            val makhachhang = it.arguments?.getString("makhachhang")
-            val tentaikhoan = it.arguments?.getString("tentaikhoan")
-
-            if (id != null) {
-                ProductDetail_Screen(
-                    navController = navController,
-                    id = id,
-                    makhachhang = makhachhang,
-                    tentaikhoan = tentaikhoan.toString(),
-                    viewModel = viewmodel,
-                    hinhAnhViewModel = hinhAnhViewModel
+                    hinhAnhViewModel = hinhAnhViewModel,
+                    hoaDonBanList = khachHangViewModel.hoaDonBanList ?: emptyList(),
+                    chiTietHoaDonBanList = khachHangViewModel.chiTietHoaDonBanList ?: emptyList()
                 )
             }
         }
         // Màn hình chi tiết phụ kiện (accessory)
         composable(
-            route = NavRoute.PRODUCTDETAIL_ACCESSORY.route + "?id={id}&makhachhang={makhachhang}",
+            route = PRODUCTDETAIL_ACCESSORY.route + "?id={id}&makhachhang={makhachhang}",
             arguments = listOf(
                 navArgument("id") { nullable = true },
                 navArgument("makhachhang") { nullable = true },
@@ -199,7 +192,7 @@ fun NavgationGraph(
         }
 
         composable(
-            route = NavRoute.PRODUCTDETAIL_ACCESSORY.route + "?id={id}&makhachhang={makhachhang}&tentaikhoan={tentaikhoan}",
+            route = PRODUCTDETAIL_ACCESSORY.route + "?id={id}&makhachhang={makhachhang}&tentaikhoan={tentaikhoan}",
             arguments = listOf(
                 navArgument("id") { nullable = true },
                 navArgument("makhachhang") { nullable = true },
@@ -223,67 +216,78 @@ fun NavgationGraph(
         }
 
 
-//       //// màn hình thanh toán
+//      //// màn hình thanh toán
         composable(
-            route = NavRoute.PAYSCREEN.route + "?selectedProducts={selectedProducts}&tongtien={tongtien}&tentaikhoan={tentaikhoan}&makhachhang={makhachhang}&hinhanh={hinhanh}",
+            route = PAYSCREEN.route +
+                    "?selectedProducts={selectedProducts}" +
+                    "&tongtien={tongtien}" +
+                    "&tentaikhoan={tentaikhoan}" +
+                    "&makhachhang={makhachhang}" +
+                    "&hinhAnhHienTai={hinhAnhHienTai}" +   // Đúng tên này!
+                    "&tensanpham={tensanpham}",
             arguments = listOf(
                 navArgument("selectedProducts") { type = NavType.StringType },
-                navArgument("tongtien") { nullable = true },
+                navArgument("tongtien") { type = NavType.StringType; nullable = true },
                 navArgument("tentaikhoan") { type = NavType.StringType },
+                navArgument("makhachhang") { type = NavType.StringType; nullable = true },
+                navArgument("hinhAnhHienTai") { type = NavType.StringType; nullable = true },
+                navArgument("tensanpham") { type = NavType.StringType; nullable = true }
+
             )
         ) { backStackEntry ->
-            // Lấy chuỗi selectedProducts từ tham số điều hướng
             val selectedProductsString = backStackEntry.arguments?.getString("selectedProducts")
+            val selectedProducts =
+                selectedProductsString?.let { parseSelectedProducts(it) } ?: emptyList()
 
-            // Gọi hàm parseSelectedProducts để chuyển chuỗi thành danh sách Triple<Int, Int, Int>
-            val selectedProducts = selectedProductsString?.let { parseSelectedProducts(it) } ?: emptyList()
-
-            // Chuyển đổi tongtien từ String sang Int, nếu không có giá trị thì mặc định là 0
             val tongtien = backStackEntry.arguments?.getString("tongtien")?.toIntOrNull() ?: 0
             val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan") ?: ""
+            val makhachhang = backStackEntry.arguments?.getString("makhachhang") ?: ""
+            val hinhAnhHienTai =
+                backStackEntry.arguments?.getString("hinhAnhHienTai")?.let { Uri.decode(it) } ?: ""
+            val tensanpham =
+                backStackEntry.arguments?.getString("tensanpham")?.let { Uri.decode(it) } ?: ""
 
-            val tensanpham = backStackEntry.arguments?.getString("tensanpham")?.let { Uri.decode(it) } ?: ""
-            val hinhanh = backStackEntry.arguments?.getString("hinhanh")?.let { Uri.decode(it) } ?: ""
-
-            // Chuyển sang màn hình PayScreen với các tham số cần thiết
             PayScreen(
                 navController = navController,
                 selectedProducts = selectedProducts,
                 tongtien = tongtien,
-                tentaikhoan,
-                tensanpham = tensanpham,
-                hinhanh = hinhanh,
+                tentaikhoan = tentaikhoan,
+                hinhanh = hinhAnhHienTai,
+                tensanpham = tensanpham // bạn có thể truyền nếu cần, hoặc bỏ luôn nếu không dùng
             )
         }
 
 //màn hình thanh tóan thành công
         composable(
-            route = "${NavRoute.PAYSUCCESS.route}?tentaikhoan={tentaikhoan}",
+            route = "${PAYSUCCESS.route}?tentaikhoan={tentaikhoan}",
             arguments = listOf(navArgument("tentaikhoan") { type = NavType.StringType })
         ) { backStackEntry ->
             val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan") ?: ""
-            PaySuccess_Screen(navController,tentaikhoan)
+            PaySuccess_Screen(navController, tentaikhoan)
         }
 
         composable(
-            route = "${NavRoute.QUANLYDONHANG.route}?makhachhang={makhachhang}",
-            arguments = listOf(navArgument("makhachhang") { type = NavType.IntType }) // Thay đổi StringType thành IntType
+            route = "${QUANLYDONHANG.route}?makhachhang={makhachhang}",
+            arguments = listOf(navArgument("makhachhang") {
+                type = NavType.IntType
+            }) // Thay đổi StringType thành IntType
         ) { backStackEntry ->
-            val makhachhang = backStackEntry.arguments?.getInt("makhachhang") ?: 0 // Lấy makhachhang dưới dạng Int
-            CartManagementSection(navController,makhachhang)
+            val makhachhang = backStackEntry.arguments?.getInt("makhachhang")
+                ?: 0 // Lấy makhachhang dưới dạng Int
+            CartManagementSection(navController, makhachhang)
         }
 
 // màn hình địa chỉ
         composable(
-            route = "${NavRoute.DIACHISCREEN.route}?makhachhang={makhachhang}",
+            route = "${DIACHISCREEN.route}?makhachhang={makhachhang}",
             arguments = listOf(navArgument("makhachhang") { type = NavType.IntType })
         ) { backStackEntry ->
             val makhachhang = backStackEntry.arguments?.getInt("makhachhang") ?: 0
-            AddressManagementScreen(navController,makhachhang)
+            AddressManagementScreen(navController, makhachhang)
         }
 
         composable(
-            route = "${NavRoute.ADDDIACHI.route}?makhachhang={makhachhang}",
+            route = "${ADDDIACHI.route}?makhachhang={makhachhang}",
             arguments = listOf(navArgument("makhachhang") { type = NavType.IntType })
         ) { backStackEntry ->
             val makhachhang = backStackEntry.arguments?.getInt("makhachhang") ?: 0
@@ -291,7 +295,7 @@ fun NavgationGraph(
         }
 
         composable(
-            route = "${NavRoute.UPDATEDIACHI.route}?makhachhang={makhachhang}&madiachi={madiachi}",
+            route = "${UPDATEDIACHI.route}?makhachhang={makhachhang}&madiachi={madiachi}",
             arguments = listOf(
                 navArgument("makhachhang") { type = NavType.IntType },
                 navArgument("madiachi") { type = NavType.IntType }
@@ -299,10 +303,10 @@ fun NavgationGraph(
         ) { backStackEntry ->
             val makhachhang = backStackEntry.arguments?.getInt("makhachhang") ?: 0
             val madiachi = backStackEntry.arguments?.getInt("madiachi") ?: 0
-            UpdateDiaChiScreen(navController,makhachhang,madiachi)
+            UpdateDiaChiScreen(navController, makhachhang, madiachi)
         }
         composable(
-            route = NavRoute.ADDRESS_SELECTION.route + "?makhachhang={makhachhang}",
+            route = ADDRESS_SELECTION.route + "?makhachhang={makhachhang}",
             arguments = listOf(navArgument("makhachhang") { type = NavType.IntType })
         ) { backStackEntry ->
             val makhachhang = backStackEntry.arguments?.getInt("makhachhang") ?: 0
@@ -310,23 +314,23 @@ fun NavgationGraph(
         }
 //màn hình tìm kiếm
         composable(
-            route = NavRoute.SEARCHSCREEN.route + "?makhachhang={makhachhang}&tentaikhoan={tentaikhoan}",
+            route = SEARCHSCREEN.route + "?makhachhang={makhachhang}&tentaikhoan={tentaikhoan}",
             arguments = listOf(
                 navArgument("makhachhang") { nullable = true },
                 navArgument("tentaikhoan") { type = NavType.StringType }
             )
         ) {
-            val tentaikhoan = it.arguments?.getString("tentaikhoan")?:null
-            val makhachhang = it.arguments?.getString("makhachhang")?:null
-            SearchScreen(navController,makhachhang, tentaikhoan)
+            val tentaikhoan = it.arguments?.getString("tentaikhoan") ?: null
+            val makhachhang = it.arguments?.getString("makhachhang") ?: null
+            SearchScreen(navController, makhachhang, tentaikhoan)
         }
 
-        composable(NavRoute.SEARCHSCREEN.route) {
-            SearchScreen(navController,null,null)
+        composable(SEARCHSCREEN.route) {
+            SearchScreen(navController, null, null)
         }
 //hoa don
         composable(
-            route = "${NavRoute.HOADONDETAILSCREEN.route}?madonhang={madonhang}&tongtien={tongtien}",
+            route = "${HOADONDETAILSCREEN.route}?madonhang={madonhang}&tongtien={tongtien}",
             arguments = listOf(
                 navArgument("madonhang") { type = NavType.IntType },
                 navArgument("tongtien") { type = NavType.IntType },
@@ -334,14 +338,14 @@ fun NavgationGraph(
         ) { backStackEntry ->
             val madonhang = backStackEntry.arguments?.getInt("madonhang") ?: 0
             val tongtien = backStackEntry.arguments?.getInt("tongtien") ?: 0
-            DonHangDetailScreen(navController, madonhang,tongtien)
+            DonHangDetailScreen(navController, madonhang, tongtien)
         }
 
-        composable(NavRoute.ADMINSCREEN.route) {
+        composable(ADMINSCREEN.route) {
             AdminScreen(navController)
         }
 
-        composable(NavRoute.REGISTERSCREEN.route) { // Khởi tạo rõ ràng ViewModel
+        composable(REGISTERSCREEN.route) { // Khởi tạo rõ ràng ViewModel
             RegisterScreen(
                 navController = navController,
                 taiKhoanViewModel = taiKhoanViewModel,
@@ -350,7 +354,7 @@ fun NavgationGraph(
         }
 ////        //yêu thích
         composable(
-            route = NavRoute.FAVORITE.route + "?tentaikhoan={tentaikhoan}",
+            route = FAVORITE.route + "?tentaikhoan={tentaikhoan}",
             arguments = listOf(
                 navArgument("tentaikhoan") { nullable = true; type = NavType.StringType }
             )
@@ -384,7 +388,7 @@ fun NavgationGraph(
 
         //thong ke
         composable(
-            route = "${NavRoute.THONGKE.route}?tentaikhoan={tentaikhoan}",
+            route = "${THONGKE.route}?tentaikhoan={tentaikhoan}",
             arguments = listOf(
                 navArgument("tentaikhoan") {
                     nullable = true
@@ -397,8 +401,45 @@ fun NavgationGraph(
             val thongKeViewModel: ThongKeViewModel = viewModel()
             ThongKeScreen(viewModel = thongKeViewModel, tentaikhoan = tentaikhoan)
         }
+
+        // Quản lý khuyến mãi - Admin
+        composable(
+            route = ADMIN_KHUYENMAI.route + "?tentaikhoan={tentaikhoan}",
+            arguments = listOf(navArgument("tentaikhoan") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan")
+            val khuyenMaiViewModel: KhuyenMaiViewModel = viewModel()
+            val sanPhamViewModel: SanPhamViewModel = viewModel()
+
+            // ĐẢM BẢO ĐÃ LOAD DANH SÁCH SẢN PHẨM
+            LaunchedEffect(Unit) {
+                sanPhamViewModel.getAllSanPham()
+            }
+            val danhSachSanPham = sanPhamViewModel.danhSachAllSanPham
+
+            AdminKhuyenMaiScreen(
+                viewModel = khuyenMaiViewModel,
+                danhSachSanPham = danhSachSanPham,
+                //navController = navController,
+            )
+        }
+//        // Khuyến mãi - Người dùng
+//        composable(
+//            route = NavRoute.KHUYENMAI.route + "?tentaikhoan={tentaikhoan}",
+//            arguments = listOf(navArgument("tentaikhoan") { type = NavType.StringType })
+//        ) { backStackEntry ->
+//            val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan")
+//            val khuyenMaiViewModel: KhuyenMaiViewModel = viewModel()
+//            LaunchedEffect(tentaikhoan) {
+//                khuyenMaiViewModel.fetchTatCaKhuyenMai()
+//            }
+//            KhuyenMaiScreen(
+//                navController = navController,
+//                khuyenMaiViewModel = khuyenMaiViewModel,
+//                tentaikhoan = tentaikhoan
+//            )
+//        }
+
+      }
     }
 }
-
-
-

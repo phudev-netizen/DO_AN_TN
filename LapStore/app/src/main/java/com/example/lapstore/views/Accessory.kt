@@ -91,70 +91,47 @@ fun AccessoryScreen(
                     .fillMaxHeight()
                     .background(Color.White)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = Color.Red),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "DANH MỤC SẢN PHẨM",
-                        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Color.White),
-                        modifier = Modifier.padding(10.dp)
-                    )
-                    IconButton(
-                        onClick = {
-                            scope.launch { drawerState.close() }
-                        }
-                    ) {
-                        Icon(
-                            Icons.Filled.ArrowBackIosNew,
-                            contentDescription = "",
-                            tint = Color.White
-                        )
-                    }
-                }
-                CategoryMenuMain(
-                    onItemClick = { category ->
-                        scope.launch {
-                            drawerState.close()
-                            when (category) {
-//                                "Laptop Văn Phòng" -> {
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .background(color = Color.Red),
+//                    horizontalArrangement = Arrangement.SpaceBetween,
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Text(
+//                        "DANH MỤC SẢN PHẨM",
+//                        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Color.White),
+//                        modifier = Modifier.padding(10.dp)
+//                    )
+//                    IconButton(
+//                        onClick = {
+//                            scope.launch { drawerState.close() }
+//                        }
+//                    ) {
+//                        Icon(
+//                            Icons.Filled.ArrowBackIosNew,
+//                            contentDescription = "",
+//                            tint = Color.White
+//                        )
+//                    }
+//                }
+//                CategoryMenuMain(
+//                    onItemClick = { category ->
+//                        scope.launch {
+//                            drawerState.close()
+//                            when (category) {
+//                                "Phụ kiện" -> {
 //                                    if (tentaikhoan != null) {
-//                                        navController.navigate("${NavRoute.LAPTOP_VANPHONG.route}?tentaikhoan=${tentaikhoan}")
+//                                        navController.navigate("${NavRoute.ACCESSORY.route}?tentaikhoan=${tentaikhoan}")
 //                                    } else {
-//                                        navController.navigate(NavRoute.LAPTOP_VANPHONG.route)
+//                                        navController.navigate(NavRoute.ACCESSORY.route)
 //                                    }
 //                                }
-//                                "Laptop Gaming" -> {
-//                                    if (tentaikhoan != null) {
-//                                        navController.navigate("${NavRoute.LAPTOP_GAMING.route}?tentaikhoan=${tentaikhoan}")
-//                                    } else {
-//                                        navController.navigate(NavRoute.LAPTOP_GAMING.route)
-//                                    }
-//                                }
-                                "Phụ kiện" -> {
-                                    if (tentaikhoan != null) {
-                                        navController.navigate("${NavRoute.ACCESSORY.route}?tentaikhoan=${tentaikhoan}")
-                                    } else {
-                                        navController.navigate(NavRoute.ACCESSORY.route)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                )
-                Text("Thông tin", modifier = Modifier.padding(10.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                ) {
-                    Icon(imageVector = Icons.Outlined.SupportAgent, contentDescription = "")
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text("19001009")
-                }
+//                            }
+//                        }
+//                    }
+//                )
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     ) {

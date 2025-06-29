@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th6 22, 2025 lúc 06:19 PM
+-- Thời gian đã tạo: Th6 29, 2025 lúc 05:06 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.1.25
 
@@ -49,10 +49,11 @@ INSERT INTO `binhluandanhgia` (`MaBinhLuan`, `MaKhachHang`, `MaSanPham`, `MaHoaD
 (8, '12', 6, 0, 5, 'ok', '2025-06-11 00:00:00', 1),
 (9, '12', 1, 0, 3, 'kê', '2025-06-11 00:00:00', 1),
 (10, '12', 1, 0, 3, 'oki', '2025-06-11 11:58:05', 1),
-(12, '', 0, 0, 0, '', '0000-00-00 00:00:00', 0),
 (13, '12', 2, 0, 5, 'rất tốt ', '2025-06-17 11:04:29', 0),
 (14, '12', 3, 0, 4, 'ổn nhe ', '2025-06-17 11:04:44', 1),
-(15, '12', 1, 0, 5, 'ok nhe \n', '2025-06-17 11:56:18', 0);
+(15, '12', 1, 0, 5, 'ok nhe \n', '2025-06-17 11:56:18', 0),
+(16, '13', 4, 0, 5, 'rất là ổn lunk', '2025-06-26 13:01:47', 1),
+(17, '13', 1, 4, 5, 'oke phết nhỉ ', '2025-06-29 19:52:36', 1);
 
 -- --------------------------------------------------------
 
@@ -108,7 +109,25 @@ INSERT INTO `chitiethoadonban` (`MaChiTietHoaDonBan`, `MaHoaDonBan`, `MaSanPham`
 (88, 65, 5, 1, 13399000, 0),
 (89, 67, 4, 1, 17390000, 0),
 (90, 67, 2, 1, 8990000, 0),
-(91, 68, 6, 1, 73990000, 0);
+(91, 68, 6, 1, 73990000, 0),
+(92, 69, 5, 1, 13399000, 0),
+(93, 70, 2, 1, 8990000, 0),
+(94, 71, 2, 1, 8990000, 0),
+(95, 72, 2, 1, 8990000, 0),
+(96, 73, 2, 1, 8990000, 0),
+(97, 74, 2, 1, 8990000, 0),
+(98, 75, 2, 1, 8990000, 0),
+(99, 77, 2, 1, 8990000, 0),
+(100, 79, 1, 6, 29990000, 0),
+(101, 80, 5, 1, 13399000, 0),
+(102, 82, 2, 1, 8990000, 0),
+(103, 84, 5, 1, 13399000, 0),
+(104, 85, 4, 1, 17390000, 0),
+(105, 86, 4, 1, 17390000, 0),
+(106, 87, 6, 1, 73990000, 0),
+(107, 88, 2, 1, 8990000, 0),
+(108, 89, 2, 2, 8990000, 0),
+(109, 90, 2, 1, 8990000, 0);
 
 -- --------------------------------------------------------
 
@@ -163,7 +182,10 @@ CREATE TABLE `giohang` (
 
 INSERT INTO `giohang` (`MaGioHang`, `MaKhachHang`, `MaSanPham`, `SoLuong`, `TrangThai`) VALUES
 (241, 12, 5, 1, 1),
-(244, 12, 1, 1, 1);
+(244, 12, 1, 1, 1),
+(246, 12, 2, 2, 1),
+(268, 13, 2, 2, 1),
+(269, 13, 4, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -221,7 +243,8 @@ INSERT INTO `hinhanh` (`MaHinhAnh`, `DuongDan`, `MacDinh`, `MaSanPham`) VALUES
 (42, 'https://i.postimg.cc/9MJXNRFq/SD5-SG2-128-G-1052-E-lg.jpg', 0, 10),
 (46, 'https://i.postimg.cc/gj1Mx8vf/Lexar.png', 1, 11),
 (47, 'https://i.postimg.cc/s2hWTjSB/ban-phim-co-khong-day-e-dra-ek368-L.jpg', 1, 12),
-(48, 'https://i.postimg.cc/prgnt3KG/ziyoulang.png', 0, 12);
+(48, 'https://i.postimg.cc/prgnt3KG/ziyoulang.png', 0, 12),
+(49, 'https://i.postimg.cc/Fs1sQ8jZ/rvn-laptop-msi-modern-14-c11m-011vn-3-61f7caf6e5db4867941fca086d789f06-bbf4fdc78bba4cfe98aa979b3cbb3.png', 1, 40);
 
 -- --------------------------------------------------------
 
@@ -272,7 +295,29 @@ INSERT INTO `hoadonban` (`MaHoaDonBan`, `MaKhachHang`, `NgayDatHang`, `MaDiaChi`
 (65, 12, '2025-06-12', 34, 13429000, 'Thanh toán khi nhận hàng', '6'),
 (66, 12, '2025-06-17', 34, 13429000, 'Thanh toán khi nhận hàng', '4'),
 (67, 13, '2025-06-18', 37, 26410000, 'Thanh toán khi nhận hàng', '4'),
-(68, 12, '2025-06-22', 34, 74020000, 'Thanh toán khi nhận hàng', '1');
+(68, 12, '2025-06-22', 34, 74020000, 'Thanh toán khi nhận hàng', '1'),
+(69, 12, '2025-06-23', 34, 13429000, 'Thanh toán khi nhận hàng', '4'),
+(70, 12, '2025-06-24', 34, 9020000, 'Thanh toán khi nhận hàng', '1'),
+(71, 12, '2025-06-24', 34, 9020000, 'Thanh toán qua Momo', '1'),
+(72, 12, '2025-06-24', 34, 9020000, 'Thanh toán qua Momo', '1'),
+(73, 12, '2025-06-24', 34, 9020000, 'Thanh toán qua Momo', '1'),
+(74, 12, '2025-06-24', 34, 9020000, 'Thanh toán qua Momo', '1'),
+(75, 12, '2025-06-24', 34, 9020000, 'Thanh toán qua Momo', '1'),
+(76, 12, '2025-06-25', 36, 9020000, 'Thanh toán qua Momo', '2'),
+(77, 13, '2025-06-25', 37, 9020000, 'Thanh toán khi nhận hàng', '6'),
+(78, 13, '2025-06-25', 37, 9020000, 'Thanh toán khi nhận hàng', '6'),
+(79, 13, '2025-06-25', 37, 179970000, 'Thanh toán khi nhận hàng', '6'),
+(80, 13, '2025-06-25', 37, 13429000, 'Thanh toán khi nhận hàng', '5'),
+(81, 13, '2025-06-25', 37, 13429000, 'Thanh toán khi nhận hàng', '4'),
+(82, 13, '2025-06-26', 37, 9020000, 'Thanh toán khi nhận hàng', '6'),
+(83, 13, '2025-06-26', 37, 9020000, 'Thanh toán khi nhận hàng', '4'),
+(84, 13, '2025-06-26', 37, 13429000, 'Thanh toán khi nhận hàng', '4'),
+(85, 13, '2025-06-26', 37, 17420000, 'Thanh toán khi nhận hàng', '4'),
+(86, 13, '2025-06-26', 37, 17420000, 'Thanh toán khi nhận hàng', '4'),
+(87, 13, '2025-06-26', 37, 74020000, 'Thanh toán khi nhận hàng', '4'),
+(88, 13, '2025-06-27', 37, 9020000, 'Thanh toán khi nhận hàng', '6'),
+(89, 13, '2025-06-27', 37, 15313000, 'Thanh toán khi nhận hàng', '6'),
+(90, 13, '2025-06-28', 37, 7671500, 'Thanh toán khi nhận hàng', '3');
 
 -- --------------------------------------------------------
 
@@ -303,7 +348,33 @@ INSERT INTO `khachhang` (`MaKhachHang`, `HoTen`, `GioiTinh`, `NgaySinh`, `Email`
 (10, 'nguyenthibetu', 'Nữ', '2004-06-05', 'betubungbu@gmail.com', '0904853621'),
 (11, 'khaylo', 'Nam', '2004-09-23', 'khaylohuynh23092004@gmail.com', '0383184941'),
 (12, 'khầy bùa ', 'Nam', '2000-12-19', 'khaybua@gmail.com', '0374897743'),
-(13, 'phu', '', '0000-00-00', 'phu77@gmail.com', '');
+(13, 'phu', '', '1997-07-03', 'phu77@gmail.com', '0377897753');
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `khuyenmai`
+--
+
+CREATE TABLE `khuyenmai` (
+  `MaKhuyenMai` int(11) NOT NULL,
+  `MaSanPham` int(11) DEFAULT NULL,
+  `TenKhuyenMai` varchar(255) DEFAULT NULL,
+  `PhanTramGiam` int(11) DEFAULT NULL CHECK (`PhanTramGiam` between 0 and 100),
+  `NgayBatDau` date DEFAULT NULL,
+  `NgayKetThuc` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `khuyenmai`
+--
+
+INSERT INTO `khuyenmai` (`MaKhuyenMai`, `MaSanPham`, `TenKhuyenMai`, `PhanTramGiam`, `NgayBatDau`, `NgayKetThuc`) VALUES
+(2, 2, 'sale', 15, '2025-06-27', '2025-06-30'),
+(3, 2, 'lap', 10, '2025-07-01', '2025-07-31'),
+(4, 5, 'salelonlam', 25, '2025-06-29', '2025-08-27'),
+(6, 5, 'saloto', 20, '2025-06-30', '2025-06-20'),
+(7, 1, 'sale', 12, '0000-00-00', '0000-00-00');
 
 -- --------------------------------------------------------
 
@@ -373,19 +444,22 @@ CREATE TABLE `sanpham` (
 --
 
 INSERT INTO `sanpham` (`MaSanPham`, `TenSanPham`, `MaLoaiSanPham`, `CPU`, `RAM`, `CardManHinh`, `SSD`, `ManHinh`, `MaMauSac`, `Gia`, `SoLuong`, `MoTa`, `TrangThai`) VALUES
-(1, 'Laptop gaming ASUS TUF Gaming F15 FX507VV LP304W', 2, 'INTEL CORE I9 12900K', 'RAM 16 GB', 'RTX 4060', 'SSD 512 GB', '1920x1080', 2, 29990000, 13, 'Laptop gaming RTX 40 Series mạnh nhất cho học sinh, sinh viên\n\nHoạt động bền bỉ, làm chủ trận chiến trên chiếc laptop ASUS TUF Gaming F15 (2023), sử dụng bộ vi xử lý Intel Core™ i7-13620H với sự kết hợp giữa lõi hiệu năng (P-core) và lõi tiết kiệm điện (E-core) cân bằng sức mạnh chơi game và khả năng đa nhiệm tuyệt vời. ASUS TUF Gaming F15 còn được trang bị đồ họa NVIDIA GeForce RTX™ 40 series mới nhất hỗ trợ G-SYNC® và có TGP tối đa là 140 W với Dynamic Boost. Sự kết hợp giữa CPU mạnh mẽ và GPU hiệu suất cao mang lại khả năng chơi game đáng kinh ngạc trên cả các tựa game mới nhất. Màn hình FHD 144Hz cho trải nghiệm gaming mượt mà, tận hưởng không gian giải trí đắm chìm. ', 1),
-(2, 'Laptop MSI Modern 14 C11M 011VN', 1, 'Intel Core i3-1115G4 (up to 4.1Ghz, 6MB)', 'RAM 8 GB', 'Intel UHD Graphics', 'SSD 512 GB', '1920x1080', 1, 8990000, 19, 'MSI Modern 14 C11M-011VN nằm trong phân khúc laptop 9 triệu được trang bị màn hình rộng 14 inch có độ phân giải Full HD cùng tần số quét ở mức cơ bản 60Hz. Màn hình IPS này sẽ đủ sắc nét để người dùng có thể thoải mái sử dụng trong học tập, nghiên cứu và làm việc.', 1),
+(1, 'Laptop gaming ASUS TUF Gaming F15 FX507VV LP304W', 2, 'INTEL CORE I9 12900K', 'RAM 16 GB', 'RTX 4060', 'SSD 512 GB', '1920x1080', 2, 29790000, 13, 'Laptop gaming RTX 40 Series mạnh nhất cho học sinh, sinh viên\n\nHoạt động bền bỉ, làm chủ trận chiến trên chiếc laptop ASUS TUF Gaming F15 (2023), sử dụng bộ vi xử lý Intel Core™ i7-13620H với sự kết hợp giữa lõi hiệu năng (P-core) và lõi tiết kiệm điện (E-core) cân bằng sức mạnh chơi game và khả năng đa nhiệm tuyệt vời. ASUS TUF Gaming F15 còn được trang bị đồ họa NVIDIA GeForce RTX™ 40 series mới nhất hỗ trợ G-SYNC® và có TGP tối đa là 140 W với Dynamic Boost. Sự kết hợp giữa CPU mạnh mẽ và GPU hiệu suất cao mang lại khả năng chơi game đáng kinh ngạc trên cả các tựa game mới nhất. Màn hình FHD 144Hz cho trải nghiệm gaming mượt mà, tận hưởng không gian giải trí đắm chìm. ', 1),
+(2, 'Laptop MSI Modern 14 C11M 011VN', 1, 'Intel i5', '4GB', 'Integrated', '128GB', '13.3&quot; FHD', 1, 8099000, 16, 'MSI Modern 14 C11M-011VN nằm trong phân khúc laptop 9 triệu được trang bị màn hình rộng 14 inch có độ phân giải Full HD cùng tần số quét ở mức cơ bản 60Hz. Màn hình IPS này sẽ đủ sắc nét để người dùng có thể thoải mái sử dụng trong học tập, nghiên cứu và làm việc.', 1),
 (3, 'Laptop gaming ASUS Vivobook 16X K3605ZF RP634W', 2, 'AMD R77700M', 'RAM 16 GB', 'RTX 3050', 'SSD 1TB', '1920x1080', 1, 17290000, 0, 'Bên trong ASUS Gaming Vivobook K3605ZF-RP634W là bộ vi xử lý Intel Core i5-12500H với 4 nhân hiệu năng cao và 8 nhân tiết kiệm điện, cùng với bộ nhớ đệm 18MB, đạt tốc độ tối đa lên đến 4.5 GHz. Cấu hình này không chỉ đáp ứng tốt các tựa game phổ biến mà còn tối ưu cho các tác vụ đa nhiệm và xử lý đồ họa nặng.', 1),
-(4, 'Laptop ASUS Vivobook 14 OLED A1405VA KM095W', 1, 'INTEL CORE I7 12500H', 'RAM 8 GB', 'INTEL ARISXE', 'SSD 1TB', '1920x1080', 1, 17390000, 3, 'Tỏa sáng với cả thế giới cùng ASUS Vivobook 14 OLED mạnh mẽ, chiếc laptop tích hợp nhiều tính năng với màn hình OLED rực rỡ, gam màu DCI-P3 đẳng cấp điện ảnh. Mọi thứ trở nên dễ dàng hơn nhờ những tiện ích thân thiện với người dùng bao gồm bản lề duỗi thẳng 180°, nắp che webcam vật lý và các phím chức năng chuyên dụng. Bảo vệ sức khỏe an toàn với ASUS kháng khuẩn Guard Plus trên các bề mặt thường xuyên chạm vào. Bắt đầu ngày mới đầy hứng khởi với ASUS Vivobook 14 OLED!', 1),
-(5, 'Laptop Acer Swift 14 AI SF14 51 53P9', 1, 'Intel® Core™ Ultra 5 Processor 226V', 'RAM 16GB', 'Intel® Arc™ Graphic', 'SSD 1TB', '14&amp;quot; 3K (2880 x 1800) OLED', 1, 13399000, 7, 'Acer Swift 14 AI SF14 51 53P9 tiếp tục thừa hưởng ngôn ngữ thiết kế tối giản, thanh lịch của dòng Swift. Vỏ máy được chế tác từ hợp kim nhôm cao cấp, mang đến vẻ ngoài sang trọng và độ bền bỉ cao. Với độ mỏng ấn tượng chỉ 15.95mm và trọng lượng siêu nhẹ 1.26kg, chiếc laptop ai này là người bạn đồng hành lý tưởng cho những người thường xuyên di chuyển. ', 1),
-(6, 'Laptop gaming MSI Stealth 16 AI Studio A1VHG 241VN', 2, 'Intel® Core™ Ultra 9 processor 185H with Intel® AI', 'RAM: 64GB', 'NVIDIA® GeForce RTX™', 'SSD: 1TB', '16\" QHD+(2560x1600), 240Hz', 1, 73990000, 10, 'Chiếc laptop gaming được trang bị con chip Intel Core Ultra 9 - 185H với 16 lõi, 22 luồng kết hợp với VGA NVIDIA GeForece RTX 4070 giúp trải nghiệm chơi các game AAA và render hình ảnh, video một cách mượt mà không xảy ra hiện tượng giật lag. \r\n\r\n', 1),
+(4, 'Laptop ASUS Vivobook 14 OLED A1405VA KM095W', 1, 'INTEL CORE I7 12500H', 'RAM 8 GB', 'INTEL ARISXE', 'SSD 1TB', '1920x1080', 1, 17000000, 6, 'Tỏa sáng với cả thế giới cùng ASUS Vivobook 14 OLED mạnh mẽ, chiếc laptop tích hợp nhiều tính năng với màn hình OLED rực rỡ, gam màu DCI-P3 đẳng cấp điện ảnh. Mọi thứ trở nên dễ dàng hơn nhờ những tiện ích thân thiện với người dùng bao gồm bản lề duỗi thẳng 180°, nắp che webcam vật lý và các phím chức năng chuyên dụng. Bảo vệ sức khỏe an toàn với ASUS kháng khuẩn Guard Plus trên các bề mặt thường xuyên chạm vào. Bắt đầu ngày mới đầy hứng khởi với ASUS Vivobook 14 OLED!', 1),
+(5, 'Laptop Acer Swift 14 AI SF14 51 53P9', 1, 'Intel® Core™ Ultra 5 Processor 226V', 'RAM 16GB', 'Intel® Arc™ Graphic', 'SSD 1TB', '14&amp;amp;amp;quot; 3K (2880 x 1800) OLED', 1, 13399000, 5, 'Acer Swift 14 AI SF14 51 53P9 tiếp tục thừa hưởng ngôn ngữ thiết kế tối giản, thanh lịch của dòng Swift. Vỏ máy được chế tác từ hợp kim nhôm cao cấp, mang đến vẻ ngoài sang trọng và độ bền bỉ cao. Với độ mỏng ấn tượng chỉ 15.95mm và trọng lượng siêu nhẹ 1.26kg, chiếc laptop ai này là người bạn đồng hành lý tưởng cho những người thường xuyên di chuyển. ', 1),
+(6, 'Laptop gaming MSI Stealth 16 AI Studio A1VHG 241VN', 2, 'Intel® Core™ Ultra 9 processor 185H with Intel® AI', 'RAM: 64GB', 'NVIDIA® GeForce RTX™', 'SSD: 1TB', '16&quot; QHD+(2560x1600), 240Hz', 1, 73990000, 9, 'Chiếc laptop gaming được trang bị con chip Intel Core Ultra 9 - 185H với 16 lõi, 22 luồng kết hợp với VGA NVIDIA GeForece RTX 4070 giúp trải nghiệm chơi các game AAA và render hình ảnh, video một cách mượt mà không xảy ra hiện tượng giật lag. \r\n\r\n', 1),
 (7, 'RAM Laptop DDR4 8GB Bus 3200MHz', 3, 'ADM 5570', 'RAM: 16GB', 'NVIDIA® GeForce RTX™', 'BUS:3200MHz', 'Kích thước 13.8cm', 1, 850000, 15, 'RAM Laptop DDR4 8GB Bus 3200MHz – nâng cấp hiệu năng, chạy đa nhiệm mượt mà, tiết kiệm điện, tương thích nhiều dòng máy.\"', 1),
-(8, 'RAM laptop Kingston CL42  DDR5  (KVR52S42BS8-16)', 3, 'AMD Ryzen 3', 'RAM:16GB', 'NVIDIA® GeForce RTX™', 'BUS :5200MHz', 'Kích thước 13.8cm', 2, 1249000, 15, 'Nâng cấp hiệu suất cho chiếc laptop của bạn với RAM Laptop DDR4 8GB Bus 3200MHz – giải pháp tối ưu giúp tăng tốc độ xử lý, cải thiện đa nhiệm và mang đến trải nghiệm mượt mà hơn trong công việc lẫn giải trí.', 1),
+(8, 'RAM laptop Kingston CL42  DDR5  (KVR52S42BS8-16)', 3, 'AMD Ryzen 3', 'RAM:16GB', 'NVIDIA® GeForce RTX™', 'BUS :5200MHz', 'Kích thước 13.8cm', 2, 124900, 15, 'Nâng cấp hiệu suất cho chiếc laptop của bạn với RAM Laptop DDR4 8GB Bus 3200MHz – giải pháp tối ưu giúp tăng tốc độ xử lý, cải thiện đa nhiệm và mang đến trải nghiệm mượt mà hơn trong công việc lẫn giải trí.', 1),
 (9, 'SSD KingSton ', 3, 'AMD Ryzen7', 'RAM:2TB', 'RTX 3060', 'BUS:3200MHz', 'Kích thước 8cm', 1, 1099000, 30, 'SSD laptop lưu trữ nhiều dữ liệu còn nhanh nữa chứ ', 1),
-(10, 'SSD SanDisk ', 3, 'AMD Ryzen 5', 'RAM:128GB', 'RTX 7090', 'BUS: 2800MHz', 'Kích thước 8cm', 1, 900000, 50, 'SSD Laptop 128GB – tăng tốc khởi động máy, truy xuất dữ liệu nhanh, nhỏ gọn, tiết kiệm điện, phù hợp nâng cấp cho laptop cũ.', 1),
+(10, 'SSD SanDisk ', 3, 'AMD Ryzen 5', 'RAM:128GB', 'RTX 7090', 'BUS: 2800MHz', 'Kích thước 8cm', 1, 989000, 50, 'SSD Laptop 128GB – tăng tốc khởi động máy, truy xuất dữ liệu nhanh, nhỏ gọn, tiết kiệm điện, phù hợp nâng cấp cho laptop cũ.', 1),
 (11, 'RAM laptop Lexar LD4AS016G-B3200GSST  DDR4  (LD4AS016G-B3200GSST (L))', 3, 'AMD Ryzen 3', 'Ram:16GB', 'RTX 3060', 'BUS:3200MHz', 'Kích thước 8cm', 2, 1090000, 25, 'Ram Laptop Lexar DDR4 16G (1x 16Gb) 3200Mhz hiệu năng cao đã được chọn lọc và hoàn toàn đáng tin cậy. Ram Lexar 32GB dành cho laptop với độ trễ thấp, mang lại một tốc độ đáp ứng gần như tức thì cho mọi ứng dụng, tối ưu trải nghiệm của bạn với hiệu năng cải thiện đáng kể.\nLắp đặt dễ dàng, ít tiêu tốn điện năng \nRam Laptop Lexar DDR4 16G (1x 16Gb) 3200Mhz cho phép bạn lắp đặt ngay mà không thông qua trình cài đặt phức tạp, dễ dàng nâng cấp cấu hình của chiếc máy tính ngay lập tức để tận hưởng hiệu năng mong muốn. Quá trình kiểm tra nghiêm ngặt đảm bảo độ tin cậy cho Ram Lexar DDR4.', 1),
-(12, 'Bàn phím', 4, 'AMD', '8GB', 'GTX 1080', '512GB', '25cm', 2, 1800000, 32, 'thích hợp mọi loại máy', 1),
-(14, '', 0, '', '', '', '', '', 0, 0, 0, '', 0);
+(12, 'Bàn phím', 4, '0', '8GB', '0', '0', '0', 2, 1800000, 32, 'thích hợp mọi loại máy', 1),
+(13, 'laptop acer', 2, 'Intel i5', '16GB', 'RTX 3050', '3200', '16&quot; QHD+(2560x1600), 240Hz', 1, 1597000, 23, 'rất vừavtuis tiền ', 1),
+(14, 'acer ', 4, 'Intel i5', '8GB', 'RTX 3050', '256GB', '13.3&quot; FHD', 1, 1200000, 21, 'rât là ổn', 1),
+(15, 'acer', 1, 'Intel i5', '4GB', 'Integrated', '128GB', '13.3&quot; FHD', 0, 1230000, 10, 'ổn ', 1),
+(40, 'acer', 1, 'Intel i5', '4GB', 'Integrated', '128GB', '13.3&quot; FHD', 1, 120000, 12, 'ổn áp', 1);
 
 -- --------------------------------------------------------
 
@@ -436,7 +510,9 @@ INSERT INTO `yeuthich` (`ID`, `MaKhachHang`, `MaSanPham`, `NgayYeuThich`) VALUES
 (1, 10, 3, '2025-06-19 11:00:21'),
 (7, 12, 6, '2025-06-22 21:29:59'),
 (8, 12, 2, '2025-06-22 22:05:34'),
-(10, 12, 1, '2025-06-22 22:20:59');
+(10, 12, 1, '2025-06-22 22:20:59'),
+(11, 13, 1, '2025-06-23 09:20:53'),
+(12, 12, 7, '2025-06-24 09:13:43');
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -494,6 +570,13 @@ ALTER TABLE `khachhang`
   ADD UNIQUE KEY `Email` (`Email`);
 
 --
+-- Chỉ mục cho bảng `khuyenmai`
+--
+ALTER TABLE `khuyenmai`
+  ADD PRIMARY KEY (`MaKhuyenMai`),
+  ADD KEY `MaSanPham` (`MaSanPham`);
+
+--
 -- Chỉ mục cho bảng `loaisanpham`
 --
 ALTER TABLE `loaisanpham`
@@ -535,13 +618,13 @@ ALTER TABLE `yeuthich`
 -- AUTO_INCREMENT cho bảng `binhluandanhgia`
 --
 ALTER TABLE `binhluandanhgia`
-  MODIFY `MaBinhLuan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `MaBinhLuan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT cho bảng `chitiethoadonban`
 --
 ALTER TABLE `chitiethoadonban`
-  MODIFY `MaChiTietHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
+  MODIFY `MaChiTietHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 
 --
 -- AUTO_INCREMENT cho bảng `diachi`
@@ -553,7 +636,7 @@ ALTER TABLE `diachi`
 -- AUTO_INCREMENT cho bảng `giohang`
 --
 ALTER TABLE `giohang`
-  MODIFY `MaGioHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=245;
+  MODIFY `MaGioHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=271;
 
 --
 -- AUTO_INCREMENT cho bảng `hinhanh`
@@ -565,13 +648,19 @@ ALTER TABLE `hinhanh`
 -- AUTO_INCREMENT cho bảng `hoadonban`
 --
 ALTER TABLE `hoadonban`
-  MODIFY `MaHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `MaHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
 
 --
 -- AUTO_INCREMENT cho bảng `khachhang`
 --
 ALTER TABLE `khachhang`
   MODIFY `MaKhachHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT cho bảng `khuyenmai`
+--
+ALTER TABLE `khuyenmai`
+  MODIFY `MaKhuyenMai` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT cho bảng `loaisanpham`
@@ -589,13 +678,13 @@ ALTER TABLE `mausac`
 -- AUTO_INCREMENT cho bảng `sanpham`
 --
 ALTER TABLE `sanpham`
-  MODIFY `MaSanPham` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `MaSanPham` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT cho bảng `yeuthich`
 --
 ALTER TABLE `yeuthich`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Các ràng buộc cho các bảng đã đổ
@@ -606,6 +695,12 @@ ALTER TABLE `yeuthich`
 --
 ALTER TABLE `diachi`
   ADD CONSTRAINT `fk_diachi_khachhang` FOREIGN KEY (`MaKhachHang`) REFERENCES `khachhang` (`MaKhachHang`);
+
+--
+-- Các ràng buộc cho bảng `khuyenmai`
+--
+ALTER TABLE `khuyenmai`
+  ADD CONSTRAINT `khuyenmai_ibfk_1` FOREIGN KEY (`MaSanPham`) REFERENCES `sanpham` (`MaSanPham`);
 
 --
 -- Các ràng buộc cho bảng `taikhoan`

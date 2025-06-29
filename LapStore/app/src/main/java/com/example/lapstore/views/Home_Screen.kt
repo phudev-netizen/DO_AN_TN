@@ -1,4 +1,3 @@
-import android.util.Log
 import android.widget.Toast
 import com.example.lapstore.views.ProductCard
 import androidx.compose.foundation.Image
@@ -31,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.lapstore.CategoryMenuMain
 import com.example.lapstore.R
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -65,13 +63,13 @@ fun HomeScreen(
     val context = LocalContext.current
     val yeuThichViewModel: YeuThichViewModel = viewModel()
     val danhSachYeuThich by yeuThichViewModel.danhSachYeuThich.observeAsState(emptyList())
+    var showProductDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(taikhoan?.MaKhachHang) {
         taikhoan?.MaKhachHang?.let { maKH ->
             yeuThichViewModel.loadDanhSach(maKH)
         }
     }
-
 
     // Điều hướng đến SearchScreen khi trường tìm kiếm được focus
 
@@ -101,88 +99,11 @@ fun HomeScreen(
         viewModel.getAllSanPham()
     }
 
-    ModalNavigationDrawer(
-        modifier = Modifier.background(Color.White),
-        scrimColor = DrawerDefaults.scrimColor,
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet(
-                drawerContainerColor = Color.White,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .background(Color.White)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = Color.Red),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "DANH MỤC SẢN PHẨM",
-                        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = Color.White),
-                        modifier = Modifier.padding(10.dp)
-                    )
-                    IconButton(
-                        onClick = {
-                            scope.launch { drawerState.close() }
-                        }
-                    ) {
-                        Icon(
-                            Icons.Filled.ArrowBackIosNew,
-                            contentDescription = "",
-                            tint = Color.White
-                        )
-                    }
-                }
-                CategoryMenuMain(
-                    onItemClick = { category ->
-                        scope.launch {
-                            drawerState.close()
-                            if (taikhoan != null) {
-                                navController.navigate("${NavRoute.ACCESSORY.route}?category=${category}&tentaikhoan=${taikhoan.TenTaiKhoan}")
-                            } else {
-                                navController.navigate("${NavRoute.ACCESSORY.route}?category=${category}")
-                            }
-                        }
-                    }
-                )
-                Text("Thông tin", modifier = Modifier.padding(10.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                ) {
-                    Icon(imageVector = Icons.Outlined.SupportAgent, contentDescription = "")
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text("19001009")
-                }
-            }
-        }
-    ) {
+    // Giao diện chính của HomeScreen
         Scaffold(
             containerColor = Color.White,
             topBar = {
                 CenterAlignedTopAppBar(
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                keyboardController?.hide()
-                                scope.launch {
-                                    drawerState.apply {
-                                        if (isClosed) open() else close()
-                                    }
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = "",
-                                tint = Color.White
-                            )
-                        }
-                    },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = Color.Red
                     ),
@@ -340,32 +261,6 @@ fun HomeScreen(
                                 )
                             }
                             // Kiểm tra vai trò của người dùng
-                            if (role == "admin") {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center,
-                                    modifier = Modifier.padding(horizontal = 8.dp)
-                                ) {
-                                    IconButton(
-                                        modifier = Modifier.size(45.dp),
-                                        onClick = {
-                                            // Truyền tentaikhoan nếu cần
-                                            if (tentaikhoan != null) {
-                                                navController.navigate("${NavRoute.THONGKE.route}?tentaikhoan=$tentaikhoan")
-                                            } else {
-                                                navController.navigate(NavRoute.THONGKE.route)
-                                            }
-                                        }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Outlined.Analytics,
-                                            contentDescription = "Thống kê",
-                                            tint = Color.Red
-                                        )
-                                    }
-                                    Text(text = "Thống kê")
-                                }
-                            }
 
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -404,10 +299,6 @@ fun HomeScreen(
                         .fillMaxSize()
                         .padding(it)
                 ) {
-                    // BANNER: Thêm banner ở đầu trang, tự động chuyển
-                    item {
-                        BannerAuto()
-                    }
                     item {
                         Text(
                             text = "Tất cả sản phẩm",
@@ -495,8 +386,6 @@ fun HomeScreen(
                                     makhachhang = taikhoan?.MaKhachHang?.toString(),
                                     tentaikhoan = taikhoan?.TenTaiKhoan
                                 )
-
-
                             }
                         }
                     }
@@ -547,91 +436,75 @@ fun HomeScreen(
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-
-
-@Composable
-fun BannerAuto() {
-    val banners = listOf(
-        R.drawable.lp1,   // Thay bằng tên ảnh banner của bạn
-        R.drawable.lp2,         // Có thể thêm nhiều ảnh banner nếu muốn
-        R.drawable.lp3,
-    )
-    val bannerCount = banners.size
-    val bannerHeight = 160.dp
-    val bannerShape = RoundedCornerShape(20.dp)
-    val listState = rememberLazyListState()
-    var currentIndex by remember { mutableStateOf(0) }
-    val scope = rememberCoroutineScope()
-
-    // Tự động chuyển banner mỗi 3 giây
-    LaunchedEffect(currentIndex) {
-        delay(3000)
-        val next = (currentIndex + 1) % bannerCount
-        currentIndex = next
-        scope.launch { listState.animateScrollToItem(next) }
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .height(bannerHeight + 8.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        LazyRow(
-            state = listState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(bannerHeight),
-            contentPadding = PaddingValues(horizontal = 0.dp)
-        ) {
-            items(bannerCount) { idx ->
-                Box(
-                    modifier = Modifier
-                        .fillParentMaxWidth()
-                        .height(bannerHeight)
-                        .clip(bannerShape)
-                        .background(Color.White, bannerShape)
-                        .border(
-                            width = 2.dp,
-                            color = Color(0xFFE53935),
-                            shape = bannerShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(id = banners[idx]),
-                        contentDescription = "Banner $idx",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .fillMaxHeight(0.8f)
+                if (role == "admin") {
+                    Box(Modifier.fillMaxSize()) {
+                        FloatingActionButton(
+                            onClick = { showProductDialog = true },
+                            containerColor = Color.Red,
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(20.dp)
+                        ) {
+                            Icon(Icons.Default.Edit, contentDescription = "Quản lý sản phẩm", tint = Color.White)
+                        }
+                    }
+                    ProductManagementDialog(
+                        showDialog = showProductDialog,
+                        onDismissRequest = { showProductDialog = false },
+                        viewModel = viewModel,
+                        onAddClick = {
+                            navController.navigate(NavRoute.PRODUCT_MANAGEMENT.route)
+                        },
+                        onUpdateClick = {
+                            navController.navigate(NavRoute.PRODUCT_MANAGEMENT.route)
+                        }
                     )
                 }
             }
         }
-        // Indicator Dots
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 7.dp)
-        ) {
-            repeat(bannerCount) { i ->
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 2.dp)
-                        .size(if (i == currentIndex) 12.dp else 8.dp)
-                        .clip(RoundedCornerShape(50))
-                        .background(if (i == currentIndex) Color.Red else Color.LightGray)
-                )
-            }
-        }
-    }
 }
 
-
+@Composable
+fun ProductManagementDialog(
+    showDialog: Boolean,
+    onDismissRequest: () -> Unit,
+    onAddClick: () -> Unit,
+    onUpdateClick: () -> Unit,
+    viewModel: SanPhamViewModel
+) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = onDismissRequest,
+            title = { Text(text = "Quản lý sản phẩm") },
+            text = {
+                Column {
+                    Button(
+                        onClick = {
+                            onAddClick()
+                            onDismissRequest()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Thêm sản phẩm mới")
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = {
+                            onUpdateClick()
+                            onDismissRequest()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = "Cập nhật sản phẩm")
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                Button(onClick = onDismissRequest) {
+                    Text("Đóng")
+                }
+            }
+        )
+    }
+}

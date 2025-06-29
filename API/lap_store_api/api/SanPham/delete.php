@@ -11,7 +11,6 @@
     $database = new database();
     $conn = $database->Connect(); // Lấy kết nối PDO
 
-    // Khởi tạo lớp Khachhang với kết nối PDO
     $sanpham = new SanPham($conn);
 
     $data = json_decode(file_get_contents("php://input"));
@@ -19,10 +18,9 @@
     $sanpham->MaSanPham = $data->MaSanPham;
 
     if($sanpham->deleteSanPham()){
-        echo json_encode(array('message','San Pham Deleted'));
+        echo json_encode(array('success' => true, 'message' => 'San Pham Deleted'));
     }
     else{
-        echo json_encode(array('message','San Pham Not Deleted'));
+        echo json_encode(array('success' => false, 'message' => 'San Pham Not Deleted'));
     }
-
 ?>

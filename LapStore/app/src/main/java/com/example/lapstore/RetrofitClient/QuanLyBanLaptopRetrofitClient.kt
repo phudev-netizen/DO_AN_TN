@@ -100,19 +100,26 @@ object QuanLyBanLaptopRetrofitClient {
             .create(ApiService::class.java)
     }
 
-//    val SanPhamYeuThichAPIService: SanPhamYeuThichAPIService by lazy {
+    val api: YeuThichApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(YeuThichApi::class.java)
+    }
+//    val instance: ThanhToanAPIService by lazy {
 //        Retrofit.Builder()
 //            .baseUrl(Constants.BASE_URL)
-//            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+//            .addConverterFactory(GsonConverterFactory.create())
 //            .build()
-//            .create(SanPhamYeuThichAPIService::class.java)
+//            .create(ThanhToanAPIService::class.java)
 //    }
-val api: YeuThichApi by lazy {
-    Retrofit.Builder()
-        .baseUrl(Constants.BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(YeuThichApi::class.java)
-}
+    val khuyenMaiAPIService: KhuyenMaiAPIService by lazy {
+        Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .build()
+            .create(KhuyenMaiAPIService::class.java)
+    }
 
 }

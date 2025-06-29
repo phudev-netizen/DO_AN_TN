@@ -75,6 +75,9 @@ dependencies {
 
     implementation("androidx.compose.material3:material3:1.3.1")
     implementation ("androidx.compose.foundation:foundation:<version>")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
 
 
 

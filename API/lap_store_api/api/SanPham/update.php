@@ -7,11 +7,9 @@
     include_once('../../config/database.php');
     include_once('../../model/sanpham.php');
 
-    // Tạo đối tượng database và kết nối
     $database = new database();
-    $conn = $database->Connect(); // Lấy kết nối PDO
+    $conn = $database->Connect();
 
-    // Khởi tạo lớp Khachhang với kết nối PDO
     $sanpham = new SanPham($conn);
 
     $data = json_decode(file_get_contents("php://input"));
@@ -30,12 +28,10 @@
     $sanpham->MoTa = $data->MoTa;
     $sanpham->TrangThai = $data->TrangThai;
 
-
     if($sanpham->UpdateSanPham()){
-        echo json_encode(array('message','San Phamg Updated'));
+        echo json_encode(array('success' => true, 'message' => 'San Phamg Updated'));
     }
     else{
-        echo json_encode(array('message','San Phamg Not Updated'));
+        echo json_encode(array('success' => false, 'message' => 'San Phamg Not Updated'));
     }
-
 ?>

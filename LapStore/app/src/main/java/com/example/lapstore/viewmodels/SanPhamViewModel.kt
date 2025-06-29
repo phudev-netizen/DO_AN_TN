@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
 
 class SanPhamViewModel : ViewModel() {
 
-    var danhSachAllSanPham by mutableStateOf<List<SanPham>>(emptyList())
+
     var danhSachSanPhamTrongHoaDon by mutableStateOf<List<SanPham>>(emptyList())
 
     private val _danhSachSanPhamGaming = MutableStateFlow<List<SanPham>>(emptyList())
@@ -63,6 +63,12 @@ class SanPhamViewModel : ViewModel() {
     private val _danhSachSanPhamPhuKienphim = MutableStateFlow<List<SanPham>>(emptyList())
     val danhSachSanPhamPhuKienphim: StateFlow<List<SanPham>> = _danhSachSanPhamPhuKienphim
 
+     var danhSachAllSanPham by mutableStateOf<List<SanPham>>(emptyList())
+    // ViewModel
+//    private val _danhSachAllSanPham = MutableStateFlow<List<SanPham>>(emptyList())
+//    val danhSachAllSanPham: StateFlow<List<SanPham>> = _danhSachAllSanPham
+
+//
 
     fun getAllSanPham() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -186,16 +192,6 @@ class SanPhamViewModel : ViewModel() {
         }
     }
 
-//    fun getSanPhamById3(id: String) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            try {
-//                val sanPham = QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamById(id)
-//                _danhsachSanPham.update { currentList -> currentList + sanPham }
-//            } catch (e: Exception) {
-//                Log.e("SanPhamViewModel", "Error getting SanPham", e)
-//            }
-//        }
-//    }
 
     fun getSanPhamSearch(search: String) {
         viewModelScope.launch {
@@ -245,8 +241,85 @@ class SanPhamViewModel : ViewModel() {
         }
     }
 
-    fun getSanPhamByMaSanPham(maSanPham: Int): SanPham? {
-        return danhSachAllSanPham.find { it.MaSanPham == maSanPham }
+//    fun createSanPham(sanpham: SanPham, onResult: (Boolean, String) -> Unit = {_,_->}) {
+//        viewModelScope.launch {
+//            try {
+//                val response = withContext(Dispatchers.IO) {
+//                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.createSanPham(sanpham)
+//                }
+//                Log.d("SanPham", "Create response: $response")
+//                if (response.success) {
+//                    getAllSanPham()
+//                    onResult(true, "Thêm sản phẩm thành công")
+//                } else {
+//                    onResult(false, "Thêm sản phẩm thất bại: ${response.message}")
+//                }
+//            } catch (e: Exception) {
+//                onResult(false, "Lỗi khi thêm sản phẩm: ${e.message}")
+//                Log.e("SanPham Error", "Lỗi khi thêm sản phẩm: ${e.message}")
+//            }
+//        }
+//    }
+fun createSanPham(sanpham: SanPham, onResult: (Boolean, String) -> Unit = {_,_->}) {
+    viewModelScope.launch {
+        try {
+            val response = withContext(Dispatchers.IO) {
+                QuanLyBanLaptopRetrofitClient.sanphamAPIService.createSanPham(sanpham)
+            }
+            Log.d("SanPham", "Create response: $response")
+            if (response.success) {
+                getAllSanPham()
+                onResult(true, "Thêm sản phẩm thành công")
+            } else {
+                onResult(false, "Thêm sản phẩm thất bại: ${response.message}")
+            }
+        } catch (e: Exception) {
+            onResult(false, "Lỗi khi thêm sản phẩm: ${e.message}")
+            Log.e("SanPham Error", "Lỗi khi thêm sản phẩm: ${e.message}")
+        }
     }
+}
+
+    fun updateSanPham(sanpham: SanPham, onResult: (Boolean, String) -> Unit = {_,_->}) {
+        viewModelScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.updateSanPham(sanpham)
+                }
+                if (response.success) {
+                    getAllSanPham()
+                    onResult(true, "Cập nhật thành công")
+                } else {
+                    onResult(false, "Cập nhật thất bại: ${response.message}")
+                }
+            } catch (e: Exception) {
+                onResult(false, "Lỗi khi cập nhật sản phẩm: ${e.message}")
+                Log.e("SanPham Error", "Lỗi khi cập nhật sản phẩm: ${e.message}")
+            }
+        }
+    }
+
+    fun deleteSanPham(maSanPham: Int, onResult: (Boolean, String) -> Unit = {_,_->}) {
+        viewModelScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.deleteSanPham(maSanPham)
+                }
+                if (response.success) {
+                    getAllSanPham()
+                    onResult(true, "Xóa sản phẩm thành công")
+                } else {
+                    onResult(false, "Xóa sản phẩm thất bại: ${response.message}")
+                }
+            } catch (e: Exception) {
+                onResult(false, "Lỗi khi xóa sản phẩm: ${e.message}")
+                Log.e("SanPham Error", "Lỗi khi xóa sản phẩm: ${e.message}")
+            }
+        }
+    }
+
+//    fun getSanPhamByMaSanPham(maSanPham: Int): SanPham? {
+//        return danhSachAllSanPham.find { it.MaSanPham == maSanPham }
+//    }
 
 }

@@ -144,6 +144,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lapstore.api.QuanLyBanLaptopRetrofitClient
+import com.example.lapstore.models.ChiTietHoaDonBan
 import com.example.lapstore.models.DiaChi
 import com.example.lapstore.models.HoaDonBan
 import com.example.lapstore.models.SanPham
@@ -154,6 +155,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class HoaDonBanVỉewModel: ViewModel() {
+
+    val hoaDonBanList = MutableStateFlow<List<HoaDonBan>>(emptyList())
+    val chiTietHoaDonBanList = MutableStateFlow<List<ChiTietHoaDonBan>>(emptyList())
     // Kết quả thêm hóa đơn
     var hoadonAddResult by mutableStateOf("")
 

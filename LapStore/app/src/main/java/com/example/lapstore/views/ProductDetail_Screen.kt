@@ -38,6 +38,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -47,6 +48,8 @@ import com.example.lapstore.models.ChiTietHoaDonBan
 import com.example.lapstore.models.GioHang
 import com.example.lapstore.models.HoaDonBan
 import com.example.lapstore.viewmodels.GioHangViewModel
+import com.example.lapstore.viewmodels.KhachHangViewModel
+import com.example.lapstore.viewmodels.KhuyenMaiViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -63,13 +66,15 @@ fun ProductDetail_Screen(
     tentaikhoan: String?,
     viewModel: SanPhamViewModel,
     hinhAnhViewModel: HinhAnhViewModel,
+    hoaDonBanList: List<HoaDonBan>,
+    chiTietHoaDonBanList: List<ChiTietHoaDonBan>,
+    khuyenMaiViewModel: KhuyenMaiViewModel = viewModel()
 ) {
 
     Log.d("fdf", id.toString())
     Log.d("fdf", makhachhang.toString())
     Log.d("fdf", tentaikhoan.toString())
     var isFocused by remember { mutableStateOf(false) }
-
     var isLoading by remember { mutableStateOf(false) }
 
     val systemUiController = rememberSystemUiController()
@@ -78,12 +83,8 @@ fun ProductDetail_Screen(
     val danhSachHinhAnh = hinhAnhViewModel.danhsachhinhanhtheosanpham
     val danhsachgiohang = gioHangViewModel.listGioHang
     val danhsachsanpham = viewModel.danhSachAllSanPham
-
     viewModel.getAllSanPham()
-
     val sanPham = viewModel.sanPham
-
-
 
     var snackbarHostState = remember {
         SnackbarHostState()
@@ -92,6 +93,12 @@ fun ProductDetail_Screen(
     var scope = rememberCoroutineScope()
 
     var hinhAnhHienTai by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(danhSachHinhAnh) {
+        if (danhSachHinhAnh.isNotEmpty()) {
+            hinhAnhHienTai = danhSachHinhAnh.first().DuongDan
+        }
+    }
 
     LaunchedEffect(isFocused) {
         if (isFocused) {
@@ -120,12 +127,19 @@ fun ProductDetail_Screen(
         systemUiController.setStatusBarColor(color = Color.Red, darkIcons = false)
     }
 
+    val khuyenMaiViewModel: KhuyenMaiViewModel = viewModel()
+    val khuyenMai = khuyenMaiViewModel.khuyenMai.value
 
-    LaunchedEffect(danhSachHinhAnh) {
-        if (danhSachHinhAnh.isNotEmpty()) {
-            hinhAnhHienTai = danhSachHinhAnh.first().DuongDan
+    if (sanPham != null) {
+        LaunchedEffect(sanPham.MaSanPham) {
+            khuyenMaiViewModel.fetchKhuyenMai(sanPham.MaSanPham)
         }
     }
+    if (khuyenMai != null) {
+        Text("Khuyến mãi: ${khuyenMai.TenKhuyenMai}")
+
+    }
+
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -301,18 +315,74 @@ fun ProductDetail_Screen(
                         lineHeight = 30.sp
                     )
                 }
-
                 // Giá sản phẩm
                 item {
+                    Column(modifier = Modifier.fillMaxWidth()) {
 
-                    Text(
-                        text = "Giá: ${formatGiaTien(sanPham.Gia)}",
-                        fontSize = 20.sp,
-                        color = Color.Black,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Left
-                    )
+                        // Nếu có khuyến mãi, hiển thị giá gốc có gạch ngang
+                        if (khuyenMai != null) {
+                            Text(
+                                text = "Giá gốc: ${formatGiaTien(sanPham.Gia)}",
+                                fontSize = 18.sp,
+                                color = Color.Gray,
+                                textDecoration = TextDecoration.LineThrough
+                            )
+
+                            Text(
+                                text = "Giảm ${khuyenMai.PhanTramGiam}%",
+                                color = Color.Red,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                            Text(
+                                text = "Giá sau giảm: ${formatGiaTien((sanPham.Gia * (100 - khuyenMai.PhanTramGiam)) / 100)}",
+                                color = Color.Red,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        } else {
+                            // Nếu không có khuyến mãi
+                            Text(
+                                text = "Giá: ${formatGiaTien(sanPham.Gia)}",
+                                fontSize = 20.sp,
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                    // Hiển thị khuyến mãi (nên đặt ở đây)
+                    khuyenMai?.let { km ->
+                        Card(
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Text("Khuyến mãi: ${km.TenKhuyenMai}")
+                                Text("Giảm giá: ${km.PhanTramGiam}%")
+                                Text("Từ ${km.NgayBatDau} đến ${km.NgayKetThuc}")
+                            }
+                        }
+                    }
+                    // Hiển thị ngày hết hạn khuyến mãi nếu có
+                    if (khuyenMai != null) {
+                        val currentDate = LocalDate.now()
+                        val endDate = LocalDate.parse(khuyenMai.NgayKetThuc, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                        if (currentDate.isAfter(endDate)) {
+                            Text(
+                                text = "Khuyến mãi đã kết thúc",
+                                color = Color.Red,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        } else {
+                            Text(
+                                text = "Khuyến mãi còn hiệu lực đến: ${khuyenMai.NgayKetThuc}",
+                                color = Color.Green,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                     if (sanPham.SoLuong == 0) {
                         Text(
                             text = "(Hết hàng)",
@@ -403,20 +473,9 @@ fun ProductDetail_Screen(
                                     textAlign = TextAlign.Center
                                 )
                             }
+                            Spacer(modifier = Modifier.width(8.dp))
 
-//                            Button(
-//                                onClick = { /* TODO: Xử lý mua ngay */ },
-//                                modifier = Modifier.weight(1f),
-//                                shape = RoundedCornerShape(10.dp),
-//                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-//                            ) {
-//                                Text(
-//                                    "MUA NGAY",
-//                                    fontWeight = FontWeight.Bold,
-//                                    fontSize = 18.sp,
-//                                    color = Color.White
-//                                )
-//                            }
+                            // Nút MUA NGAY
                             Button(
                                 onClick = {
                                     if (makhachhang.isNullOrBlank() || tentaikhoan.isNullOrBlank()) {
@@ -432,24 +491,32 @@ fun ProductDetail_Screen(
                                                     duration = SnackbarDuration.Short
                                                 )
                                             } else {
-                                                val selectedProducts = "${sanPham.MaSanPham},1,${sanPham.Gia},${sanPham.TenSanPham},${hinhAnhHienTai ?: ""},${sanPham.SoLuong}"
-                                                val tongTien = sanPham.Gia
+                                                // TÍNH GIÁ SAU GIẢM
+                                                val giaSauGiam = if (khuyenMai != null)
+                                                    (sanPham.Gia * (100 - khuyenMai.PhanTramGiam)) / 100
+                                                else
+                                                    sanPham.Gia
+
+                                                // CHỈ TRUYỀN BA TRƯỜNG: mã sản phẩm, số lượng, mã giỏ hàng (0 nếu không có)
+                                                val rawSelectedProducts = "${sanPham.MaSanPham},1,0"
+                                                val encodedSelectedProducts = Uri.encode(rawSelectedProducts)
+                                                val encodedTenTaiKhoan = Uri.encode(tentaikhoan)
+                                                val encodedImage = Uri.encode(hinhAnhHienTai ?: "")
+
                                                 navController.navigate(
                                                     "${NavRoute.PAYSCREEN.route}?" +
-                                                            "selectedProducts=$selectedProducts" +
-                                                            "&tongtien=$tongTien" +
-                                                            "&tentaikhoan=${Uri.encode(tentaikhoan)}" +
-                                                            "&tensanpham=${Uri.encode(sanPham.TenSanPham ?: "")}" +
-                                                            "&hinhanh=${Uri.encode(hinhAnhHienTai ?: "")}" +
-                                                            "&masanpham=${sanPham.MaSanPham}" +
-                                                            "&soluong=${sanPham.SoLuong}"
+                                                            "selectedProducts=$encodedSelectedProducts" +
+                                                            "&tongtien=$giaSauGiam" + // giá đã giảm
+                                                            "&tentaikhoan=$encodedTenTaiKhoan" +
+                                                            "&makhachhang=$makhachhang" +
+                                                            "&hinhAnhHienTai=$encodedImage" +
+                                                            "&tensanpham=${Uri.encode(sanPham.TenSanPham)}"
                                                 )
                                             }
                                             isLoading = false
                                         }
                                     }
                                 },
-                                // ... các thuộc tính khác
                                 enabled = !isLoading,
                                 modifier = Modifier.weight(1f),
                                 shape = RoundedCornerShape(10.dp),
@@ -462,6 +529,7 @@ fun ProductDetail_Screen(
                                     color = Color.White
                                 )
                             }
+
                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -508,6 +576,7 @@ fun ProductDetail_Screen(
                         )
                     }
                 }
+                // Khoảng cách giữa mô tả và thông số kỹ thuật
                 item {
                     Spacer(modifier = Modifier.height(12.dp))
                     Box(
@@ -552,7 +621,9 @@ fun ProductDetail_Screen(
                     ProductCommentSection(
                         masp = sanPham!!.MaSanPham.toString(),
                         makhachhang = makhachhang,
-                        tentaikhoan = tentaikhoan
+                        tentaikhoan = tentaikhoan,
+                        hoaDonBanList = hoaDonBanList,
+                        chiTietHoaDonBanList = chiTietHoaDonBanList
                     )
                 }
             }
@@ -565,40 +636,69 @@ fun formatGiaTien(gia: Int): String {
     return "${formatter.format(gia)}đ"
 }
 
+
 @Composable
 fun ProductCommentSection(
     masp: String,
     makhachhang: String?,
     tentaikhoan: String?,
-    isAdmin: Boolean = true,
-    viewModel: BinhLuanDanhGiaViewModel = viewModel()
-) {
+    hoaDonBanList: List<HoaDonBan>,
+    chiTietHoaDonBanList: List<ChiTietHoaDonBan>,
+    viewModel: BinhLuanDanhGiaViewModel = viewModel(),
+    khachHangViewModel: KhachHangViewModel = viewModel(),
 
+) {
     val binhLuanList by viewModel.list.observeAsState(initial = emptyList())
     val message by viewModel.message.observeAsState(initial = "")
-
 
     val isAdminUser = (tentaikhoan == "admin")
     val listToShow = if (isAdminUser) binhLuanList else binhLuanList.filter { it.TrangThai == "1" }
 
-
     var noiDung by remember { mutableStateOf("") }
     var soSao by remember { mutableStateOf(5) }
 
-    LaunchedEffect(masp) {
-        viewModel.fetchAll()
+    val hoaDonBanList = khachHangViewModel.hoaDonBanList
+    val chiTietHoaDonBanList = khachHangViewModel.chiTietHoaDonBanList
+
+    val daMuaHang = remember(hoaDonBanList, chiTietHoaDonBanList, makhachhang, masp) {
+        val mkh = makhachhang?.trim()
+        if (mkh.isNullOrBlank()) {
+            false
+        } else {
+            val hoaDons = hoaDonBanList.filter { it.MaKhachHang.toString() == mkh }
+            val hoaDonIds = hoaDons.map { it.MaHoaDonBan }
+            val found = chiTietHoaDonBanList.any {
+                it.MaSanPham.toString() == masp && hoaDonIds.contains(it.MaHoaDonBan)
+            }
+            found
+        }
     }
 
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(16.dp)) {
+    LaunchedEffect(Unit) {
+        khachHangViewModel.getAllHoaDonBan()
+        khachHangViewModel.getAllChiTietHoaDonBan()
+    }
 
+    // Hiển thị loading nếu chưa có data
+    if (hoaDonBanList.isEmpty() || chiTietHoaDonBanList.isEmpty()) {
+        CircularProgressIndicator()
+        return
+    }
+
+    LaunchedEffect(masp) { viewModel.fetchAll() }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
         Text(
             "Bình luận & Đánh giá",
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(bottom = 12.dp)
         )
-
+        RatingSummarySection(listToShow.filter { it.MaSanPham == masp })
+        Spacer(modifier = Modifier.height(8.dp))
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -631,7 +731,7 @@ fun ProductCommentSection(
                                 val ngayGioFormatted = try {
                                     val dateTime = LocalDateTime.parse(binhLuan.NgayDanhGia)
                                     dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-                                } catch (e: Exception) {
+                                } catch (_: Exception) {
                                     binhLuan.NgayDanhGia
                                 }
                                 Text(
@@ -640,7 +740,6 @@ fun ProductCommentSection(
                                     color = Color.Gray
                                 )
                             }
-
                             Row {
                                 repeat(binhLuan.SoSao) {
                                     Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFA000), modifier = Modifier.size(18.dp))
@@ -650,9 +749,7 @@ fun ProductCommentSection(
                                 }
                             }
                         }
-
                         Spacer(modifier = Modifier.height(10.dp))
-
                         Text(
                             text = binhLuan.NoiDung,
                             style = MaterialTheme.typography.bodyMedium,
@@ -660,11 +757,8 @@ fun ProductCommentSection(
                             lineHeight = 20.sp
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-
-                        // Hiển thị trạng thái bình luận
                         if (isAdminUser) {
                             Spacer(modifier = Modifier.height(6.dp))
-                            // Hiện trạng thái ẩn/hiện cho admin
                             if (binhLuan.TrangThai != "1") {
                                 Text(
                                     "Đã bị ẩn",
@@ -704,80 +798,124 @@ fun ProductCommentSection(
         Divider(thickness = 1.dp)
         Spacer(Modifier.height(12.dp))
 
-        // Phần nhập bình luận (nếu không phải admin)
         if (!isAdminUser) {
-            Text("Viết bình luận của bạn", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = noiDung,
-                    onValueChange = { noiDung = it },
-                    label = { Text("Nội dung") },
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 4,
-                    shape = RoundedCornerShape(12.dp)
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text("Đánh giá:", modifier = Modifier.padding(end = 8.dp))
-                    for (i in 1..5) {
-                        Icon(
-                            imageVector = if (i <= soSao) Icons.Default.Star else Icons.Default.StarBorder,
-                            contentDescription = "$i sao",
-                            modifier = Modifier
-                                .size(28.dp)
-                                .clickable { soSao = i },
-                            tint = if (i <= soSao) Color(0xFFFFA000) else Color.Gray
-                        )
+            if (daMuaHang) {
+                // Nếu đã mua hàng thì hiện khung nhập bình luận
+                Text("Viết bình luận của bạn", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = noiDung,
+                        onValueChange = { noiDung = it },
+                        label = { Text("Nội dung") },
+                        modifier = Modifier.fillMaxWidth(),
+                        maxLines = 4,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("Đánh giá:", modifier = Modifier.padding(end = 8.dp))
+                        for (i in 1..5) {
+                            Icon(
+                                imageVector = if (i <= soSao) Icons.Default.Star else Icons.Default.StarBorder,
+                                contentDescription = "$i sao",
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .clickable { soSao = i },
+                                tint = if (i <= soSao) Color(0xFFFFA000) else Color.Gray
+                            )
+                        }
+                    }
+                    Button(
+                        onClick = {
+                            if (noiDung.isBlank() || makhachhang.isNullOrBlank()) return@Button
+                            val newBinhLuan = BinhLuanDanhGia(
+                                MaBinhLuan = null,
+                                MaKhachHang = makhachhang,
+                                MaSanPham = masp,
+                                MaHoaDonBan = null,
+                                SoSao = soSao,
+                                NoiDung = noiDung,
+                                NgayDanhGia = LocalDateTime.now().toString(),
+                                TrangThai = "1"
+                            )
+                            viewModel.add(newBinhLuan)
+                            noiDung = ""
+                            soSao = 5
+                        },
+                        enabled = !makhachhang.isNullOrBlank() && noiDung.isNotBlank(),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Gửi")
                     }
                 }
-
-                Button(
-                    onClick = {
-                        if (noiDung.isBlank() || makhachhang.isNullOrBlank()) return@Button
-                        val newBinhLuan = BinhLuanDanhGia(
-                            MaBinhLuan = null,
-                            MaKhachHang = makhachhang,
-                            MaSanPham = masp,
-                            MaHoaDonBan = null,
-                            SoSao = soSao,
-                            NoiDung = noiDung,
-                            NgayDanhGia = LocalDateTime.now().toString(),
-                            TrangThai = "1"
-                        )
-                        viewModel.add(newBinhLuan)
-                        noiDung = ""
-                        soSao = 5
-                    },
-                    enabled = !makhachhang.isNullOrBlank() && noiDung.isNotBlank(),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Gửi")
-                }
-            }
-
-            if (makhachhang.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
+            } else {
+                // Nếu chưa mua thì hiện cảnh báo
                 Text(
-                    "Bạn cần đăng nhập để bình luận!",
+                    "Bạn cần mua sản phẩm này để bình luận!",
                     color = Color.Red,
                     fontSize = 13.sp,
                     fontStyle = FontStyle.Italic
                 )
             }
         }
+    }
+}
+@Composable
+fun RatingSummarySection(binhLuanList: List<BinhLuanDanhGia>) {
+    if (binhLuanList.isEmpty()) return
 
-        if (message.isNotBlank()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = message,
-                color = Color.Blue,
-                fontSize = 13.sp
-            )
+    val filteredList = binhLuanList.filter { it.TrangThai == "1" }
+    val totalReviews = filteredList.size
+
+    if (totalReviews == 0) return
+
+    val ratingCounts = (1..5).associateWith { star ->
+        filteredList.count { it.SoSao == star }
+    }
+
+    val averageRating = filteredList.sumOf { it.SoSao }.toFloat() / totalReviews
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp)
+    ) {
+        Text(
+            text = "⭐ Trung bình: %.1f ★".format(averageRating),
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+        )
+        Text(
+            text = "Tổng số đánh giá: $totalReviews",
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.Gray
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Hiển thị mỗi dòng sao (5★ đến 1★)
+        for (i in 5 downTo 1) {
+            val count = ratingCounts[i] ?: 0
+            val percentage = if (totalReviews != 0) count / totalReviews.toFloat() else 0f
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 2.dp)
+            ) {
+                Text("$i ★", modifier = Modifier.width(24.dp))
+                LinearProgressIndicator(
+                    progress = percentage,
+                    modifier = Modifier
+                        .height(10.dp)
+                        .weight(1f)
+                        .clip(RoundedCornerShape(6.dp)),
+                    color = Color(0xFFFFA000),
+                    trackColor = Color.LightGray
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("$count")
+            }
         }
     }
 }

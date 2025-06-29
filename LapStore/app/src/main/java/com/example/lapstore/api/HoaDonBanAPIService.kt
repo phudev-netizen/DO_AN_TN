@@ -67,4 +67,7 @@ interface HoaDonBanAPIService{
     suspend fun addHoaDonBanAndGetId(
         @Body hoadon: HoaDonBan
     ): AddHoaDonBanAndGetIdResponse
+
+    @GET("HoaDonBan/read.php")
+    suspend fun getAllHoaDonBan(): HoaDonBanResponse
 }
