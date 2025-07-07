@@ -59,13 +59,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.lapstore.models.DiaChi
-import com.example.lapstore.ui.formatGiaTien
 import com.example.lapstore.viewmodels.DiaChiViewmodel
 import com.example.lapstore.viewmodels.GioHangViewModel
 import com.example.lapstore.viewmodels.KhuyenMaiViewModel
+import com.example.lapstore.views.formatGiaTien
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -186,12 +184,6 @@ fun calculateTotalPrice() {
                                 navController.navigate(
                                     "${NavRoute.PAYSCREEN.route}?selectedProducts=${encodedProducts}&tongtien=${totalPrice}&tentaikhoan=${tentaikhoan}"
                                 )
-//                                val selectedProductsString = selectedProducts.joinToString(",") { "${it.first}:${it.second}:${it.third}" }
-//                                val encodedProducts = Uri.encode(selectedProductsString)
-//                                navController.navigate(
-//                                    "${NavRoute.PAYSCREEN.route}?selectedProducts=${encodedProducts}&tongtien=${totalPrice}&tentaikhoan=${tentaikhoan}"
-//                                )
-                                
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),

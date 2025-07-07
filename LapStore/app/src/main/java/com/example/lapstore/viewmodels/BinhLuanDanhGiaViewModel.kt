@@ -28,22 +28,26 @@ class BinhLuanDanhGiaViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 _message.value = "Lỗi mạng hoặc server ${e.message}"
+                Log.e("BinhLuanViewModel", "fetchAll lỗi: ${e.message}")
             }
         }
     }
 
-    fun add(binhLuan: BinhLuanDanhGia) {
-        viewModelScope.launch {
-            try {
-                val res = QuanLyBanLaptopRetrofitClient.binhLuanAPIService.add(binhLuan)
-                _message.value = res.body()?.message ?: "Lỗi thêm"
-                fetchAll()
-            } catch (e: Exception) {
-                _message.value = "Lỗi mạng khi thêm: ${e.message}"
-            }
+fun add(binhLuan: BinhLuanDanhGia) {
+    if (binhLuan.MaHoaDonBan == 0) {
+        _message.value = "Bạn phải mua sản phẩm này mới được bình luận!"
+        return
+    }
+    viewModelScope.launch {
+        try {
+            val res = QuanLyBanLaptopRetrofitClient.binhLuanAPIService.add(binhLuan)
+            _message.value = res.body()?.message ?: "Lỗi thêm"
+            fetchAll()
+        } catch (e: Exception) {
+            _message.value = "Lỗi mạng khi thêm: ${e.message}"
         }
     }
-
+}
     fun update(binhLuan: BinhLuanDanhGia) {
         viewModelScope.launch {
             try {

@@ -1,5 +1,9 @@
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -30,14 +35,18 @@ import com.example.lapstore.models.ChiTietHoaDonBan
 import com.example.lapstore.models.DiaChi
 import com.example.lapstore.models.HoaDonBan
 import com.example.lapstore.models.SanPham
-import com.example.lapstore.ui.formatGiaTien
 import com.example.lapstore.viewmodels.*
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import com.bumptech.glide.Glide
+import com.example.lapstore.api.QuanLyBanLaptopRetrofitClient.Thanhtoanapi
 import com.example.lapstore.models.KhuyenMai
-
+import com.example.lapstore.views.formatGiaTien
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,9 +56,8 @@ fun PayScreen(
     tongtien: Int,
     tentaikhoan: String,
     makhachhang: String = "",
-    hinhanh: String = "" ,
+    hinhanh: String = "",
     tensanpham: String = ""
-
 ) {
     val ngayhientai = LocalDate.now()
     val formattedDate = ngayhientai.format(DateTimeFormatter.ofPattern("yyyy/MM/dd"))
@@ -72,16 +80,14 @@ fun PayScreen(
     val taikhoan = taiKhoanViewModel.taikhoan
     val context = LocalContext.current
 
-// Định dạng tiền tệ
     val phiVanChuyen = 30000
-//khuyên mãi
     val khuyenMaiViewModel: KhuyenMaiViewModel = viewModel()
     val listKhuyenMai by remember { derivedStateOf { khuyenMaiViewModel.khuyenMaiList.toList() } }
 
     LaunchedEffect(Unit) {
         khuyenMaiViewModel.fetchTatCaKhuyenMai()
     }
-    // Tổng tiền hàng: tổng giá gốc của từng sản phẩm * số lượng
+
     val tongTienHang = remember(selectedProducts, danhsachsanpham) {
         selectedProducts.sumOf { triple ->
             val sp = danhsachsanpham.find { it.MaSanPham == triple.first }
@@ -90,7 +96,6 @@ fun PayScreen(
         }
     }
 
-// Tổng giảm giá: tổng phần giảm của từng sản phẩm
     val tongGiamGia = remember(selectedProducts, danhsachsanpham, listKhuyenMai) {
         selectedProducts.sumOf { triple ->
             val sp = danhsachsanpham.find { it.MaSanPham == triple.first }
@@ -101,11 +106,9 @@ fun PayScreen(
         }
     }
 
-// Tổng sau giảm
     val tongTienSauGiam = tongTienHang - tongGiamGia
     val tongTienThanhToan = if (tongTienSauGiam < 0) 0 else tongTienSauGiam
     val tongTien = tongTienThanhToan + phiVanChuyen
-
 
     // Địa chỉ được chọn
     var selectedAddress by remember { mutableStateOf<DiaChi?>(null) }
@@ -113,17 +116,14 @@ fun PayScreen(
 
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
 
-    // Lấy ID địa chỉ đã chọn từ savedStateHandle
     LaunchedEffect(navBackStackEntry) {
         val id = navBackStackEntry?.savedStateHandle?.get<Int>("selectedAddressId")
         if (id != null) {
-            // Gọi tới ViewModel để lấy DiaChi theo ID
             diaChiViewmodel.getDiaChiByMaDiaChi(id)
             navBackStackEntry.savedStateHandle.remove<Int>("selectedAddressId")
         }
     }
 
-// Lắng nghe thay đổi của diachi trong ViewModel
     val diaChiFromVM = diaChiViewmodel.diachi
     LaunchedEffect(diaChiFromVM) {
         if (diaChiFromVM != null) {
@@ -150,7 +150,6 @@ fun PayScreen(
     SideEffect {
         systemUiController.setStatusBarColor(color = Color.White, darkIcons = true)
     }
-
 
     Scaffold(
         containerColor = Color.White,
@@ -186,7 +185,6 @@ fun PayScreen(
                         color = Color.Red,
                         fontSize = 20.sp
                     )
-
                     if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(50.dp),
@@ -194,16 +192,23 @@ fun PayScreen(
                         )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
-                    Button(
-                        onClick = {
-                            selectedProducts.forEach { triple ->
-                                gioHangViewModel.deleteGioHang(triple.third)
-                            }
 
-                            if (taikhoan != null && addressToUse != null) {
+//                    // NÚT ĐẶT HÀNG VÀ THANH TOÁN BẰNG MOMO
+                    if (selectedPaymentMethod == "Thanh toán qua Momo") {
+                        Button(
+                            onClick = {
+                                // Kiểm tra điều kiện
+                                if (taikhoan == null || addressToUse == null) {
+                                    Toast.makeText(context, "Thiếu tài khoản hoặc địa chỉ", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+                                if (selectedProducts.isEmpty()) {
+                                    Toast.makeText(context, "Chưa chọn sản phẩm", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+
                                 val maKhachHang = taikhoan.MaKhachHang ?: 0
                                 val maDiaChi = addressToUse.MaDiaChi
-
                                 val hoaDonBan = HoaDonBan(
                                     0,
                                     maKhachHang,
@@ -213,107 +218,119 @@ fun PayScreen(
                                     selectedPaymentMethod,
                                     1
                                 )
-
                                 hoaDonBanVỉewModel.addHoaDon(hoaDonBan)
                                 isLoading = true
-                                // Chờ cho đến khi hoaDonBan được thêm thành công
+
                                 selectedProducts.forEach { triple ->
                                     danhsachsanpham.forEach { sanpham ->
                                         if (sanpham.MaSanPham == triple.first) {
+                                            val km = listKhuyenMai.find { it.MaSanPham == sanpham.MaSanPham }
+                                            val giaGoc = sanpham.Gia
+                                            val phanTramGiam = km?.PhanTramGiam ?: 0
+                                            val giaSauGiam = getGiaSauGiam(giaGoc, phanTramGiam)
+                                            val tongGiamGia = (giaGoc - giaSauGiam) * triple.second
+
                                             val chitiethoadon = ChiTietHoaDonBan(
                                                 0,
                                                 0,
                                                 sanpham.MaSanPham,
                                                 triple.second,
-                                                sanpham.Gia,
-                                                sanpham.Gia + 30000,
-                                                0,
-                                                sanpham.TenSanPham ?: "" // Đã sửa chỗ này!
+                                                giaGoc,
+                                                giaSauGiam * triple.second,
+                                                tongGiamGia,
+                                                sanpham.TenSanPham ?: ""
                                             )
                                             chiTietHoaDonBanViewmodel.addHoaDon(chitiethoadon)
                                         }
                                     }
                                 }
-                            }
 
-                            navController.navigate("paysuccess_screen?tentaikhoan=${tentaikhoan}")
-                        },
-//                        onClick = {
-//                            try {
-//                                val context = context
-//
-//                                if (taikhoan == null || addressToUse == null) {
-//                                    Toast.makeText(context, "Thiếu tài khoản hoặc địa chỉ", Toast.LENGTH_SHORT).show()
-//                                    return@Button
-//                                }
-//
-//                                if (selectedProducts.isEmpty() || danhsachsanpham.isEmpty()) {
-//                                    Toast.makeText(context, "Vui lòng chọn sản phẩm để thanh toán", Toast.LENGTH_SHORT).show()
-//                                    return@Button
-//                                }
-//
-//                                val maKhachHang = taikhoan.MaKhachHang ?: return@Button
-//                                val maDiaChi = addressToUse.MaDiaChi
-//                                val tongTienThanhToan = tongtien + 30000
-//
-//                                // Tạo hóa đơn
-//                                val hoaDonBan = HoaDonBan(
-//                                    0,
-//                                    maKhachHang,
-//                                    formattedDate,
-//                                    maDiaChi,
-//                                    tongTienThanhToan,
-//                                    selectedPaymentMethod,
-//                                    1
-//                                )
-//
-//                                hoaDonBanVỉewModel.addHoaDon(hoaDonBan)
-//                                isLoading = true
-//
-//                                // Tạo chi tiết hóa đơn
-//                                selectedProducts.forEach { triple ->
-//                                    val sanpham = danhsachsanpham.find { it.MaSanPham == triple.first }
-//                                    if (sanpham != null) {
-//                                        val chiTiet = ChiTietHoaDonBan(
-//                                            0, 0,
-//                                            sanpham.MaSanPham,
-//                                            triple.second,
-//                                            sanpham.Gia,
-//                                            sanpham.Gia + 30000,
-//                                            0,
-//                                            sanpham.TenSanPham ?: ""
-//                                        )
-//                                        chiTietHoaDonBanViewmodel.addHoaDon(chiTiet)
-//                                    } else {
-//                                        Log.e("PaymentError", "Không tìm thấy sản phẩm ${triple.first}")
-//                                    }
-//                                }
-//
-//                                // Xóa sản phẩm khỏi giỏ hàng nếu không phải mua ngay
-//                                selectedProducts.forEach { gioHangViewModel.deleteGioHang(it.third) }
-//
-//                                // Gọi thanh toán Momo nếu được chọn
-//                                if (selectedPaymentMethod == "Thanh toán qua Momo") {
-//                                    thanhToanQuaMomo(
-//                                        context = context,
-//                                        maKhachHang = maKhachHang.toString(),
-//                                        maDiaChi = maDiaChi.toString(),
-//                                        tongTien = tongTienThanhToan.toString()
-//                                    )
-//                                } else {
-//                                    navController.navigate("paysuccess_screen?tentaikhoan=${tentaikhoan}")
-//                                }
-//
-//                            } catch (e: Exception) {
-//                                Log.e("PaymentException", "Lỗi khi xử lý thanh toán: ${e.message}", e)
-//                                Toast.makeText(context, "Lỗi: ${e.message}", Toast.LENGTH_SHORT).show()
-//                            }
-//                        },
-                         enabled = !isLoading,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Đặt hàng")
+                                thanhToanQuaMomo(
+                                    context = context,
+                                    maKhachHang = maKhachHang.toString(),
+                                    maDiaChi = maDiaChi.toString(),
+                                    tongTien = (tongtien + 30000).toString()
+                                )
+                                isLoading = false
+                            },
+                            enabled = !isLoading,
+                            modifier = Modifier
+                                .height(48.dp)
+                                .defaultMinSize(minWidth = 130.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                            shape = RoundedCornerShape(12.dp),
+                            elevation = ButtonDefaults.buttonElevation(
+                                defaultElevation = 10.dp,
+                                pressedElevation = 12.dp
+                            )
+
+                        ) {
+                            Text(
+                                text = "MOMO",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp
+                            )
+                        }
+                } else {
+                        // NÚT ĐẶT HÀNG BÌNH THƯỜNG
+                        Button(
+                            onClick = {
+                                selectedProducts.forEach { triple ->
+                                    gioHangViewModel.deleteGioHang(triple.third)
+                                }
+
+                                if (taikhoan != null && addressToUse != null) {
+                                    val maKhachHang = taikhoan.MaKhachHang ?: 0
+                                    val maDiaChi = addressToUse.MaDiaChi
+                                    val hoaDonBan = HoaDonBan(
+                                        0,
+                                        maKhachHang,
+                                        formattedDate,
+                                        maDiaChi,
+                                        tongtien + 30000,
+                                        selectedPaymentMethod,
+                                        1
+                                    )
+
+                                    hoaDonBanVỉewModel.addHoaDon(hoaDonBan)
+                                    isLoading = true
+                                    selectedProducts.forEach { triple ->
+                                        danhsachsanpham.forEach { sanpham ->
+                                            if (sanpham.MaSanPham == triple.first) {
+                                                val km = listKhuyenMai.find { it.MaSanPham == sanpham.MaSanPham }
+                                                val giaGoc = sanpham.Gia
+                                                val phanTramGiam = km?.PhanTramGiam ?: 0
+                                                val giaSauGiam = getGiaSauGiam(giaGoc, phanTramGiam)
+                                                val tongGiamGia = (giaGoc - giaSauGiam) * triple.second
+
+                                                val chitiethoadon = ChiTietHoaDonBan(
+                                                    0,
+                                                    0,
+                                                    sanpham.MaSanPham,
+                                                    triple.second,
+                                                    giaGoc,
+                                                    giaSauGiam * triple.second,
+                                                    tongGiamGia,
+                                                    sanpham.TenSanPham ?: ""
+                                                )
+                                                chiTietHoaDonBanViewmodel.addHoaDon(chitiethoadon)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                navController.navigate("paysuccess_screen?tentaikhoan=${tentaikhoan}")
+                            },
+                            enabled = !isLoading,
+                            modifier = Modifier
+                                .height(48.dp)
+                                .defaultMinSize(minWidth = 130.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Đặt hàng", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        }
                     }
                 }
             }
@@ -620,6 +637,38 @@ fun PayScreen(
         }
     }
 }
+
+fun thanhToanQuaMomo(
+    context: Context,
+    maKhachHang: String,
+    maDiaChi: String,
+    tongTien: String
+) {
+    val scope = CoroutineScope(Dispatchers.IO)
+
+    scope.launch {
+        try {
+            val response = Thanhtoanapi.taoThanhToanMomo(
+                mapOf("amount" to tongTien)
+            )
+            if (response.success && response.payUrl != null) {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(response.payUrl))
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+            } else {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context, "Lỗi: ${response.message ?: "Không thể tạo thanh toán"}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                Toast.makeText(context, "Lỗi kết nối đến server", Toast.LENGTH_SHORT).show()
+                Log.e("MoMo", "Lỗi tạo thanh toán", e)
+            }
+        }
+    }
+}
+
 
 @Composable
 fun ProductItem(sanPham: SanPham, soLuong: Int, listKhuyenMai: List<KhuyenMai>) {

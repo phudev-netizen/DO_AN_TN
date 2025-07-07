@@ -2,10 +2,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -21,17 +24,194 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.lapstore.models.HoaDonBan
-import com.example.lapstore.ui.formatGiaTien
 import com.example.lapstore.viewmodels.ChiTietHoaDonBanViewmodel
-import com.example.lapstore.viewmodels.DiaChiViewmodel
 import com.example.lapstore.viewmodels.HoaDonBanVỉewModel
 import com.example.lapstore.views.formatDate
+import com.example.lapstore.views.formatGiaTien
 
+//@Composable
+//fun CardDonHangAdmin(
+//    navController: NavHostController,
+//    hoaDonBan: HoaDonBan,
+//    trangthai: Int,
+//    hoaDonBanVỉewModel: HoaDonBanVỉewModel
+//) {
+//    val chiTietHoaDonBanViewModel: ChiTietHoaDonBanViewmodel = viewModel()
+//    val sanPhamViewModel: SanPhamViewModel = viewModel()
+//
+//    // Lấy danh sách chi tiết hóa đơn
+//    val danhsachchitiethoadon = chiTietHoaDonBanViewModel.danhsachchitethoadon
+//    LaunchedEffect(hoaDonBan) {
+//        chiTietHoaDonBanViewModel.getChiTietHoaDonTheoMaHoaDon(hoaDonBan.MaHoaDonBan)
+//    }
+//
+//    // Lấy danh sách sản phẩm
+//    val danhSachAllSanPham = sanPhamViewModel.danhSachSanPhamTrongHoaDon
+//    LaunchedEffect(hoaDonBan) {
+//        sanPhamViewModel.getSanPhamTrongHoaDon(hoaDonBan.MaHoaDonBan)
+//    }
+//
+//    Card(
+//        colors = CardDefaults.cardColors(
+//            containerColor = Color.White
+//        ),
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(5.dp),
+//        elevation = CardDefaults.cardElevation(4.dp),
+//        onClick = {
+//            navController.navigate("${NavRoute.HOADONDETAILSCREEN.route}?madonhang=${hoaDonBan.MaHoaDonBan}&tongtien=${hoaDonBan.TongTien}")
+//        }
+//    ) {
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp),
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            // Cột chứa thông tin hóa đơn
+//            Column(
+//                modifier = Modifier.weight(1f) // Cột chiếm không gian linh hoạt
+//            ) {
+//                Text(text = "Mã Hóa Đơn: ${hoaDonBan.MaHoaDonBan}")
+//                Text(text = "Ngày Đặt Hàng: ${formatDate(hoaDonBan.NgayDatHang)}")
+//                Text(text = "Tổng Tiền: ${formatGiaTien(hoaDonBan.TongTien)}")
+//            }
+//
+//            // Nút Hủy
+////            if (trangthai != 4 && trangthai != 6) {
+////                Box(
+////                    modifier = Modifier
+////                        .fillMaxHeight()
+////                        .padding(start = 8.dp)
+////                ) {
+////                    Button(
+////                        modifier = Modifier.fillMaxHeight(),
+////                        colors = ButtonDefaults.buttonColors(
+////                            containerColor = Color.Red
+////                        ),
+////                        shape = RoundedCornerShape(10.dp),
+////                        onClick = {
+////                            if(trangthai==2){
+////                                for (chiTiet in danhsachchitiethoadon) {
+////                                    val sanPham = danhSachAllSanPham.find { it.MaSanPham == chiTiet.MaSanPham }
+////                                    if (sanPham != null) {
+////                                        // Cộng số lượng trong chi tiết hóa đơn vào sản phẩm
+////                                        sanPham.SoLuong -= chiTiet.SoLuong
+////
+////                                        // Cập nhật lại sản phẩm
+////                                        sanPhamViewModel.updateSanPham(sanPham)
+////                                    }
+////                                }
+////                            }
+////                            XacNhan(trangthai, hoaDonBan, hoaDonBanVỉewModel)
+////                        }
+////                    ) {
+////                        Text("Xác nhận")
+////                    }
+////                }
+////            }
+//            if (trangthai in 1..5) {
+//                Button(
+//                    modifier = Modifier.height(40.dp),
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
+//                    shape = RoundedCornerShape(10.dp),
+//                    onClick = {
+//                        if (trangthai == 2) {
+//                            for (chiTiet in danhsachchitiethoadon) {
+//                                val sanPham = danhSachAllSanPham.find { it.MaSanPham == chiTiet.MaSanPham }
+//                                if (sanPham != null) {
+//                                    sanPham.SoLuong -= chiTiet.SoLuong
+//                                    sanPhamViewModel.updateSanPham(sanPham)
+//                                }
+//                            }
+//                        }
+//                        XacNhan(trangthai, hoaDonBan, hoaDonBanVỉewModel)
+//                    }
+//                ) {
+//                    Text(getButtonLabel(trangthai))
+//                }
+//            }
+//
+//// Nút Huỷ nếu trạng thái là "Chờ giao hàng"
+//            if (trangthai == 2) {
+//                Spacer(modifier = Modifier.width(8.dp))
+//                Button(
+//                    modifier = Modifier.height(40.dp),
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+//                    shape = RoundedCornerShape(10.dp),
+//                    onClick = {
+//                        val hoaDonHuy = hoaDonBan.copy(TrangThai = 6)
+//                        hoaDonBanVỉewModel.updateHoaDonBan(hoaDonHuy)
+//                    }
+//                ) {
+//                    Text("Huỷ đơn")
+//                }
+//            }
+//
+//// Nút Trả hàng nếu trạng thái là "Đã giao"
+//            if (trangthai == 4) {
+//                Spacer(modifier = Modifier.width(8.dp))
+//                Button(
+//                    modifier = Modifier.height(40.dp),
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF009688)),
+//                    shape = RoundedCornerShape(10.dp),
+//                    onClick = {
+//                        val hoaDonTraHang = hoaDonBan.copy(TrangThai = 7)
+//                        hoaDonBanVỉewModel.updateHoaDonBan(hoaDonTraHang)
+//                    }
+//                ) {
+//                    Text("Trả hàng")
+//                }
+//            }
+//
+//
+//        }
+//    }
+//}
+//
+//// Hàm xác nhận đơn hàng, sử dụng when thay vì if-else
+//fun XacNhan(
+//    trangthai: Int,
+//    hoaDonBan: HoaDonBan,
+//    hoaDonBanVỉewModel: HoaDonBanVỉewModel
+//) {
+//    val trangThaiMoi = when (trangthai) {
+//        1 -> 2
+//        2 -> 3
+//        3 -> 4
+//        4 -> 5
+//        5 -> 6
+//        else -> trangthai // Nếu không có trạng thái hợp lệ, không thay đổi
+//    }
+//
+//    val hoadonbannew = HoaDonBan(
+//        hoaDonBan.MaHoaDonBan,
+//        hoaDonBan.MaKhachHang,
+//        hoaDonBan.NgayDatHang,
+//        hoaDonBan.MaDiaChi,
+//        hoaDonBan.TongTien,
+//        hoaDonBan.PhuongThucThanhToan,
+//        trangThaiMoi
+//    )
+//
+//    hoaDonBanVỉewModel.updateHoaDonBan(hoadonbannew)
+//}
+//fun getButtonLabel(trangThai: Int): String {
+//    return when (trangThai) {
+//        1 -> "Duyệt đơn"
+//        2 -> "Xác nhận giao "
+//        3 -> "Xác nhận đã giao"
+//        4 -> "Hoàn thành"
+//        5 -> "Xác nhận hủy"
+//        else -> "Cập nhật"
+//    }
+//}
 @Composable
 fun CardDonHangAdmin(
     navController: NavHostController,
     hoaDonBan: HoaDonBan,
-    trangthai: Int,
     hoaDonBanVỉewModel: HoaDonBanVỉewModel
 ) {
     val chiTietHoaDonBanViewModel: ChiTietHoaDonBanViewmodel = viewModel()
@@ -50,15 +230,15 @@ fun CardDonHangAdmin(
     }
 
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         onClick = {
-            navController.navigate("${NavRoute.HOADONDETAILSCREEN.route}?madonhang=${hoaDonBan.MaHoaDonBan}&tongtien=${hoaDonBan.TongTien}")
+            navController.navigate(
+                "${NavRoute.HOADONDETAILSCREEN.route}?madonhang=${hoaDonBan.MaHoaDonBan}&tongtien=${hoaDonBan.TongTien}"
+            )
         }
     ) {
         Row(
@@ -68,76 +248,93 @@ fun CardDonHangAdmin(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Cột chứa thông tin hóa đơn
-            Column(
-                modifier = Modifier.weight(1f) // Cột chiếm không gian linh hoạt
-            ) {
+            // Thông tin hóa đơn
+            Column(modifier = Modifier.weight(1f)) {
                 Text(text = "Mã Hóa Đơn: ${hoaDonBan.MaHoaDonBan}")
                 Text(text = "Ngày Đặt Hàng: ${formatDate(hoaDonBan.NgayDatHang)}")
                 Text(text = "Tổng Tiền: ${formatGiaTien(hoaDonBan.TongTien)}")
+
+                if (hoaDonBan.TrangThai == 7) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Khách hàng đã yêu cầu trả hàng",
+                        color = Color.Red
+                    )
+                }
             }
 
-            // Nút Hủy
-            if (trangthai != 4 && trangthai != 6) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(start = 8.dp)
+            // ✅ Nút hoàn tất trả hàng (TrangThai = 7)
+            if (hoaDonBan.TrangThai == 7) {
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    modifier = Modifier.height(40.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                    shape = RoundedCornerShape(10.dp),
+                    onClick = {
+                        val hoadonMoi = hoaDonBan.copy(TrangThai = 8) // 8: Hoàn tất trả hàng
+                        hoaDonBanVỉewModel.updateHoaDonBan(hoadonMoi)
+                    }
                 ) {
-                    Button(
-                        modifier = Modifier.fillMaxHeight(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Red
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        onClick = {
-                            if(trangthai==2){
-                                for (chiTiet in danhsachchitiethoadon) {
-                                    val sanPham = danhSachAllSanPham.find { it.MaSanPham == chiTiet.MaSanPham }
-                                    if (sanPham != null) {
-                                        // Cộng số lượng trong chi tiết hóa đơn vào sản phẩm
-                                        sanPham.SoLuong -= chiTiet.SoLuong
+                    Text("Hoàn tất trả hàng")
+                }
+            }
 
-                                        // Cập nhật lại sản phẩm
-                                        sanPhamViewModel.updateSanPham(sanPham)
-                                    }
+            // ✅ Nút xác nhận tiến trình đơn hàng (TrangThai = 1..5)
+            if (hoaDonBan.TrangThai in 1..5 && hoaDonBan.TrangThai != 4) {
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(
+                    modifier = Modifier.height(40.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
+                    shape = RoundedCornerShape(10.dp),
+                    onClick = {
+                        if (hoaDonBan.TrangThai == 2) {
+                            // cập nhật tồn kho
+                            for (chiTiet in danhsachchitiethoadon) {
+                                val sanPham = danhSachAllSanPham
+                                    .find { it.MaSanPham == chiTiet.MaSanPham }
+                                sanPham?.let {
+                                    it.SoLuong -= chiTiet.SoLuong
+                                    sanPhamViewModel.updateSanPham(it)
                                 }
                             }
-                            XacNhan(trangthai, hoaDonBan, hoaDonBanVỉewModel)
                         }
-                    ) {
-                        Text("Xác nhận")
+                        XacNhan(hoaDonBan, hoaDonBanVỉewModel)
                     }
+                ) {
+                    Text(getButtonLabel(hoaDonBan.TrangThai))
                 }
             }
         }
     }
 }
 
-// Hàm xác nhận đơn hàng, sử dụng when thay vì if-else
+// ✅ Hàm xác nhận tiến trình đơn hàng
 fun XacNhan(
-    trangthai: Int,
     hoaDonBan: HoaDonBan,
     hoaDonBanVỉewModel: HoaDonBanVỉewModel
 ) {
-    val trangThaiMoi = when (trangthai) {
+    val trangThaiMoi = when (hoaDonBan.TrangThai) {
         1 -> 2
         2 -> 3
         3 -> 4
         4 -> 5
         5 -> 6
-        else -> trangthai // Nếu không có trạng thái hợp lệ, không thay đổi
+        else -> hoaDonBan.TrangThai
     }
 
-    val hoadonbannew = HoaDonBan(
-        hoaDonBan.MaHoaDonBan,
-        hoaDonBan.MaKhachHang,
-        hoaDonBan.NgayDatHang,
-        hoaDonBan.MaDiaChi,
-        hoaDonBan.TongTien,
-        hoaDonBan.PhuongThucThanhToan,
-        trangThaiMoi
-    )
-
+    val hoadonbannew = hoaDonBan.copy(TrangThai = trangThaiMoi)
     hoaDonBanVỉewModel.updateHoaDonBan(hoadonbannew)
 }
+
+// ✅ Gán nhãn nút theo trạng thái
+fun getButtonLabel(trangThai: Int): String {
+    return when (trangThai) {
+        1 -> "Duyệt đơn"
+        2 -> "Xác nhận giao"
+        3 -> "Xác nhận đã giao"
+        4 -> "Hoàn thành"
+        5 -> "Xác nhận huỷ"
+        else -> "Cập nhật"
+    }
+}
+

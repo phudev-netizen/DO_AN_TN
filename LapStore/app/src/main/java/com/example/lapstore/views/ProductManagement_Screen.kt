@@ -1,5 +1,9 @@
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,14 +20,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.lapstore.models.SanPham
-import com.example.lapstore.ui.formatGiaTien
+import com.example.lapstore.views.formatGiaTien
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,19 +110,24 @@ fun ProductManagementScreen(
                                         .padding(12.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    // Hình ảnh placeholder (nếu bạn có link ảnh trong sanPham.HinhAnh thì thay thế vào đây)
-                                    Box(
-                                        modifier = Modifier
-                                            .size(80.dp)
-                                            .background(Color.LightGray, RoundedCornerShape(12.dp))
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Laptop,
-                                            contentDescription = null,
-                                            modifier = Modifier.align(Alignment.Center),
-                                            tint = Color.Gray
-                                        )
-                                    }
+//                                    // Hình ảnh placeholder
+
+                                        Box(
+                                            modifier = Modifier
+                                                .size(80.dp)
+                                                .background(Color.LightGray, RoundedCornerShape(12.dp))
+
+                                        ) {
+                                            AsyncImage(
+                                                model = sanPham.HinhAnh,
+                                                contentDescription = "Hình ảnh sản phẩm",
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(100.dp)
+                                                    .clip(RoundedCornerShape(12.dp)),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                        }
 
                                     Spacer(modifier = Modifier.width(12.dp))
 
@@ -159,18 +172,45 @@ fun ProductManagementScreen(
                     }
                 }
             }
+            val context = LocalContext.current
 
             if (showForm) {
                 ProductFormDialog(
                     sanPham = editingSanPham,
                     onDismiss = { showForm = false },
-                    onSave = { sanPham ->
-                        if (sanPham.MaSanPham == 0) {
-                            viewModel.createSanPham(sanPham) { _, _ -> showForm = false }
+//                    onSave = { sanPham ->
+//                        if (sanPham.MaSanPham == 0) {
+//                            viewModel.createSanPham(sanPham) { _, _ -> showForm = false }
+//                        } else {
+//                            viewModel.updateSanPham(sanPham) { _, _ -> showForm = false }
+//                        }
+//                    }
+                    onSave = { sanPham, imageUri ->
+                        if (imageUri != null) {
+                            viewModel.uploadImage(context, imageUri) { imageUrl ->
+                                if (imageUrl != null) {
+                                    // Tạo bản mới để chắc chắn có imageUrl
+                                    val updatedSanPham = sanPham.copy(HinhAnh = imageUrl)
+
+                                    if (sanPham.MaSanPham == 0) {
+                                        viewModel.createSanPham(updatedSanPham) { _, _ -> showForm = false }
+                                    } else {
+                                        viewModel.updateSanPham(updatedSanPham) { _, _ -> showForm = false }
+                                    }
+                                } else {
+                                    // Upload ảnh thất bại
+                                }
+                            }
                         } else {
-                            viewModel.updateSanPham(sanPham) { _, _ -> showForm = false }
+                            // Không chọn ảnh mới → dùng ảnh cũ đã có trong sanPham
+                            if (sanPham.MaSanPham == 0) {
+                                viewModel.createSanPham(sanPham) { _, _ -> showForm = false }
+                            } else {
+                                viewModel.updateSanPham(sanPham) { _, _ -> showForm = false }
+                            }
                         }
                     }
+
                 )
             }
         }
@@ -185,23 +225,28 @@ fun formatGiaTien(gia: Double): String {
 fun ProductFormDialog(
     sanPham: SanPham?,
     onDismiss: () -> Unit,
-    onSave: (SanPham) -> Unit
+//    onSave: (SanPham) -> Unit
+     onSave: (SanPham, Uri?) -> Unit
 ) {
     val cpuOptions = listOf("Intel i5", "Intel i7", "AMD Ryzen 5", "AMD Ryzen 7", "Apple M1", "Apple M2")
     val ramOptions = listOf("4GB", "8GB", "16GB", "32GB", "64GB")
     val cardOptions = listOf("Integrated", "GTX 1650", "RTX 3050", "RTX 3060", "RTX 4060", "RTX 4080")
-    val mauSacOptions = listOf("Đen", "Trắng", "Bạc", "Xám", "Xanh", "Đỏ", "Hồng", "Vàng")
+    val mauSacOptions = listOf(1 to " Đen", 2  to "Trắng")
     val maloaiOptions = listOf(
         1 to "Laptop Gaming",
-        2 to "Laptop Văn phòng",
-        3 to "Phụ kiện RAM",
-        4 to "Phụ kiện Phím",
-        5 to "Phụ kiện Chuột",
-        6 to "Phụ kiện Màn hình"
+        2 to "Laptop Văn phòng"
     )
     val ssdOptions = listOf("128GB", "256GB", "512GB", "1TB", "2TB")
     val manHinhOptions = listOf("13.3\" FHD", "14\" FHD", "15.6\" FHD", "16\" 2K", "17\" 4K", "18\" QHD")
     val trangThaiOptions = listOf("Kinh doanh" to 1, "Ngừng bán" to 0)
+
+    // Image picker launcher
+    val imageUriState = remember { mutableStateOf<Uri?>(null) }
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        imageUriState.value = uri
+    }
 
     var tenSanPham by remember { mutableStateOf(sanPham?.TenSanPham ?: "") }
     var gia by remember { mutableStateOf(sanPham?.Gia?.toString() ?: "") }
@@ -266,16 +311,17 @@ fun ProductFormDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            Button(
-                onClick = {
-                    if (tenSanPham.isBlank()) { errorText = "Tên sản phẩm không được để trống"; return@Button }
-                    val giaInt = gia.toIntOrNull(); if (giaInt == null || giaInt <= 0) { errorText = "Giá phải là số > 0"; return@Button }
-                    val soLuongInt = soLuong.toIntOrNull(); if (soLuongInt == null || soLuongInt < 0) { errorText = "Số lượng không hợp lệ"; return@Button }
-                    if (moTa.isBlank()) { errorText = "Mô tả không được để trống"; return@Button }
-                    if (hinhAnh.isBlank()) { errorText = "Phải nhập link hình ảnh"; return@Button }
-                    errorText = null
-                    onSave(
-                        SanPham(
+            Button(onClick = {
+                if (tenSanPham.isBlank()) { errorText = "Tên sản phẩm không được để trống"; return@Button }
+                val giaInt = gia.toIntOrNull(); if (giaInt == null || giaInt <= 0) { errorText = "Giá phải là số > 0"; return@Button }
+                val soLuongInt = soLuong.toIntOrNull(); if (soLuongInt == null || soLuongInt < 0) { errorText = "Số lượng không hợp lệ"; return@Button }
+                if (moTa.isBlank()) { errorText = "Mô tả không được để trống"; return@Button }
+                if (imageUriState.value == null && sanPham?.HinhAnh.isNullOrBlank()) {
+                    errorText = "Vui lòng chọn ảnh"; return@Button
+                }
+                errorText = null
+                onSave(
+                    SanPham(
                             MaSanPham = sanPham?.MaSanPham ?: 0,
                             TenSanPham = tenSanPham,
                             MaLoaiSanPham = selectedLoai.first,
@@ -294,10 +340,10 @@ fun ProductFormDialog(
                             DaXoa = sanPham?.DaXoa ?: 0,
                             NgayTao = sanPham?.NgayTao ?: "",
                             NgayCapNhat = sanPham?.NgayCapNhat ?: ""
-                        )
-                    )
-                }
-            ) {
+                        ),
+                    imageUriState.value
+                )
+            }) {
                 Text(if (sanPham == null) "Thêm mới" else "Cập nhật")
             }
         },
@@ -332,10 +378,32 @@ fun ProductFormDialog(
                     value = moTa, onValueChange = { moTa = it },
                     label = { Text("Mô tả *") }
                 )
-                OutlinedTextField(
-                    value = hinhAnh, onValueChange = { hinhAnh = it },
-                    label = { Text("Link hình ảnh *") }
-                )
+                // Chọn ảnh
+                Button(onClick = {
+                    imagePickerLauncher.launch("image/*")
+                }) {
+                    Text("Chọn ảnh từ thiết bị")
+                }
+
+                imageUriState.value?.let { uri ->
+                    Spacer(Modifier.height(8.dp))
+                    AsyncImage(
+                        model = uri,
+                        contentDescription = "Ảnh sản phẩm",
+                        modifier = Modifier
+                            .height(150.dp)
+                            .fillMaxWidth()
+                    )
+                } ?: sanPham?.HinhAnh?.takeIf { it.isNotBlank() }?.let {
+                    Spacer(Modifier.height(8.dp))
+                    AsyncImage(
+                        model = it,
+                        contentDescription = "Ảnh cũ",
+                        modifier = Modifier
+                            .height(150.dp)
+                            .fillMaxWidth()
+                    )
+                }
                 // Loại sản phẩm
                 ExposedDropdownMenuBox(
                     expanded = loaiExpanded,
@@ -506,27 +574,29 @@ fun ProductFormDialog(
                     onExpandedChange = { mauSacExpanded = !mauSacExpanded }
                 ) {
                     OutlinedTextField(
-                        value = mauSacOptions.getOrNull(selectedMauSac) ?: mauSacOptions.first(),
+                        value = mauSacOptions.find { it.first == selectedMauSac }?.second ?: "Chưa chọn",
                         onValueChange = {},
                         modifier = Modifier.menuAnchor(),
-                        label = { Text("Màu sắc *") }, readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(mauSacExpanded) }
+                        label = { Text("Màu sắc *") },
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = mauSacExpanded) }
                     )
                     ExposedDropdownMenu(
                         expanded = mauSacExpanded,
                         onDismissRequest = { mauSacExpanded = false }
                     ) {
-                        mauSacOptions.forEachIndexed { idx, option ->
+                        mauSacOptions.forEach { (maMau, tenMau) ->
                             DropdownMenuItem(
-                                text = { Text(option) },
+                                text = { Text(tenMau) },
                                 onClick = {
-                                    selectedMauSac = idx
+                                    selectedMauSac = maMau
                                     mauSacExpanded = false
                                 }
                             )
                         }
                     }
                 }
+
                 // Trạng thái
                 ExposedDropdownMenuBox(
                     expanded = trangThaiExpanded,

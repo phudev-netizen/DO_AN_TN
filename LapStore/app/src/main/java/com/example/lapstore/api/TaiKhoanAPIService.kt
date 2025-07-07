@@ -20,7 +20,8 @@ data class taikhoanUpdateResponse(
 
 data class KiemTraTaiKhoanResponse(
     val result: Boolean,
-    val message: String? = null
+    val message: String? = null,
+    val role: String?
 )
 
 interface TaiKhoanAPIService{

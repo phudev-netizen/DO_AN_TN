@@ -22,6 +22,8 @@ import androidx.navigation.NavHostController
 import com.example.lapstore.models.KhuyenMai
 import com.example.lapstore.models.SanPham
 import com.example.lapstore.viewmodels.KhuyenMaiViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +38,7 @@ fun AdminKhuyenMaiScreen(
     LaunchedEffect(Unit) {
         viewModel.fetchTatCaKhuyenMai()
     }
+
 
     Scaffold(
         topBar = {
@@ -65,7 +68,10 @@ fun AdminKhuyenMaiScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("🎁 ${km.TenKhuyenMai}", style = MaterialTheme.typography.titleMedium)
-                        Text("🛒 Sản phẩm: ${danhSachSanPham.firstOrNull { it.MaSanPham == km.MaSanPham }?.TenSanPham ?: "Không rõ"}")
+
+                        val tenSP = if (km.MaSanPham == 0) "Tất cả sản phẩm"
+                        else danhSachSanPham.firstOrNull { it.MaSanPham == km.MaSanPham }?.TenSanPham ?: "Không rõ"
+                        Text("🛒 Sản phẩm: $tenSP")
                         Text("🔻 Giảm giá: ${km.PhanTramGiam}%")
                         Text("🕒 Thời gian: ${km.NgayBatDau} → ${km.NgayKetThuc}")
 
@@ -127,8 +133,14 @@ fun KhuyenMaiFormDialog(
 ) {
     var tenKhuyenMai by remember { mutableStateOf(initial?.TenKhuyenMai ?: "") }
     var phanTramGiam by remember { mutableStateOf(initial?.PhanTramGiam?.toString() ?: "") }
-    var ngayBatDau by remember { mutableStateOf(initial?.NgayBatDau ?: "") }
-    var ngayKetThuc by remember { mutableStateOf(initial?.NgayKetThuc ?: "") }
+
+    var ngayBatDau by remember {
+        mutableStateOf(if (initial != null) convertToDisplayDate(initial.NgayBatDau) else "")
+    }
+    var ngayKetThuc by remember {
+        mutableStateOf(if (initial != null) convertToDisplayDate(initial.NgayKetThuc) else "")
+    }
+
     var expanded by remember { mutableStateOf(false) }
     var selectedSanPham by remember {
         mutableStateOf(
@@ -146,33 +158,8 @@ fun KhuyenMaiFormDialog(
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
-                ) {
-                    OutlinedTextField(
-                        value = selectedSanPham?.TenSanPham ?: "",
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Sản phẩm") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor().fillMaxWidth()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        danhSachSanPham.forEach { sp ->
-                            DropdownMenuItem(
-                                text = { Text(sp.TenSanPham) },
-                                onClick = {
-                                    selectedSanPham = sp
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
-                }
+
+                Text("🎯 Áp dụng cho toàn bộ sản phẩm", fontWeight = FontWeight.Medium)
 
                 OutlinedTextField(
                     value = tenKhuyenMai,
@@ -203,14 +190,23 @@ fun KhuyenMaiFormDialog(
         },
         confirmButton = {
             ElevatedButton(onClick = {
+                    // Validate ngày
+                val ngayBatDauIso = convertToIsoDate(ngayBatDau)
+                val ngayKetThucIso = convertToIsoDate(ngayKetThuc)
+
+                if (ngayBatDauIso.isEmpty() || ngayKetThucIso.isEmpty()) {
+                    // Hiển thị lỗi định dạng ngày
+                    return@ElevatedButton
+                }
                 val km = KhuyenMai(
                     MaKhuyenMai = initial?.MaKhuyenMai ?: 0,
-                    MaSanPham = selectedSanPham?.MaSanPham ?: 0,
+                    MaSanPham = 0,
                     TenKhuyenMai = tenKhuyenMai,
                     PhanTramGiam = phanTramGiam.toIntOrNull() ?: 0,
-                    NgayBatDau = ngayBatDau,
-                    NgayKetThuc = ngayKetThuc
+                    NgayBatDau = convertToIsoDate(ngayBatDau),
+                    NgayKetThuc = convertToIsoDate(ngayKetThuc)
                 )
+
                 onSubmit(km)
             }) {
                 Text("Xác nhận")
@@ -222,4 +218,25 @@ fun KhuyenMaiFormDialog(
             }
         }
     )
+}
+
+fun convertToIsoDate(input: String): String {
+    return try {
+        val fromFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val toFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val date = fromFormat.parse(input)
+        if (date != null) toFormat.format(date) else ""
+    } catch (e: Exception) {
+        ""
+    }
+}
+fun convertToDisplayDate(input: String): String {
+    return try {
+        val fromFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val toFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val date = fromFormat.parse(input)
+        if (date != null) toFormat.format(date) else ""
+    } catch (e: Exception) {
+        ""
+    }
 }

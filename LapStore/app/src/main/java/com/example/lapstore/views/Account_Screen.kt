@@ -2,6 +2,7 @@ package com.example.lapstore.views
 
 import ChangePasswordSection
 import NavRoute
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -43,12 +44,9 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -66,18 +64,20 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.lapstore.datastore.UserPreferences
 import com.example.lapstore.models.KhachHang
 import com.example.lapstore.models.TaiKhoan
-import com.example.lapstore.viewmodels.DiaChiViewmodel
 import com.example.lapstore.viewmodels.KhachHangViewModel
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -186,16 +186,14 @@ fun AcccountScreen(
         }
     }
 }
-
-
 @Composable
 fun AccountInfoSection(
     tentaikhoan: String
 ) {
     val maxLength = 10
 
-    var taikhoanviewModel: TaiKhoanViewModel = viewModel()
-    var khachhangviewModel: KhachHangViewModel = viewModel()
+    val taikhoanviewModel: TaiKhoanViewModel = viewModel()
+    val khachhangviewModel: KhachHangViewModel = viewModel()
 
     val taikhoan = taikhoanviewModel.taikhoan
     val khachhang = khachhangviewModel.khachhang
@@ -203,22 +201,18 @@ fun AccountInfoSection(
     var isFocused by remember { mutableStateOf(false) }
     var isButtonEnabled by remember { mutableStateOf(false) }
 
-    var snackbarHostState = remember {
-        SnackbarHostState()
-    }
-    var scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(tentaikhoan) {
         if (tentaikhoan.isNotEmpty()) {
             taikhoanviewModel.getTaiKhoanByTentaikhoan(tentaikhoan)
         }
     }
 
-
     if (taikhoan != null) {
         khachhangviewModel.getKhachHangById(taikhoan.MaKhachHang.toString())
     }
-
-
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -230,7 +224,8 @@ fun AccountInfoSection(
             Text("Thông tin tài khoản", fontWeight = FontWeight.Bold, fontSize = 20.sp)
 
             Spacer(modifier = Modifier.height(8.dp))
-            if (khachhang != null) {
+            if (khachhang != null && taikhoan != null) {
+                val isEditable = taikhoan.LoaiTaiKhoan == 0 // khách hàng mới được chỉnh sửa
                 val hoTen = remember { mutableStateOf(khachhang.HoTen) }
                 val soDienThoai = remember { mutableStateOf(khachhang.SoDienThoai) }
                 val email = remember { mutableStateOf(khachhang.Email) }
@@ -258,7 +253,6 @@ fun AccountInfoSection(
                 LaunchedEffect(hoTen.value, soDienThoai.value, email.value, gioiTinh.value, selectedDay.value, selectedMonth.value, selectedYear.value) {
                     isButtonEnabled = checkIfChanged()
                 }
-
                 // Họ tên
                 Text("Họ Tên: ", fontWeight = FontWeight.Bold)
                 OutlinedTextField(
@@ -270,6 +264,7 @@ fun AccountInfoSection(
                     modifier = Modifier.fillMaxWidth().onFocusChanged {
                         if (it.isFocused) isFocused = true
                     },
+                    enabled = isEditable,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Red,
                         unfocusedBorderColor = Color.Red,
@@ -289,6 +284,7 @@ fun AccountInfoSection(
                                 RadioButton(
                                     selected = gioiTinh.value == gender,
                                     onClick = { gioiTinh.value = gender },
+                                    enabled = isEditable,
                                     colors = RadioButtonDefaults.colors(
                                         selectedColor = Color.Red
                                     )
@@ -314,6 +310,7 @@ fun AccountInfoSection(
                     modifier = Modifier.fillMaxWidth().onFocusChanged {
                         if (it.isFocused) isFocused = true
                     },
+                    enabled = isEditable,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Red,
                         unfocusedBorderColor = Color.Red,
@@ -335,6 +332,7 @@ fun AccountInfoSection(
                     modifier = Modifier.fillMaxWidth().onFocusChanged {
                         if (it.isFocused) isFocused = true
                     },
+                    enabled = isEditable,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Red,
                         unfocusedBorderColor = Color.Red,
@@ -356,6 +354,7 @@ fun AccountInfoSection(
                         items = (1..31).map { it.toString() },
                         selectedValue = selectedDay.value,
                         onValueChange = { selectedDay.value = it },
+                        enabled = isEditable,
                         modifier = Modifier
                             .weight(1.15f)
                             .padding(end = 0.5.dp)
@@ -367,9 +366,10 @@ fun AccountInfoSection(
                         items = (1..12).map { it.toString() },
                         selectedValue = selectedMonth.value,
                         onValueChange = { selectedMonth.value = it },
+                        enabled = isEditable,
                         modifier = Modifier
                             .weight(1.2f)
-                            .padding(horizontal = 0.5.dp)
+                            .padding(horizontal = 0.5.dp),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
 
@@ -378,9 +378,10 @@ fun AccountInfoSection(
                         items = (1900..2025).map { it.toString() }.reversed(),
                         selectedValue = selectedYear.value,
                         onValueChange = { selectedYear.value = it },
+                        enabled = isEditable,
                         modifier = Modifier
                             .weight(1.4f)
-                            .padding(start = 0.5.dp)
+                            .padding(start = 0.5.dp),
                     )
                 }
 
@@ -389,62 +390,64 @@ fun AccountInfoSection(
                     modifier = Modifier.padding(4.dp),
                     hostState = snackbarHostState,
                 )
-                Button(
-                    onClick = {
-                        // Xử lý lưu dữ liệu
-                        val regexName = "^[a-zA-Z\\p{L} ]+$"
-                        val regexPhone = "^\\d{10}$".toRegex()
+                        Button(
+                            onClick = {
+                                // Xử lý lưu dữ liệu
+                                val regexName = "^[a-zA-Z\\p{L} ]+$"
+                                val regexPhone = "^\\d{10}$".toRegex()
 
-                        if (hoTen.value.isBlank() || !hoTen.value.matches(Regex(regexName))) {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = "Họ và tên không hợp lệ",
-                                    duration = SnackbarDuration.Short
-                                )
-                            }
-                        } else if (!regexPhone.matches(soDienThoai.value)) {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = "Số điện thoại phải có 10 số."
-                                )
-                            }
-                        } else if (email.value.isBlank()) {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = "Email không được để trống.",
-                                    duration = SnackbarDuration.Short
-                                )
-                            }
-                        } else if (!email.value.contains("@")) {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = "Email phải chứa ký tự '@'.",
-                                    duration = SnackbarDuration.Short
-                                )
-                            }
-                        } else {
-                            val khachHang = KhachHang(
-                                MaKhachHang = khachhang.MaKhachHang,
-                                HoTen = hoTen.value,
-                                GioiTinh = gioiTinh.value,
-                                NgaySinh = "${selectedYear.value}-${selectedMonth.value}-${selectedDay.value}",
-                                Email = email.value,
-                                SoDienThoai = soDienThoai.value
-                            )
-                            khachhangviewModel.updateKhachHang(khachHang)
-                            scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = "Cập nhật thành công",
-                                    duration = SnackbarDuration.Short
-                                )
-                            }
+                                if (hoTen.value.isBlank() || !hoTen.value.matches(Regex(regexName))) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "Họ và tên không hợp lệ",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
+                                } else if (!regexPhone.matches(soDienThoai.value)) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "Số điện thoại phải có 10 số."
+                                        )
+                                    }
+                                } else if (email.value.isBlank()) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "Email không được để trống.",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
+                                } else if (!email.value.contains("@")) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "Email phải chứa ký tự '@'.",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
+                                } else {
+                                    val khachHang = KhachHang(
+                                        MaKhachHang = khachhang.MaKhachHang,
+                                        HoTen = hoTen.value,
+                                        GioiTinh = gioiTinh.value,
+                                        NgaySinh = "${selectedYear.value}-${selectedMonth.value}-${selectedDay.value}",
+                                        Email = email.value,
+                                        SoDienThoai = soDienThoai.value
+                                    )
+                                    khachhangviewModel.updateKhachHang(khachHang)
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "Cập nhật thành công",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red) ,
+                            enabled = isEditable && isButtonEnabled,
+
+                            ) {
+                            Text("LƯU THAY ĐỔI", color = Color.White)
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                ) {
-                    Text("LƯU THAY ĐỔI", color = Color.White)
-                }
             }
         }
     }
@@ -458,6 +461,7 @@ fun DropdownMenuField(
     selectedValue: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean,
 ) {
     var isExpanded by remember { mutableStateOf(false) } // Trạng thái menu
 
@@ -514,6 +518,8 @@ fun AccountOptionsSection(
     taikhoan: TaiKhoan
 ) {
     val openDialog = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -527,7 +533,7 @@ fun AccountOptionsSection(
 
         Column(modifier = Modifier.padding(8.dp)) {
 
-            if(taikhoan.LoaiTaiKhoan==1){
+            if (taikhoan.LoaiTaiKhoan == 1) {
                 AccountOptionItem(
                     iconRes = Icons.Filled.AdminPanelSettings,
                     label = "Duyệt đơn hàng",
@@ -552,39 +558,48 @@ fun AccountOptionsSection(
                     isSelected = currentTab == "thongke",
                     onClick = { onOptionSelected("thongke") }
                 )
+                AccountOptionItem(
+                    iconRes = Icons.Filled.ExitToApp,
+                    label = "Đăng xuất",
+                    isSelected = false, // Không cần trạng thái cho mục đăng xuất
+                    onClick = {
+                        openDialog.value = true
+                    }
+                )
+            } else {
+                AccountOptionItem(
+                    iconRes = Icons.Filled.Person,
+                    label = "Thông tin tài khoản",
+                    isSelected = currentTab == "accountInfo",
+                    onClick = { onOptionSelected("accountInfo") }
+                )
+                AccountOptionItem(
+                    iconRes = Icons.Filled.LocationOn,
+                    label = "Số địa chỉ",
+                    isSelected = currentTab == "addresses",
+                    onClick = { onOptionSelected("addresses") }
+                )
+                AccountOptionItem(
+                    iconRes = Icons.Filled.ShoppingCart,
+                    label = "Quản lý đơn hàng",
+                    isSelected = currentTab == "cartManagement",
+                    onClick = { onOptionSelected("cartManagement") }
+                )
+                AccountOptionItem(
+                    iconRes = Icons.Filled.Lock,
+                    label = "Đổi mật khẩu",
+                    isSelected = currentTab == "changePassword",
+                    onClick = { onOptionSelected("changePassword") }
+                )
+                AccountOptionItem(
+                    iconRes = Icons.Filled.ExitToApp,
+                    label = "Đăng xuất",
+                    isSelected = false, // Không cần trạng thái cho mục đăng xuất
+                    onClick = {
+                        openDialog.value = true
+                    }
+                )
             }
-            AccountOptionItem(
-                iconRes = Icons.Filled.Person,
-                label = "Thông tin tài khoản",
-                isSelected = currentTab == "accountInfo",
-                onClick = { onOptionSelected("accountInfo") }
-            )
-            AccountOptionItem(
-                iconRes = Icons.Filled.LocationOn,
-                label = "Số địa chỉ",
-                isSelected = currentTab == "addresses",
-                onClick = { onOptionSelected("addresses") }
-            )
-            AccountOptionItem(
-                iconRes = Icons.Filled.ShoppingCart,
-                label = "Quản lý đơn hàng",
-                isSelected = currentTab == "cartManagement",
-                onClick = { onOptionSelected("cartManagement") }
-            )
-            AccountOptionItem(
-                iconRes = Icons.Filled.Lock,
-                label = "Đổi mật khẩu",
-                isSelected = currentTab == "changePassword",
-                onClick = { onOptionSelected("changePassword") }
-            )
-            AccountOptionItem(
-                iconRes = Icons.Filled.ExitToApp,
-                label = "Đăng xuất",
-                isSelected = false, // Không cần trạng thái cho mục đăng xuất
-                onClick = {
-                    openDialog.value = true
-                }
-            )
         }
     }
 
@@ -596,10 +611,30 @@ fun AccountOptionsSection(
             text = { Text("Đăng xuất tài khoản của bạn?", fontSize = 17.sp) },
             confirmButton = {
                 TextButton(
+//                    onClick = {
+//                        openDialog.value = false
+//                        navController.navigate(NavRoute.HOME.route)
+//                    }
                     onClick = {
                         openDialog.value = false
-                        navController.navigate(NavRoute.HOME.route)
+
+                        // 👉 Xóa thông tin login đã lưu
+                        val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit().clear().apply()
+
+                        // 👉 Đánh dấu là đã đăng xuất
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val userPrefs = UserPreferences(context)
+                            userPrefs.setLoggedOut(true)
+                        }
+
+                        // 👉 Quay về màn hình đăng nhập
+                        navController.navigate(NavRoute.LOGINSCREEN.route) {
+                            popUpTo(0) // Xóa toàn bộ back stack
+                        }
                     }
+
+
                 ) {
                     Text("OK", color = Color.Red, fontSize = 14.sp)
                 }

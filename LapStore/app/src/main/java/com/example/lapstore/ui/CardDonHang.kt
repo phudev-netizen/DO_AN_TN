@@ -3,9 +3,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -33,23 +35,89 @@ import com.example.lapstore.viewmodels.HoaDonBanVỉewModel
 import com.example.lapstore.views.formatDate
 import com.example.lapstore.views.formatGiaTien
 
+//@Composable
+//fun CardDonHang(
+//    navController: NavHostController,
+//    hoaDonBan: HoaDonBan,
+//    ishuy: Boolean,
+//) {
+//    val hoaDonBanViewModel: HoaDonBanVỉewModel = viewModel()
+//    Card(
+//        colors = CardDefaults.cardColors(
+//            containerColor = Color.White
+//        ),
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(5.dp),
+//        elevation = CardDefaults.cardElevation(4.dp),
+//        onClick = {
+//            navController.navigate("${NavRoute.HOADONDETAILSCREEN.route}?madonhang=${hoaDonBan.MaHoaDonBan}&tongtien=${hoaDonBan.TongTien}")
+//        }
+//    ) {
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(16.dp),
+//            horizontalArrangement = Arrangement.SpaceBetween,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            // Cột chứa thông tin hóa đơn
+//            Column(
+//                modifier = Modifier.weight(1f) // Cột chiếm không gian linh hoạt
+//            ) {
+//                Text(
+//                    text = "Mã Hóa Đơn: ${hoaDonBan.MaHoaDonBan}",
+//                )
+//                Text(text = "Ngày Đặt Hàng: ${formatDate(hoaDonBan.NgayDatHang)}")
+//                Text(text = "Tổng Tiền: ${formatGiaTien(hoaDonBan.TongTien)}")
+//            }
+//
+//            // Nút Hủy
+//            if (ishuy) {
+//                Box(
+//                    modifier = Modifier
+//                        .fillMaxHeight()
+//                        .padding(start = 8.dp)
+//                ) {
+//                    Button(
+//                        modifier = Modifier.fillMaxHeight(),
+//                        colors = ButtonDefaults.buttonColors(
+//                            containerColor = Color.Red
+//                        ),
+//                        shape = RoundedCornerShape(10.dp),
+//                        onClick = {
+//                            // Cập nhật trạng thái của hóa đơn thành "Chờ xác nhận hủy"
+//                            val hoadonbannew = hoaDonBan.copy(
+//                                TrangThai = 5 // Giả sử trạng thái 5 là "Đã Hủy"
+//                            )
+//                            hoaDonBanViewModel.updateHoaDonBan(hoadonbannew)
+//                        }
+//                    ) {
+//                        Text("Hủy")
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 @Composable
 fun CardDonHang(
     navController: NavHostController,
     hoaDonBan: HoaDonBan,
-    ishuy: Boolean,
+    isAdmin: Boolean // Dự phòng nếu cần phân quyền
 ) {
     val hoaDonBanViewModel: HoaDonBanVỉewModel = viewModel()
+
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         onClick = {
-            navController.navigate("${NavRoute.HOADONDETAILSCREEN.route}?madonhang=${hoaDonBan.MaHoaDonBan}&tongtien=${hoaDonBan.TongTien}")
+            navController.navigate(
+                "${NavRoute.HOADONDETAILSCREEN.route}?madonhang=${hoaDonBan.MaHoaDonBan}&tongtien=${hoaDonBan.TongTien}"
+            )
         }
     ) {
         Row(
@@ -59,39 +127,43 @@ fun CardDonHang(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Cột chứa thông tin hóa đơn
-            Column(
-                modifier = Modifier.weight(1f) // Cột chiếm không gian linh hoạt
-            ) {
-                Text(
-                    text = "Mã Hóa Đơn: ${hoaDonBan.MaHoaDonBan}",
-                )
+            // Thông tin hóa đơn
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "Mã Hóa Đơn: ${hoaDonBan.MaHoaDonBan}")
                 Text(text = "Ngày Đặt Hàng: ${formatDate(hoaDonBan.NgayDatHang)}")
                 Text(text = "Tổng Tiền: ${formatGiaTien(hoaDonBan.TongTien)}")
             }
 
-            // Nút Hủy
-            if (ishuy) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(start = 8.dp)
-                ) {
+            // Các nút dành cho khách hàng
+            Column(horizontalAlignment = Alignment.End) {
+                // Nút Hủy đơn nếu đang chờ lấy hàng (TrangThai == 2)
+                if (hoaDonBan.TrangThai == 2) {
                     Button(
-                        modifier = Modifier.fillMaxHeight(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Red
-                        ),
-                        shape = RoundedCornerShape(10.dp),
                         onClick = {
-                            // Cập nhật trạng thái của hóa đơn thành "Chờ xác nhận hủy"
-                            val hoadonbannew = hoaDonBan.copy(
-                                TrangThai = 5 // Giả sử trạng thái 5 là "Đã Hủy"
-                            )
-                            hoaDonBanViewModel.updateHoaDonBan(hoadonbannew)
-                        }
+                            val hoadonHuy = hoaDonBan.copy(TrangThai = 6) // Giả sử 6 là "Đã hủy"
+                            hoaDonBanViewModel.updateHoaDonBan(hoadonHuy)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.height(40.dp)
                     ) {
-                        Text("Hủy")
+                        Text("Hủy đơn")
+                    }
+                }
+
+                // Nút Trả hàng nếu đã giao (TrangThai == 4)
+                if (hoaDonBan.TrangThai == 4) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = {
+                            val hoadonTra = hoaDonBan.copy(TrangThai = 7) // Giả sử 7 là "Trả hàng"
+                            hoaDonBanViewModel.updateHoaDonBan(hoadonTra)
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF009688)),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.height(40.dp)
+                    ) {
+                        Text("Trả hàng")
                     }
                 }
             }

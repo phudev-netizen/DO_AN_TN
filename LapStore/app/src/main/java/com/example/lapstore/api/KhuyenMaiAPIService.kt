@@ -15,6 +15,8 @@ interface KhuyenMaiAPIService {
         @Query("MaSanPham") maSanPham: Int
     ): List<KhuyenMai>
 
+    @GET("KhuyenMai/lay_khuyen_mai.php")
+    suspend fun getTatCaKhuyenMai(): List<KhuyenMai>
 
     @DELETE("KhuyenMai/xoa_khuyen_mai.php")
     suspend fun deleteKhuyenMai(@Query("MaKhuyenMai") id: Int): Response<Unit>
@@ -24,6 +26,7 @@ interface KhuyenMaiAPIService {
 
     @POST("KhuyenMai/them_khuyen_mai.php")
     suspend fun addKhuyenMai(@Body khuyenMai: KhuyenMai): Response<Unit>
+
 
 }
 

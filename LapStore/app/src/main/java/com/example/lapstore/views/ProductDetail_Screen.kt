@@ -140,6 +140,7 @@ fun ProductDetail_Screen(
 
     }
 
+
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -393,7 +394,7 @@ fun ProductDetail_Screen(
                         )
                     }
                 }
-                // Nút thêm vào giỏ hàng
+                // Nút thêm vào giỏ hàng và mua ngay
                 item {
                     Column {
                         Row(
@@ -831,11 +832,26 @@ fun ProductCommentSection(
                     Button(
                         onClick = {
                             if (noiDung.isBlank() || makhachhang.isNullOrBlank()) return@Button
+
+                            // Lấy danh sách hóa đơn của khách hàng
+                            val hoaDons = hoaDonBanList.filter { it.MaKhachHang.toString() == makhachhang }
+                            // Lấy danh sách mã hóa đơn
+                            val hoaDonIds = hoaDons.map { it.MaHoaDonBan }
+                            // Tìm mã hóa đơn đầu tiên đã mua sản phẩm này
+                            val maHoaDonBan = chiTietHoaDonBanList.firstOrNull {
+                                it.MaSanPham.toString() == masp && hoaDonIds.contains(it.MaHoaDonBan)
+                            }?.MaHoaDonBan
+
+                            if (maHoaDonBan == null) {
+                                // Không tìm thấy hóa đơn => không cho gửi
+                                return@Button
+                            }
+
                             val newBinhLuan = BinhLuanDanhGia(
                                 MaBinhLuan = null,
                                 MaKhachHang = makhachhang,
                                 MaSanPham = masp,
-                                MaHoaDonBan = null,
+                                MaHoaDonBan = maHoaDonBan, // Sửa ở đây!
                                 SoSao = soSao,
                                 NoiDung = noiDung,
                                 NgayDanhGia = LocalDateTime.now().toString(),

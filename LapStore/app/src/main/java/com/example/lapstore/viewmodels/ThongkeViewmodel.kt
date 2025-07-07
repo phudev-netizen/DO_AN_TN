@@ -15,6 +15,12 @@ class ThongKeViewModel : ViewModel() {
 
     private val api = QuanLyBanLaptopRetrofitClient.apiService
 
+    private val _data = mutableStateOf<ThongKeSanPhamResponse?>(null)
+    val data: State<ThongKeSanPhamResponse?> = _data
+
+    private val _loading = mutableStateOf(false)
+    val loading: State<Boolean> = _loading
+
 
     fun fetchThongKe() {
         viewModelScope.launch {
@@ -33,4 +39,38 @@ class ThongKeViewModel : ViewModel() {
             }
         }
     }
+    fun fetchThongKeTheoNam(nam: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val response = api.getThongKeBaoCaoTheoNam(nam = nam, role = "admin")
+
+                Log.d("ThongKe", "Response body (năm $nam): ${response.body()}")
+                if (response.isSuccessful && response.body()?.success == true) {
+                    _thongKe.value = response.body()!!.data
+                }
+            } catch (e: Exception) {
+                Log.e("ThongKe", "Lỗi khi tải thống kê theo năm: ${e.message}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun fetchThongKeSanPham() {
+        viewModelScope.launch {
+            _loading.value = true
+            try {
+                val response = QuanLyBanLaptopRetrofitClient.apiService.getThongKeSanPham()
+                if (response.isSuccessful && response.body()?.success == true) {
+                    _data.value = response.body()
+                }
+            } catch (e: Exception) {
+                Log.e("ThongKeSanPham", "Lỗi: ${e.message}")
+            } finally {
+                _loading.value = false
+            }
+        }
+    }
+
 }

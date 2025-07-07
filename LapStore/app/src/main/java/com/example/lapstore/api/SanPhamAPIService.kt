@@ -1,12 +1,16 @@
 import com.example.lapstore.models.KhachHang
 import com.example.lapstore.models.SanPham
 import com.google.gson.annotations.SerializedName
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -54,8 +58,19 @@ interface SanPhamAPIService{
         @Query("MaSanPham") MaSanPham: Int
     ): ApiResponse5
 
+    @Multipart
+    @POST("SanPham/uploadImage.php")
+    suspend fun uploadImage(
+        @Part file: MultipartBody.Part
+    ): retrofit2.Response<ImageUploadResponse>
+
 }
 data class ApiResponse5(
     val success: Boolean,
     val message: String
+)
+
+data class ImageUploadResponse(
+    val success: Boolean,
+    val imageUrl: String?
 )

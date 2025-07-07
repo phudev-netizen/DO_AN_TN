@@ -19,3 +19,15 @@ data class ThongKeError(
     val success: Boolean,
     val message: String
 )
+data class ThongKeSanPhamResponse(
+    val success: Boolean,
+    val topSelling: List<SanPhamThongKe>,
+    val slowSelling: List<SanPhamThongKe>,
+    val totalQtySold: Int
+)
+
+data class SanPhamThongKe(
+    val MaSanPham: Int,
+    val TenSanPham: String,
+    val totalQty: Int
+)

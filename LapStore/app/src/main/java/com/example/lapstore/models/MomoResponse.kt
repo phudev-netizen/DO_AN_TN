@@ -1,7 +1,7 @@
-//package com.example.lapstore.models
-//
-//// Response nhận từ PHP (phản hồi từ Momo)
-//data class MomoResponse(
-//    val payUrl: String,
-//    val message: String
-//)
+package com.example.lapstore.data.model
+
+data class MomoResponse(
+    val success: Boolean,
+    val payUrl: String? = null,
+    val message: String? = null
+)

@@ -78,10 +78,22 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
+    implementation ("com.android.volley:volley:1.2.1")
+    implementation ("androidx.activity:activity-compose:1.7.2")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation ("androidx.compose.foundation:foundation:1.5.4")
+
+
+
 
 
 
     implementation(libs.play.services.analytics.impl)
+    implementation(libs.volley)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.foundation.layout.android)
+    implementation(libs.androidx.foundation.layout.android)
 
     val composeBom = platform("androidx.compose:compose-bom:2024.09.00")
     implementation(composeBom)

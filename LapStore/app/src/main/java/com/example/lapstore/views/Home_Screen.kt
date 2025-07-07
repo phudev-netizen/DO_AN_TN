@@ -234,32 +234,6 @@ fun HomeScreen(
                                     text = "Yêu thích",
                                 )
                             }
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.SpaceAround
-                            ) {
-                                IconButton(
-                                    modifier = Modifier.size(45.dp),
-                                    onClick = {
-                                        if (tentaikhoan != null) {
-                                            navController.navigate("${NavRoute.ACCESSORY.route}?tentaikhoan=${tentaikhoan}") {
-                                                popUpTo(0) { inclusive = true }
-                                            }
-                                        } else {
-                                            navController.navigate(NavRoute.ACCESSORY.route)
-                                        }
-                                    }
-                                ) {
-                                    Icon(
-                                        Icons.Outlined.Category,
-                                        contentDescription = "Profile",
-                                        tint = Color.Red
-                                    )
-                                }
-                                Text(
-                                    text = "Phụ kiện",
-                                )
-                            }
                             // Kiểm tra vai trò của người dùng
 
                             Column(

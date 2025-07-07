@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.lapstore.viewmodels.HoaDonBanVỉewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.flow.filter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +63,8 @@ fun AdminScreen(navController: NavHostController) {
         "Chờ giao hàng",
         "Đã giao",
         "Chờ xác nhận hủy",
-        "Đã hủy"
+        "Đã hủy",
+        "Trả hàng"
     )
     Scaffold(
         containerColor = Color.White,
@@ -143,6 +145,7 @@ fun AdminScreen(navController: NavHostController) {
                     3 -> DuyetDaGiaoHangScreen(navController)
                     4 -> DuyetChoXacNhanHuy(navController)
                     5 -> DuyetHuyDonHangScreen(navController)
+                    6 -> DonHangTraHangScreen(navController)
                 }
             }
         }
@@ -224,7 +227,9 @@ fun DuyetHuyDonHangScreen(navController: NavHostController) {
                     }
 
                     items(danhSachHoaDonChoXacNhan) { hoadon ->
-                        CardDonHangAdmin(navController,hoadon,6,hoaDonBanViewModel)
+//                        CardDonHangAdmin(navController,hoadon,6,hoaDonBanViewModel)
+                        CardDonHangAdmin(navController, hoadon, hoaDonBanViewModel)
+
                     }
                 }
             }
@@ -308,7 +313,9 @@ fun DuyetChoXacNhanHuy(navController: NavHostController) {
                         )
                     }
                     items(danhSachHoaDonChoXacNhan) { hoadon ->
-                        CardDonHangAdmin(navController,hoadon,5,hoaDonBanViewModel)
+//                        CardDonHangAdmin(navController,hoadon,5,hoaDonBanViewModel)
+                        CardDonHangAdmin(navController, hoadon, hoaDonBanViewModel)
+
                     }
                 }
             }
@@ -390,7 +397,9 @@ fun DuyetDaGiaoHangScreen(navController: NavHostController) {
                         )
                     }
                     items(danhSachHoaDonChoXacNhan) { hoadon ->
-                        CardDonHangAdmin(navController,hoadon,4,hoaDonBanViewModel)
+                        //CardDonHangAdmin(navController,hoadon,4,hoaDonBanViewModel)
+                        CardDonHangAdmin(navController, hoadon, hoaDonBanViewModel)
+
                     }
                 }
             }
@@ -473,7 +482,9 @@ fun DuyetChoGiaoHangScreen(navController: NavHostController) {
                     }
 
                     items(danhSachHoaDonChoXacNhan) { hoadon ->
-                        CardDonHangAdmin(navController,hoadon,3,hoaDonBanViewModel)
+//                        CardDonHangAdmin(navController,hoadon,3,hoaDonBanViewModel)
+                        CardDonHangAdmin(navController, hoadon, hoaDonBanViewModel)
+
                     }
                 }
             }
@@ -546,7 +557,7 @@ fun DuyetChoLayHangScreen(navController: NavHostController) {
                 ) {
                     item {
                         Text(
-                            "Số luượng đơn hàng(${soluonghoadonchoxacnhan.value})",
+                            "Số lượng đơn hàng(${soluonghoadonchoxacnhan.value})",
                             modifier = Modifier.padding(4.dp),
                             color = Color.Red,
                             fontWeight = FontWeight.Bold
@@ -554,7 +565,9 @@ fun DuyetChoLayHangScreen(navController: NavHostController) {
                     }
 
                     items(danhSachHoaDonChoXacNhan) { hoadon ->
-                        CardDonHangAdmin(navController,hoadon,2,hoaDonBanViewModel)
+//                        CardDonHangAdmin(navController,hoadon,2,hoaDonBanViewModel)
+                        CardDonHangAdmin(navController, hoadon, hoaDonBanViewModel)
+
                     }
                 }
             }
@@ -636,10 +649,98 @@ fun DuyetDonChoXacNhan(navController: NavHostController) {
                         )
                     }
                     items(danhSachHoaDonChoXacNhan) { hoadon ->
-                        CardDonHangAdmin(navController,hoadon,1,hoaDonBanViewModel)
+//                        CardDonHangAdmin(navController,hoadon,1,hoaDonBanViewModel)
+                        CardDonHangAdmin(navController, hoadon, hoaDonBanViewModel)
+
                     }
                 }
             }
         }
     }
 }
+
+@Composable
+fun DonHangTraHangScreen(navController: NavHostController) {
+    val hoaDonBanViewModel: HoaDonBanVỉewModel = viewModel()
+
+    val danhSachHoaDonTraHang by hoaDonBanViewModel.danhSachHoaDonTheoTrangThai.collectAsState()
+
+    // Trạng thái đang tải
+    val isLoading = remember { mutableStateOf(false) }
+
+    // Trạng thái lỗi (nếu có)
+    val errorMessage = remember { mutableStateOf<String?>(null) }
+
+    val soLuongHoaDonTraHang = remember { mutableStateOf(0) }
+
+    // Gọi API lấy đơn trả hàng (TrangThai = 7)
+    hoaDonBanViewModel.getHoaDonTheoTrangThai(7)
+
+    LaunchedEffect(danhSachHoaDonTraHang) {
+        soLuongHoaDonTraHang.value = danhSachHoaDonTraHang.count()
+    }
+
+    isLoading.value = true
+    errorMessage.value = null
+    try {
+        hoaDonBanViewModel.getHoaDonTheoTrangThai(7)
+    } catch (e: Exception) {
+        errorMessage.value = "Lỗi khi tải dữ liệu: ${e.message}"
+    } finally {
+        isLoading.value = false
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(4.dp)
+    ) {
+        when {
+            isLoading.value -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+            errorMessage.value != null -> {
+                Text(
+                    text = errorMessage.value ?: "Đã xảy ra lỗi",
+                    color = Color.Red,
+                    modifier = Modifier.align(Alignment.Center),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            danhSachHoaDonTraHang.isEmpty() -> {
+                Text(
+                    text = "Không có đơn hàng nào đang trả hàng.",
+                    modifier = Modifier.align(Alignment.Center),
+                    textAlign = TextAlign.Center,
+                )
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(4.dp)
+                ) {
+                    item {
+                        Text(
+                            "Số lượng đơn trả hàng (${soLuongHoaDonTraHang.value})",
+                            modifier = Modifier.padding(4.dp),
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    items(danhSachHoaDonTraHang) { hoadon ->
+                       // CardDonHangAdmin(navController, hoadon, 7, hoaDonBanViewModel)
+                        CardDonHangAdmin(navController, hoadon, hoaDonBanViewModel)
+
+                    }
+                }
+            }
+        }
+    }
+}
+

@@ -42,8 +42,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.lapstore.models.GioHang
 import com.example.lapstore.models.SanPham
-import com.example.lapstore.ui.formatGiaTien
 import com.example.lapstore.viewmodels.GioHangViewModel
+import com.example.lapstore.views.formatGiaTien
 
 @Composable
 fun SanPhamCard(

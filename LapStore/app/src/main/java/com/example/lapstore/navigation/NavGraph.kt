@@ -2,27 +2,33 @@ import android.net.Uri
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.lapstore.datastore.UserPreferences
 import com.example.lapstore.models.ThongKeScreen
 import com.example.lapstore.viewmodels.KhachHangViewModel
 import com.example.lapstore.viewmodels.KhuyenMaiViewModel
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
 import com.example.lapstore.views.AcccountScreen
-import com.example.lapstore.views.AccessoryScreen
 import com.example.lapstore.views.AddDiaChiScreen
 import com.example.lapstore.views.AddressManagementScreen
 import com.example.lapstore.views.AdminScreen
 import com.example.lapstore.views.CartManagementSection
 import com.example.lapstore.views.LoginScreen
-import com.example.lapstore.views.ProductDetail_AccessoryScreen
 import com.example.lapstore.views.ProductDetail_Screen
 import com.example.lapstore.views.RegisterScreen
 import com.example.lapstore.views.UpdateDiaChiScreen
+import com.example.lapstore.views.VerifyOTPScreen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 sealed class NavRoute(val route: String) {
     object HOME : NavRoute("home_screen")
@@ -40,26 +46,30 @@ sealed class NavRoute(val route: String) {
     object HOADONDETAILSCREEN : NavRoute("hoadondetail_screen")
     object ADMINSCREEN : NavRoute("admin_screen")
     object REGISTERSCREEN: NavRoute("register_screen")
-    object ACCESSORY: NavRoute("accessory_screen")
-    object PRODUCTDETAIL_ACCESSORY  : NavRoute("productdetail_accesory")
     object FAVORITE : NavRoute("favorite_screen")
     object ADDRESS_SELECTION: NavRoute("address_selection_screen")
     object THONGKE : NavRoute("thongke_screen")
     object KHUYENMAI : NavRoute("khuyenmai_screen")
     object  ADMIN_KHUYENMAI : NavRoute("admin_khuyenmai_screen")
     object PRODUCT_MANAGEMENT : NavRoute("product_management_screen")
-    object UPDATEPRODUCT : NavRoute("update_product_screen")
+    object OTPSCREEN : NavRoute("otp_screen")
+    object SPLASH : NavRoute("splash_screen")
 
 
-@Composable
+
+
+    @Composable
 fun NavgationGraph(
     navController: NavHostController,
     viewmodel: SanPhamViewModel,
     hinhAnhViewModel: HinhAnhViewModel,
     khachHangViewModel: KhachHangViewModel,
-    taiKhoanViewModel: TaiKhoanViewModel
+    taiKhoanViewModel: TaiKhoanViewModel,
+    sanPhamViewModel: SanPhamViewModel
 ) {
-    NavHost(navController = navController, startDestination = NavRoute.HOME.route) {
+    //NavHost(navController = navController, startDestination = HOME.route)
+    NavHost(navController = navController, startDestination = SPLASH.route)
+        {
     // HomeScreen không có tham số (Chưa đăng nhập)
         composable(HOME.route) {
             HomeScreen(
@@ -87,32 +97,12 @@ fun NavgationGraph(
                 navController = navController
             )
         }
-//        composable(NavRoute.UPDATEPRODUCT.route) {
-//            UpdateProductScreen(viewModel = viewmodel)
-//        }
+        composable(SPLASH.route) {
+            val context = LocalContext.current
+            val userPreferences = remember { UserPreferences(context) }
+            SplashScreen(navController = navController, userPreferences = userPreferences)
+        }
 
-        // Trang phụ kiện - chưa đăng nhập
-        composable(ACCESSORY.route) {
-            AccessoryScreen(
-                navController = navController,
-                viewModel = viewmodel,
-                tentaikhoan = null
-            )
-        }
-        // Trang phụ kiện - đã đăng nhập
-        composable(
-            route = ACCESSORY.route + "?tentaikhoan={tentaikhoan}",
-            arguments = listOf(
-                navArgument("tentaikhoan") { type = NavType.StringType }
-            )
-        ) {
-            val tentaikhoan = it.arguments?.getString("tentaikhoan")
-            AccessoryScreen(
-                navController = navController,
-                viewModel = viewmodel,
-                tentaikhoan = tentaikhoan
-            )
-        }
 
         // Màn hình tài khoản
         composable(
@@ -168,54 +158,6 @@ fun NavgationGraph(
                 )
             }
         }
-        // Màn hình chi tiết phụ kiện (accessory)
-        composable(
-            route = PRODUCTDETAIL_ACCESSORY.route + "?id={id}&makhachhang={makhachhang}",
-            arguments = listOf(
-                navArgument("id") { nullable = true },
-                navArgument("makhachhang") { nullable = true },
-            )
-        ) {
-            val id = it.arguments?.getString("id")
-            val makhachhang = it.arguments?.getString("makhachhang")
-
-            if (id != null) {
-                ProductDetail_AccessoryScreen(
-                    navController = navController,
-                    id = id,
-                    makhachhang = makhachhang,
-                    tentaikhoan = null,
-                    viewModel = viewmodel,
-                    hinhAnhViewModel = hinhAnhViewModel
-                )
-            }
-        }
-
-        composable(
-            route = PRODUCTDETAIL_ACCESSORY.route + "?id={id}&makhachhang={makhachhang}&tentaikhoan={tentaikhoan}",
-            arguments = listOf(
-                navArgument("id") { nullable = true },
-                navArgument("makhachhang") { nullable = true },
-                navArgument("tentaikhoan") { type = NavType.StringType }
-            )
-        ) {
-            val id = it.arguments?.getString("id")
-            val makhachhang = it.arguments?.getString("makhachhang")
-            val tentaikhoan = it.arguments?.getString("tentaikhoan")
-
-            if (id != null) {
-                ProductDetail_AccessoryScreen(
-                    navController = navController,
-                    id = id,
-                    makhachhang = makhachhang,
-                    tentaikhoan = tentaikhoan,
-                    viewModel = viewmodel,
-                    hinhAnhViewModel = hinhAnhViewModel
-                )
-            }
-        }
-
-
 //      //// màn hình thanh toán
         composable(
             route = PAYSCREEN.route +
@@ -370,7 +312,6 @@ fun NavgationGraph(
                     taiKhoanViewModel.getTaiKhoanByTentaikhoan(tentaikhoan)
                 }
             }
-
             // Chờ đến khi có tài khoản mới hiển thị
             if (taikhoan != null) {
                 taikhoan.MaKhachHang?.let {
@@ -385,6 +326,7 @@ fun NavgationGraph(
                 Text("🔒 Đang tải tài khoản...")
             }
         }
+
 
         //thong ke
         composable(
@@ -420,25 +362,16 @@ fun NavgationGraph(
             AdminKhuyenMaiScreen(
                 viewModel = khuyenMaiViewModel,
                 danhSachSanPham = danhSachSanPham,
-                //navController = navController,
             )
         }
-//        // Khuyến mãi - Người dùng
-//        composable(
-//            route = NavRoute.KHUYENMAI.route + "?tentaikhoan={tentaikhoan}",
-//            arguments = listOf(navArgument("tentaikhoan") { type = NavType.StringType })
-//        ) { backStackEntry ->
-//            val tentaikhoan = backStackEntry.arguments?.getString("tentaikhoan")
-//            val khuyenMaiViewModel: KhuyenMaiViewModel = viewModel()
-//            LaunchedEffect(tentaikhoan) {
-//                khuyenMaiViewModel.fetchTatCaKhuyenMai()
-//            }
-//            KhuyenMaiScreen(
-//                navController = navController,
-//                khuyenMaiViewModel = khuyenMaiViewModel,
-//                tentaikhoan = tentaikhoan
-//            )
-//        }
+        composable(OTPSCREEN.route) {
+            VerifyOTPScreen(
+                navController = navController,
+                taiKhoanViewModel = taiKhoanViewModel,
+                khachHangViewModel = khachHangViewModel
+            )
+        }
+
 
       }
     }

@@ -1,58 +1,33 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json; charset=UTF-8");
+header('Access-Control-Allow-Origin:*');
+header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type,Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
-// Kết nối CSDL và model hóa đơn
-include_once("../../config/database.php");
-include_once("../../model/hoadonban.php");
+include_once('../../config/database.php');
+include_once('../../model/MomoPayment.php');
 
-// Lấy dữ liệu từ client gửi qua (POST)
-$maKhachHang = $_POST['MaKhachHang'] ?? '';
-$maDiaChi = $_POST['MaDiaChi'] ?? '';
-$tongTien = $_POST['TongTien'] ?? '';
-$ngayDat = date("Y-m-d");
-$phuongThuc = "Thanh toán qua Momo";
-$trangThai = 0; // Chưa xác nhận
+// Nhận dữ liệu từ app
+$data = json_decode(file_get_contents("php://input"));
 
-// Kiểm tra dữ liệu đầu vào
-if (empty($maKhachHang) || empty($maDiaChi) || empty($tongTien)) {
-    echo json_encode(["success" => false, "message" => "Thiếu thông tin bắt buộc"]);
+if (!isset($data->amount)) {
+    echo json_encode(['success' => false, 'message' => 'Thiếu số tiền']);
     exit;
 }
 
-// Tạo kết nối CSDL
- $database = new database();
- $conn = $database->Connect();
+$momo = new MomoPayment();
+$result = $momo->createPayment($data->amount);
 
-// Tạo hóa đơn mới
-$hoaDon = new HoaDonBan($db);
-
-// Gán dữ liệu cho đối tượng
-$hoaDon->MaHoaDonBan = null;
-$hoaDon->MaKhachHang = $maKhachHang;
-$hoaDon->NgayDatHang = $ngayDat;
-$hoaDon->MaDiaChi = $maDiaChi;
-$hoaDon->TongTien = $tongTien;
-$hoaDon->PhuongThucThanhToan = $phuongThuc;
-$hoaDon->TrangThai = $trangThai;
-
-// Thêm hóa đơn vào DB
-if ($hoaDon->addHoaDonBan()) {
-    // Lấy mã hóa đơn mới nhất để đưa vào URL thanh toán (tùy chọn)
-    $maHoaDonMoi = $hoaDon->getMaxMaHoaDonBan();
-
-    // Giả lập tạo liên kết thanh toán qua Momo
-    $payUrl = "https://momo.vn/pay?amount={$tongTien}&orderId={$maHoaDonMoi}&makh={$maKhachHang}";
-
+// Gửi link thanh toán về cho app
+if (isset($result['payUrl'])) {
     echo json_encode([
-        "success" => true,
-        "payUrl" => $payUrl,
-        "MaHoaDonBan" => $maHoaDonMoi
+        'success' => true,
+        'payUrl' => $result['payUrl']
     ]);
 } else {
     echo json_encode([
-        "success" => false,
-        "message" => "Tạo hóa đơn thất bại"
+        'success' => false,
+        'message' => 'Tạo thanh toán thất bại',
+        'error' => $result
     ]);
 }
-?>

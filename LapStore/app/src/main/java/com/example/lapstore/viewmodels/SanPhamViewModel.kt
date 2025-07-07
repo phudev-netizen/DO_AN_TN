@@ -1,3 +1,5 @@
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +23,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch/**/
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class SanPhamViewModel : ViewModel() {
 
@@ -64,11 +69,7 @@ class SanPhamViewModel : ViewModel() {
     val danhSachSanPhamPhuKienphim: StateFlow<List<SanPham>> = _danhSachSanPhamPhuKienphim
 
      var danhSachAllSanPham by mutableStateOf<List<SanPham>>(emptyList())
-    // ViewModel
-//    private val _danhSachAllSanPham = MutableStateFlow<List<SanPham>>(emptyList())
-//    val danhSachAllSanPham: StateFlow<List<SanPham>> = _danhSachAllSanPham
 
-//
 
     fun getAllSanPham() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -85,50 +86,6 @@ class SanPhamViewModel : ViewModel() {
         }
     }
 
-
-    //    fun getSanPhamTheoLoaiPhuKien() {
-//        viewModelScope.launch {
-//            try {
-//                val response = withContext(Dispatchers.IO) {
-//                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamTheoLoai(3)
-//                }
-//                Log.d("SanPhamViewModel", "PhuKien API trả về: ${response.sanpham}")
-//                _danhSachSanPhamPhuKien.value = response.sanpham ?: emptyList()
-//            } catch (e: Exception) {
-//                Log.e("SanPham Error", "Lỗi khi lấy sanpham: ${e.message}")
-//                _danhSachSanPhamPhuKien.value = emptyList()
-//            }
-//        }
-//    }
-    fun getSanPhamTheoLoaiRAM() {
-        viewModelScope.launch {
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamTheoLoai(3)
-                }
-                Log.d("SanPhamViewModel", "PhuKien API trả về: ${response.sanpham}")
-                _danhSachSanPhamPhuKien.value = response.sanpham ?: emptyList()
-            } catch (e: Exception) {
-                Log.e("SanPham Error", "Lỗi khi lấy sanpham: ${e.message}")
-                _danhSachSanPhamPhuKien.value = emptyList()
-            }
-        }
-    }
-
-    fun getSanPhamTheoLoaiPHIM() {
-        viewModelScope.launch {
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamTheoLoai(4)
-                }
-                Log.d("SanPhamViewModel", "PhuKien API trả về: ${response.sanpham}")
-                _danhSachSanPhamPhuKienphim.value = response.sanpham ?: emptyList()
-            } catch (e: Exception) {
-                Log.e("SanPham Error", "Lỗi khi lấy sanpham: ${e.message}")
-                _danhSachSanPhamPhuKienphim.value = emptyList()
-            }
-        }
-    }
 
     fun getSanPhamTheoLoaiGaming() {
         viewModelScope.launch {
@@ -241,25 +198,6 @@ class SanPhamViewModel : ViewModel() {
         }
     }
 
-//    fun createSanPham(sanpham: SanPham, onResult: (Boolean, String) -> Unit = {_,_->}) {
-//        viewModelScope.launch {
-//            try {
-//                val response = withContext(Dispatchers.IO) {
-//                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.createSanPham(sanpham)
-//                }
-//                Log.d("SanPham", "Create response: $response")
-//                if (response.success) {
-//                    getAllSanPham()
-//                    onResult(true, "Thêm sản phẩm thành công")
-//                } else {
-//                    onResult(false, "Thêm sản phẩm thất bại: ${response.message}")
-//                }
-//            } catch (e: Exception) {
-//                onResult(false, "Lỗi khi thêm sản phẩm: ${e.message}")
-//                Log.e("SanPham Error", "Lỗi khi thêm sản phẩm: ${e.message}")
-//            }
-//        }
-//    }
 fun createSanPham(sanpham: SanPham, onResult: (Boolean, String) -> Unit = {_,_->}) {
     viewModelScope.launch {
         try {
@@ -318,8 +256,40 @@ fun createSanPham(sanpham: SanPham, onResult: (Boolean, String) -> Unit = {_,_->
         }
     }
 
-//    fun getSanPhamByMaSanPham(maSanPham: Int): SanPham? {
-//        return danhSachAllSanPham.find { it.MaSanPham == maSanPham }
-//    }
+    fun uploadImage(context: Context, uri: Uri, onResult: (String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val contentResolver = context.contentResolver
+                val inputStream = contentResolver.openInputStream(uri)
+                val bytes = inputStream?.readBytes()
+
+                if (bytes != null) {
+                    val requestBody = bytes.toRequestBody("image/*".toMediaTypeOrNull())
+                    val body = MultipartBody.Part.createFormData(
+                        "file", "sanpham_${System.currentTimeMillis()}.jpg", requestBody
+                    )
+
+                    val response = withContext(Dispatchers.IO) {
+                        QuanLyBanLaptopRetrofitClient.sanphamAPIService.uploadImage(body)
+                    }
+
+                    if (response.isSuccessful && response.body() != null) {
+                        onResult(response.body()?.imageUrl)
+                    } else {
+                        Log.e("UploadImage", "Upload failed: ${response.errorBody()?.string()}")
+                        onResult(null)
+                    }
+                } else {
+                    onResult(null)
+                }
+            } catch (e: Exception) {
+                Log.e("UploadImage", "Lỗi khi upload ảnh: ${e.message}")
+                onResult(null)
+            }
+        }
+    }
+
+
+
 
 }

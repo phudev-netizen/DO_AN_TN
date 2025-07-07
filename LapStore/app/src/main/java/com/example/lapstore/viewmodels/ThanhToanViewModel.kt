@@ -1,60 +1,33 @@
-//package com.example.lapstore.viewmodels
-//
-//import android.content.Context
-//import android.content.Intent
-//import android.net.Uri
-//import android.widget.Toast
-//import com.example.lapstore.api.QuanLyBanLaptopRetrofitClient
-//import com.example.lapstore.models.MomoRequest
-//import com.example.lapstore.models.MomoResponse
-//import retrofit2.Call
-//import retrofit2.Callback
-//import retrofit2.Response
-//
-////fun thanhToanQuaMomo(context: Context, maKhachHang: String, maDiaChi: String, tongTien: String) {
-////    val request = MomoRequest(
-////        MaKhachHang = maKhachHang,
-////        MaDiaChi = maDiaChi,
-////        TongTien = tongTien
-////    )
-////
-////    QuanLyBanLaptopRetrofitClient.instance.createMomoPayment(request)
-////        .enqueue(object : Callback<MomoResponse> {
-////            override fun onResponse(call: Call<MomoResponse>, response: Response<MomoResponse>) {
-////                if (response.isSuccessful && response.body() != null) {
-////                    val payUrl = response.body()!!.payUrl
-////                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(payUrl))
-////                    context.startActivity(intent)
-////                } else {
-////                    Toast.makeText(context, "Không lấy được URL thanh toán", Toast.LENGTH_SHORT).show()
-////                }
-////            }
-////
-////            override fun onFailure(call: Call<MomoResponse>, t: Throwable) {
-////                Toast.makeText(context, "Lỗi mạng: ${t.message}", Toast.LENGTH_SHORT).show()
-////            }
-////        })
-////}
-//fun thanhToanQuaMomo(context: Context, maKhachHang: String, maDiaChi: String, tongTien: String) {
-//    val api = QuanLyBanLaptopRetrofitClient.instance
-//
-//    api.createMomoPayment(maKhachHang, maDiaChi, tongTien)
-//        .enqueue(object : Callback<MomoResponse> {
-//            override fun onResponse(call: Call<MomoResponse>, response: Response<MomoResponse>) {
-//                if (response.isSuccessful && response.body() != null) {
-//                    val payUrl = response.body()!!.payUrl
-//                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(payUrl))
-//                    context.startActivity(intent)
-//                } else {
-//                    Toast.makeText(context, "Không lấy được URL thanh toán", Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<MomoResponse>, t: Throwable) {
-//                Toast.makeText(context, "Lỗi mạng: ${t.message}", Toast.LENGTH_SHORT).show()
-//            }
-//        })
-//}
-//
-//
-//
+package com.example.lapstore.ui.viewmodel
+
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.lapstore.api.QuanLyBanLaptopRetrofitClient.Thanhtoanapi
+import com.example.lapstore.data.api.ThanhToanAPIService
+import com.example.lapstore.data.model.MomoResponse
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+class PaymentViewModel : ViewModel() {
+
+    private val _momoResponse = MutableStateFlow<MomoResponse?>(null)
+    val momoResponse: StateFlow<MomoResponse?> = _momoResponse
+
+    fun taoThanhToan(amount: String) {
+        viewModelScope.launch {
+            try {
+                val response = Thanhtoanapi.taoThanhToanMomo(mapOf("amount" to amount))
+                _momoResponse.value = response
+            } catch (e: Exception) {
+                Log.e("PaymentViewModel", "Lỗi tạo thanh toán", e)
+                _momoResponse.value = MomoResponse(false, null, e.localizedMessage)
+            }
+        }
+    }
+}
+
+

@@ -6,13 +6,13 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.lapstore.api.KhuyenMaiAPIService
 import com.example.lapstore.api.QuanLyBanLaptopRetrofitClient
 import com.example.lapstore.models.KhuyenMai
 
 import kotlinx.coroutines.launch
 
 class KhuyenMaiViewModel : ViewModel() {
-//    val khuyenMaiList: MutableList<KhuyenMai> = mutableListOf()
 
     private val _khuyenMai = mutableStateOf<KhuyenMai?>(null)
     val khuyenMai: State<KhuyenMai?> = _khuyenMai
@@ -20,47 +20,45 @@ class KhuyenMaiViewModel : ViewModel() {
     private val _khuyenMaiList = mutableStateListOf<KhuyenMai>()
     val khuyenMaiList: List<KhuyenMai> get() = _khuyenMaiList
 
-    fun fetchKhuyenMai(maSanPham: Int) {
-        viewModelScope.launch {
-            try {
-                val response = QuanLyBanLaptopRetrofitClient.khuyenMaiAPIService.getKhuyenMaiByProductId(maSanPham)
-                Log.d("KhuyenMaiVM", "Fetch khuyến mãi cho MaSanPham = $maSanPham, kết quả: $response")
-                _khuyenMai.value = response.firstOrNull()
-            } catch (e: Exception) {
-            }
+
+fun fetchKhuyenMai(maSanPham: Int) {
+    viewModelScope.launch {
+        try {
+            val response = QuanLyBanLaptopRetrofitClient.khuyenMaiAPIService.getKhuyenMaiByProductId(maSanPham)
+            Log.d("KhuyenMaiVM", "KQ KM cho SP $maSanPham: $response")
+
+            // Ưu tiên khuyến mãi riêng cho SP trước, nếu không có thì lấy khuyến mãi toàn bộ
+            _khuyenMai.value = response.firstOrNull { it.MaSanPham == maSanPham }
+                ?: response.firstOrNull { it.MaSanPham == 0 }
+
+            Log.d("KhuyenMaiVM", "Khuyến mãi áp dụng: ${_khuyenMai.value}")
+        } catch (e: Exception) {
+            Log.e("KhuyenMaiVM", "Lỗi khi fetch KM: ${e.message}")
         }
     }
+}
 
     fun fetchTatCaKhuyenMai() {
         viewModelScope.launch {
             try {
-                val response = QuanLyBanLaptopRetrofitClient.khuyenMaiAPIService.getKhuyenMaiByProductId(0) // 0 để lấy tất cả
+                val response = QuanLyBanLaptopRetrofitClient.khuyenMaiAPIService.getTatCaKhuyenMai()
                 _khuyenMaiList.clear()
                 _khuyenMaiList.addAll(response)
             } catch (e: Exception) {
+                Log.e("KM", "Lỗi fetch tất cả KM: ${e.message}")
             }
         }
     }
 
-//    fun fetchTatCaKhuyenMai1() {
-//            viewModelScope.launch {
-//                try {
-//                    val response = QuanLyBanLaptopRetrofitClient.khuyenMaiAPIService.getKhuyenMaiByProductId(0)
-//                    _khuyenMaiList.clear()
-//                    _khuyenMaiList.addAll(response)
-//                } catch (e: Exception) {
-//                    Log.e("KhuyenMaiViewModel", "Lỗi fetchTatCaKhuyenMai: ${e.message}")
-//                }
-//            }
-//        }
-
     fun addKhuyenMai(khuyenMai: KhuyenMai, onSuccess: () -> Unit) {
         viewModelScope.launch {
             try {
+                Log.d("DEBUG_ADD_KM", "Gửi lên: $khuyenMai")
                 QuanLyBanLaptopRetrofitClient.khuyenMaiAPIService.addKhuyenMai(khuyenMai)
                 _khuyenMaiList.add(khuyenMai)
                 onSuccess()
             } catch (e: Exception) {
+                Log.e("ADD_KM", "Lỗi thêm khuyến mãi: ${e.message}")
 
             }
         }
