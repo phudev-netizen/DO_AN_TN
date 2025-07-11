@@ -147,10 +147,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 object Constants {
     private const val BASE_URL_EMULATOR = "http://10.0.2.2/lap_store_api/api/"
     private const val BASE_URL_DEVICE = "http://192.168.3.49/lap_store_api/api/"
-
     // 👉 Chỉ cần đổi dòng này nếu chuyển môi trường
     val BASE_URL: String = BASE_URL_DEVICE
-    // val BASE_URL: String = BASE_URL_EMULATOR
+    //val BASE_URL: String = BASE_URL_EMULATOR
 }
 
 object QuanLyBanLaptopRetrofitClient {

@@ -19,4 +19,9 @@ suspend fun getThongKeSanPham(
     @Header("Role") role: String = "admin"
 ): Response<ThongKeSanPhamResponse>
 
+@GET("ThongKe/thongke_donhang.php")
+suspend fun getOrders(
+    @Header("Role") role: String = "admin"
+): Response<OrderResponse>
+
 }

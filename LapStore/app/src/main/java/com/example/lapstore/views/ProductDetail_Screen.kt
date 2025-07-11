@@ -7,6 +7,7 @@ import SanPhamViewModel
 import android.icu.text.DecimalFormat
 import android.net.Uri
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,6 +35,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -85,6 +87,18 @@ fun ProductDetail_Screen(
     val danhsachsanpham = viewModel.danhSachAllSanPham
     viewModel.getAllSanPham()
     val sanPham = viewModel.sanPham
+
+    val soluong = remember { mutableIntStateOf(1) }
+
+
+    val cartItemCount by remember { derivedStateOf { gioHangViewModel.listGioHang.sumOf { it.SoLuong } } }
+
+    LaunchedEffect(makhachhang) {
+        if (!makhachhang.isNullOrEmpty()) {
+            gioHangViewModel.getGioHangByKhachHang(makhachhang.toInt())
+        }
+    }
+
 
     var snackbarHostState = remember {
         SnackbarHostState()
@@ -170,13 +184,27 @@ fun ProductDetail_Screen(
                             }
                         }
                     ) {
+                        BadgedBox(
+                            badge = {
+                                if (cartItemCount > 0) {
+                                    Badge(
+                                        containerColor = Color.Yellow,
+                                        contentColor = Color.Black
+                                    ) {
+                                        Text(cartItemCount.toString(), fontSize = 10.sp)
+                                    }
+                                }
+                            }
+                        ) {
                         Icon(
                             imageVector = Icons.Filled.ShoppingCart,
                             contentDescription = "",
                             tint = Color.White
                         )
                     }
+                }
                 },
+
                 title = {
                     // Search Bar
                     Row(
@@ -477,6 +505,63 @@ fun ProductDetail_Screen(
                             Spacer(modifier = Modifier.width(8.dp))
 
                             // Nút MUA NGAY
+//                            Button(
+//                                onClick = {
+//                                    if (makhachhang.isNullOrBlank() || tentaikhoan.isNullOrBlank()) {
+//                                        navController.navigate(NavRoute.LOGINSCREEN.route)
+//                                    } else {
+//                                        isLoading = true
+//                                        scope.launch {
+//                                            val sanPhamTonKho = danhsachsanpham.find { it.MaSanPham == sanPham.MaSanPham }
+//                                            if (sanPhamTonKho == null || sanPhamTonKho.SoLuong <= 0) {
+//                                                delay(500)
+//                                                snackbarHostState.showSnackbar(
+//                                                    "Sản phẩm đã hết hàng, không thể mua ngay.",
+//                                                    duration = SnackbarDuration.Short
+//                                                )
+//                                            } else {
+//                                                // TÍNH GIÁ SAU GIẢM
+//                                                val giaSauGiam = if (khuyenMai != null)
+//                                                    (sanPham.Gia * (100 - khuyenMai.PhanTramGiam)) / 100
+//                                                else
+//                                                    sanPham.Gia
+//                                                // Kiểm tra số lượng mua
+//                                                val tongTien  = giaSauGiam * soluong.value
+//
+//                                                // CHỈ TRUYỀN BA TRƯỜNG: mã sản phẩm, số lượng, mã giỏ hàng (0 nếu không có)
+////                                                val rawSelectedProducts = "${sanPham.MaSanPham},1,0"
+//                                                val soLuongMua = soluong.value
+//                                                val rawSelectedProducts = "${sanPham.MaSanPham},${soluong.value},0"
+//                                                val encodedSelectedProducts = Uri.encode(rawSelectedProducts)
+//                                                val encodedTenTaiKhoan = Uri.encode(tentaikhoan)
+//                                                val encodedImage = Uri.encode(hinhAnhHienTai ?: "")
+//
+//                                                navController.navigate(
+//                                                    "${NavRoute.PAYSCREEN.route}?" +
+//                                                            "selectedProducts=$encodedSelectedProducts" +
+//                                                            "&tongtien=$giaSauGiam" + // giá đã giảm
+//                                                            "&tentaikhoan=$encodedTenTaiKhoan" +
+//                                                            "&makhachhang=$makhachhang" +
+//                                                            "&hinhAnhHienTai=$encodedImage" +
+//                                                            "&tensanpham=${Uri.encode(sanPham.TenSanPham)}"
+//                                                )
+//                                            }
+//                                            isLoading = false
+//                                        }
+//                                    }
+//                                },
+//                                enabled = !isLoading,
+//                                modifier = Modifier.weight(1f),
+//                                shape = RoundedCornerShape(10.dp),
+//                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+//                            ) {
+//                                Text(
+//                                    "MUA NGAY",
+//                                    fontWeight = FontWeight.Bold,
+//                                    fontSize = 18.sp,
+//                                    color = Color.White
+//                                )
+//                            }
                             Button(
                                 onClick = {
                                     if (makhachhang.isNullOrBlank() || tentaikhoan.isNullOrBlank()) {
@@ -485,6 +570,7 @@ fun ProductDetail_Screen(
                                         isLoading = true
                                         scope.launch {
                                             val sanPhamTonKho = danhsachsanpham.find { it.MaSanPham == sanPham.MaSanPham }
+
                                             if (sanPhamTonKho == null || sanPhamTonKho.SoLuong <= 0) {
                                                 delay(500)
                                                 snackbarHostState.showSnackbar(
@@ -498,20 +584,25 @@ fun ProductDetail_Screen(
                                                 else
                                                     sanPham.Gia
 
-                                                // CHỈ TRUYỀN BA TRƯỜNG: mã sản phẩm, số lượng, mã giỏ hàng (0 nếu không có)
-                                                val rawSelectedProducts = "${sanPham.MaSanPham},1,0"
-                                                val encodedSelectedProducts = Uri.encode(rawSelectedProducts)
+                                                val selectedProducts = listOf(
+                                                    Triple(sanPham.MaSanPham, soluong.value, giaSauGiam)
+                                                )
+
+                                                val encodedSelectedProducts = Uri.encode(
+                                                    selectedProducts.joinToString("|") { "${it.first},${it.second},${it.third}" }
+                                                )
+
                                                 val encodedTenTaiKhoan = Uri.encode(tentaikhoan)
                                                 val encodedImage = Uri.encode(hinhAnhHienTai ?: "")
+                                                val encodedTenSanPham = Uri.encode(sanPham.TenSanPham)
 
                                                 navController.navigate(
                                                     "${NavRoute.PAYSCREEN.route}?" +
                                                             "selectedProducts=$encodedSelectedProducts" +
-                                                            "&tongtien=$giaSauGiam" + // giá đã giảm
                                                             "&tentaikhoan=$encodedTenTaiKhoan" +
                                                             "&makhachhang=$makhachhang" +
                                                             "&hinhAnhHienTai=$encodedImage" +
-                                                            "&tensanpham=${Uri.encode(sanPham.TenSanPham)}"
+                                                            "&tensanpham=$encodedTenSanPham"
                                                 )
                                             }
                                             isLoading = false
@@ -531,7 +622,9 @@ fun ProductDetail_Screen(
                                 )
                             }
 
-                       }
+
+
+                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
 

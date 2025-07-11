@@ -111,7 +111,12 @@ public function getTotalQuantitySold() {
     return $result['totalQty'] ?? 0;
 }
 
-
+public function getOrders() {
+    $sql = "SELECT MaHoaDonBan, NgayDatHang, TrangThai, TongTien FROM hoadonban ORDER BY NgayDatHang DESC";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 }
 ?>

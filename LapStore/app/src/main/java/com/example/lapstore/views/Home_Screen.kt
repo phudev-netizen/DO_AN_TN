@@ -1,4 +1,5 @@
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import com.example.lapstore.views.ProductCard
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.lapstore.R
+import com.example.lapstore.viewmodels.GioHangViewModel
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
@@ -58,6 +60,12 @@ fun HomeScreen(
 
     val taiKhoanViewModel: TaiKhoanViewModel = viewModel()
     val taikhoan = taiKhoanViewModel.taikhoan
+
+    val gioHangViewModel: GioHangViewModel = viewModel()
+
+    val cartItemCount by remember {
+        derivedStateOf { gioHangViewModel.listGioHang.sumOf { it.SoLuong } }
+    }
 
 
     val context = LocalContext.current
@@ -98,6 +106,13 @@ fun HomeScreen(
         viewModel.getSanPhamTheoLoaiVanPhong()
         viewModel.getAllSanPham()
     }
+    LaunchedEffect(taikhoan?.MaKhachHang) {
+        taikhoan?.MaKhachHang?.let { maKH ->
+            yeuThichViewModel.loadDanhSach(maKH)
+            gioHangViewModel.getGioHangByKhachHang(maKH.toInt()) // 🛒 Gọi ViewModel giỏ hàng
+        }
+    }
+
 
     // Giao diện chính của HomeScreen
         Scaffold(
@@ -117,14 +132,27 @@ fun HomeScreen(
                                 }
                             }
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.ShoppingCart,
-                                contentDescription = "",
-                                tint = Color.White
-                            )
+                            BadgedBox(
+                                badge = {
+                                    if (cartItemCount > 0) {
+                                        Badge(
+                                            containerColor = Color.Yellow,
+                                            contentColor = Color.Black
+                                        ) {
+                                            Text(cartItemCount.toString(), fontSize = 10.sp)
+                                        }
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.ShoppingCart,
+                                    contentDescription = "",
+                                    tint = Color.White
+                                )
+                            }
                         }
                     },
-                    title = {
+                            title = {
                         Row(
                             modifier = Modifier.fillMaxWidth()
                         ) {

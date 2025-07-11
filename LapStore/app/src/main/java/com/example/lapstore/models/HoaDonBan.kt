@@ -7,6 +7,7 @@ data class HoaDonBan(
     val MaDiaChi: Int,
     val TongTien: Int,
     val PhuongThucThanhToan: String,
-    val TrangThai: Int
+    val TrangThai: Int,
+    val LyDoTraHang: String? = null
 )
 

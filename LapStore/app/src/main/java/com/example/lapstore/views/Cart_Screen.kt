@@ -1,3 +1,4 @@
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
@@ -20,7 +21,10 @@ import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.RemoveCircleOutline
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,6 +44,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -66,6 +71,7 @@ import com.example.lapstore.views.formatGiaTien
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
+@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
@@ -107,8 +113,11 @@ fun CartScreen(
 
     var showDialog by remember { mutableStateOf(false) }
 
+    val cartItemCount by derivedStateOf { listGioHang.sumOf { it.SoLuong } }
 
-fun calculateTotalPrice() {
+
+
+    fun calculateTotalPrice() {
     if (listGioHang.isEmpty()) {
         totalPrice = 0
     } else {
@@ -337,6 +346,12 @@ fun calculateTotalPrice() {
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 15.sp,
                                         maxLines = 2
+                                    )
+                                    Text(
+                                        text = "Tồn kho: ${sanPham.SoLuong}",
+                                        color = Color.Gray,
+                                        fontSize = 12.sp,
+                                        modifier = Modifier.padding(top = 2.dp)
                                     )
 
                                     Spacer(Modifier.height(4.dp))

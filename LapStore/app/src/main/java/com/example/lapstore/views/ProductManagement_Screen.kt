@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,6 +47,7 @@ fun ProductManagementScreen(
     LaunchedEffect(Unit) {
         viewModel.getAllSanPham()
     }
+
 
     val danhSachSanPham by remember { viewModel::danhSachAllSanPham }
     val isLoading = viewModel.isLoading
@@ -111,7 +113,6 @@ fun ProductManagementScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
 //                                    // Hình ảnh placeholder
-
                                         Box(
                                             modifier = Modifier
                                                 .size(80.dp)
@@ -173,45 +174,30 @@ fun ProductManagementScreen(
                 }
             }
             val context = LocalContext.current
-
             if (showForm) {
                 ProductFormDialog(
                     sanPham = editingSanPham,
                     onDismiss = { showForm = false },
-//                    onSave = { sanPham ->
-//                        if (sanPham.MaSanPham == 0) {
-//                            viewModel.createSanPham(sanPham) { _, _ -> showForm = false }
-//                        } else {
-//                            viewModel.updateSanPham(sanPham) { _, _ -> showForm = false }
-//                        }
-//                    }
-                    onSave = { sanPham, imageUri ->
-                        if (imageUri != null) {
-                            viewModel.uploadImage(context, imageUri) { imageUrl ->
+                    onSave = { sp, imageUris ->
+                        if (imageUris.isNotEmpty()) {
+                            viewModel.uploadImage(context, imageUris[0]) { imageUrl ->
                                 if (imageUrl != null) {
-                                    // Tạo bản mới để chắc chắn có imageUrl
-                                    val updatedSanPham = sanPham.copy(HinhAnh = imageUrl)
-
-                                    if (sanPham.MaSanPham == 0) {
-                                        viewModel.createSanPham(updatedSanPham) { _, _ -> showForm = false }
+                                    val updated = sp.copy(HinhAnh = imageUrl)
+                                    if (updated.MaSanPham == 0) {
+                                        viewModel.createSanPham(updated) { _, _ -> showForm = false }
                                     } else {
-                                        viewModel.updateSanPham(updatedSanPham) { _, _ -> showForm = false }
+                                        viewModel.updateSanPham(updated) { _, _ -> showForm = false }
                                     }
-                                } else {
-                                    // Upload ảnh thất bại
                                 }
                             }
                         } else {
-                            // Không chọn ảnh mới → dùng ảnh cũ đã có trong sanPham
-                            if (sanPham.MaSanPham == 0) {
-                                viewModel.createSanPham(sanPham) { _, _ -> showForm = false }
-                            } else {
-                                viewModel.updateSanPham(sanPham) { _, _ -> showForm = false }
-                            }
+                            if (sp.MaSanPham == 0) viewModel.createSanPham(sp) { _, _ -> showForm = false }
+                            else viewModel.updateSanPham(sp) { _, _ -> showForm = false }
                         }
-                    }
-
+                    },
+                    sanPhamViewModel = viewModel
                 )
+
             }
         }
     }
@@ -225,123 +211,86 @@ fun formatGiaTien(gia: Double): String {
 fun ProductFormDialog(
     sanPham: SanPham?,
     onDismiss: () -> Unit,
-//    onSave: (SanPham) -> Unit
-     onSave: (SanPham, Uri?) -> Unit
+    onSave: (SanPham, List<Uri>) -> Unit, // ✅ Sửa kiểu List<Uri>
+    sanPhamViewModel: SanPhamViewModel
 ) {
-    val cpuOptions = listOf("Intel i5", "Intel i7", "AMD Ryzen 5", "AMD Ryzen 7", "Apple M1", "Apple M2")
-    val ramOptions = listOf("4GB", "8GB", "16GB", "32GB", "64GB")
-    val cardOptions = listOf("Integrated", "GTX 1650", "RTX 3050", "RTX 3060", "RTX 4060", "RTX 4080")
-    val mauSacOptions = listOf(1 to " Đen", 2  to "Trắng")
-    val maloaiOptions = listOf(
-        1 to "Laptop Gaming",
-        2 to "Laptop Văn phòng"
-    )
-    val ssdOptions = listOf("128GB", "256GB", "512GB", "1TB", "2TB")
-    val manHinhOptions = listOf("13.3\" FHD", "14\" FHD", "15.6\" FHD", "16\" 2K", "17\" 4K", "18\" QHD")
-    val trangThaiOptions = listOf("Kinh doanh" to 1, "Ngừng bán" to 0)
+    val context = LocalContext.current
 
-    // Image picker launcher
-    val imageUriState = remember { mutableStateOf<Uri?>(null) }
+    // 🔁 Chọn nhiều ảnh
+    val imageUris = remember { mutableStateListOf<Uri>() }
     val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        imageUriState.value = uri
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris: List<Uri> ->
+        imageUris.clear()
+        imageUris.addAll(uris)
     }
 
+    // Các state khác như title, price, dropdown...
     var tenSanPham by remember { mutableStateOf(sanPham?.TenSanPham ?: "") }
     var gia by remember { mutableStateOf(sanPham?.Gia?.toString() ?: "") }
-    var moTa by remember { mutableStateOf(sanPham?.MoTa ?: "") }
     var soLuong by remember { mutableStateOf(sanPham?.SoLuong?.toString() ?: "") }
+    var moTa by remember { mutableStateOf(sanPham?.MoTa ?: "") }
     var hinhAnh by remember { mutableStateOf(sanPham?.HinhAnh ?: "") }
 
-    var selectedLoai by remember {
-        mutableStateOf(maloaiOptions.find { it.first == sanPham?.MaLoaiSanPham } ?: maloaiOptions.first())
-    }
-    var loaiExpanded by remember { mutableStateOf(false) }
+    // Dropdown lấy từ ViewModel
+    val cpuOptions = sanPhamViewModel.getDistinctCpuList()
+    val ramOptions = sanPhamViewModel.getDistinctRamList()
+    val cardOptions = sanPhamViewModel.getDistinctCardList()
+    val ssdOptions = sanPhamViewModel.getDistinctSsdList()
+    val manHinhOptions = sanPhamViewModel.getDistinctManHinhList()
+    val maloaiOptions = sanPhamViewModel.getLoaiSanPhamList()
+    val mauSacOptions = listOf(1 to "Đen", 2 to "Trắng", 3 to "Xám")
+    val trangThaiOptions = listOf("Kinh doanh" to 1, "Ngừng bán" to 0)
 
-    var selectedCPU by remember {
-        mutableStateOf(cpuOptions.find { it == sanPham?.CPU } ?: cpuOptions.first())
-    }
-    var cpuExpanded by remember { mutableStateOf(false) }
-
-    var selectedRAM by remember {
-        mutableStateOf(ramOptions.find { it == sanPham?.RAM } ?: ramOptions.first())
-    }
-    var ramExpanded by remember { mutableStateOf(false) }
-
-    var selectedCard by remember {
-        mutableStateOf(cardOptions.find { it == sanPham?.CardManHinh } ?: cardOptions.first())
-    }
-    var cardExpanded by remember { mutableStateOf(false) }
-
-    var selectedSSD by remember {
-        mutableStateOf(ssdOptions.find { it == sanPham?.SSD } ?: ssdOptions.first())
-    }
-    var ssdExpanded by remember { mutableStateOf(false) }
-
-    var selectedManHinh by remember {
-        mutableStateOf(manHinhOptions.find { it == sanPham?.ManHinh } ?: manHinhOptions.first())
-    }
-    var manHinhExpanded by remember { mutableStateOf(false) }
-
-    var selectedMauSac by remember {
-        mutableStateOf(
-            if ((sanPham?.MaMauSac ?: 0) in mauSacOptions.indices) sanPham?.MaMauSac ?: 0 else 0
-        )
-    }
-    var mauSacExpanded by remember { mutableStateOf(false) }
-
-    var selectedTrangThai by remember {
-        mutableStateOf(trangThaiOptions.find { it.second == sanPham?.TrangThai } ?: trangThaiOptions.first())
-    }
-    var trangThaiExpanded by remember { mutableStateOf(false) }
+    // Các state dropdown
+    var selectedLoai by remember { mutableStateOf(maloaiOptions.find { it.first == sanPham?.MaLoaiSanPham } ?: maloaiOptions.first()) }
+    var selectedCPU by remember { mutableStateOf(cpuOptions.firstOrNull().orEmpty()) }
+    var selectedRAM by remember { mutableStateOf(ramOptions.firstOrNull().orEmpty()) }
+    var selectedCard by remember { mutableStateOf(cardOptions.firstOrNull().orEmpty()) }
+    var selectedSSD by remember { mutableStateOf(ssdOptions.firstOrNull().orEmpty()) }
+    var selectedManHinh by remember { mutableStateOf(manHinhOptions.firstOrNull().orEmpty()) }
+    var selectedMauSac by remember { mutableStateOf(sanPham?.MaMauSac ?: mauSacOptions.first().first) }
+    var selectedTrangThai by remember { mutableStateOf(trangThaiOptions.first()) }
 
     var errorText by remember { mutableStateOf<String?>(null) }
-
-    // Khi đổi loại sản phẩm, reset các field về mặc định
-    LaunchedEffect(selectedLoai) {
-        selectedCPU = cpuOptions.first()
-        selectedRAM = ramOptions.first()
-        selectedCard = cardOptions.first()
-        selectedSSD = ssdOptions.first()
-        selectedManHinh = manHinhOptions.first()
-        selectedMauSac = 0
-    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             Button(onClick = {
+                // ✅ Validate dữ liệu
                 if (tenSanPham.isBlank()) { errorText = "Tên sản phẩm không được để trống"; return@Button }
                 val giaInt = gia.toIntOrNull(); if (giaInt == null || giaInt <= 0) { errorText = "Giá phải là số > 0"; return@Button }
                 val soLuongInt = soLuong.toIntOrNull(); if (soLuongInt == null || soLuongInt < 0) { errorText = "Số lượng không hợp lệ"; return@Button }
                 if (moTa.isBlank()) { errorText = "Mô tả không được để trống"; return@Button }
-                if (imageUriState.value == null && sanPham?.HinhAnh.isNullOrBlank()) {
-                    errorText = "Vui lòng chọn ảnh"; return@Button
+                if (imageUris.isEmpty() && sanPham?.HinhAnh.isNullOrBlank()) {
+                    errorText = "Vui lòng chọn ít nhất 1 ảnh"; return@Button
                 }
+
                 errorText = null
+                // ✅ Gọi onSave truyền SanPham mới và danh sách ảnh
                 onSave(
                     SanPham(
-                            MaSanPham = sanPham?.MaSanPham ?: 0,
-                            TenSanPham = tenSanPham,
-                            MaLoaiSanPham = selectedLoai.first,
-                            CPU = selectedCPU,
-                            RAM = selectedRAM,
-                            CardManHinh = selectedCard,
-                            SSD = selectedSSD,
-                            ManHinh = selectedManHinh,
-                            MaMauSac = selectedMauSac,
-                            Gia = giaInt,
-                            SoLuong = soLuongInt,
-                            MoTa = moTa,
-                            HinhAnh = hinhAnh,
-                            TrangThai = selectedTrangThai.second,
-                            loaiPhuKien = sanPham?.loaiPhuKien,
-                            DaXoa = sanPham?.DaXoa ?: 0,
-                            NgayTao = sanPham?.NgayTao ?: "",
-                            NgayCapNhat = sanPham?.NgayCapNhat ?: ""
-                        ),
-                    imageUriState.value
+                        MaSanPham = sanPham?.MaSanPham ?: 0,
+                        TenSanPham = tenSanPham,
+                        MaLoaiSanPham = selectedLoai.first,
+                        CPU = selectedCPU,
+                        RAM = selectedRAM,
+                        CardManHinh = selectedCard,
+                        SSD = selectedSSD,
+                        ManHinh = selectedManHinh,
+                        MaMauSac = selectedMauSac,
+                        Gia = giaInt,
+                        SoLuong = soLuongInt,
+                        MoTa = moTa,
+                        HinhAnh = "", // sẽ được cập nhật từ ViewModel khi upload
+                        TrangThai = selectedTrangThai.second,
+                        loaiPhuKien = sanPham?.loaiPhuKien,
+                        DaXoa = sanPham?.DaXoa ?: 0,
+                        NgayTao = sanPham?.NgayTao ?: "",
+                        NgayCapNhat = sanPham?.NgayCapNhat ?: ""
+                    ),
+                    imageUris.toList() // ✅ truyền list ảnh
                 )
             }) {
                 Text(if (sanPham == null) "Thêm mới" else "Cập nhật")
@@ -356,275 +305,90 @@ fun ProductFormDialog(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = 500.dp)
+                    .heightIn(max = 600.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                if (errorText != null) Text(errorText!!, color = MaterialTheme.colorScheme.error)
-                OutlinedTextField(
-                    value = tenSanPham, onValueChange = { tenSanPham = it },
-                    label = { Text("Tên sản phẩm *") }, singleLine = true
-                )
-                OutlinedTextField(
-                    value = gia, onValueChange = { gia = it },
-                    label = { Text("Giá (VND) *") }, singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-                OutlinedTextField(
-                    value = soLuong, onValueChange = { soLuong = it },
-                    label = { Text("Số lượng *") }, singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-                OutlinedTextField(
-                    value = moTa, onValueChange = { moTa = it },
-                    label = { Text("Mô tả *") }
-                )
-                // Chọn ảnh
-                Button(onClick = {
-                    imagePickerLauncher.launch("image/*")
-                }) {
-                    Text("Chọn ảnh từ thiết bị")
+                errorText?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+
+                // Các TextField
+                OutlinedTextField(tenSanPham, onValueChange = { tenSanPham = it }, label = { Text("Tên sản phẩm *") })
+                OutlinedTextField(gia, onValueChange = { gia = it }, label = { Text("Giá (VND) *") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                OutlinedTextField(soLuong, onValueChange = { soLuong = it }, label = { Text("Số lượng *") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                OutlinedTextField(moTa, onValueChange = { moTa = it }, label = { Text("Mô tả *") })
+
+                // Nút chọn nhiều ảnh
+                Button(onClick = { imagePickerLauncher.launch("image/*") }) {
+                    Text("Chọn nhiều ảnh")
                 }
 
-                imageUriState.value?.let { uri ->
-                    Spacer(Modifier.height(8.dp))
-                    AsyncImage(
-                        model = uri,
-                        contentDescription = "Ảnh sản phẩm",
-                        modifier = Modifier
-                            .height(150.dp)
-                            .fillMaxWidth()
-                    )
-                } ?: sanPham?.HinhAnh?.takeIf { it.isNotBlank() }?.let {
-                    Spacer(Modifier.height(8.dp))
-                    AsyncImage(
-                        model = it,
-                        contentDescription = "Ảnh cũ",
-                        modifier = Modifier
-                            .height(150.dp)
-                            .fillMaxWidth()
-                    )
-                }
-                // Loại sản phẩm
-                ExposedDropdownMenuBox(
-                    expanded = loaiExpanded,
-                    onExpandedChange = { loaiExpanded = !loaiExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = selectedLoai.second,
-                        onValueChange = {},
-                        modifier = Modifier.menuAnchor(),
-                        label = { Text("Loại sản phẩm *") },
-                        readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(loaiExpanded) }
-                    )
-                    ExposedDropdownMenu(
-                        expanded = loaiExpanded,
-                        onDismissRequest = { loaiExpanded = false }
-                    ) {
-                        maloaiOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option.second) },
-                                onClick = {
-                                    selectedLoai = option
-                                    loaiExpanded = false
-                                }
+                // Hiển thị ảnh đã chọn
+                if (imageUris.isNotEmpty()) {
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(imageUris) { uri ->
+                            AsyncImage(
+                                model = uri,
+                                contentDescription = "Ảnh đã chọn",
+                                modifier = Modifier
+                                    .size(150.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Crop
                             )
                         }
                     }
-                }
-                // CPU
-                ExposedDropdownMenuBox(
-                    expanded = cpuExpanded,
-                    onExpandedChange = { cpuExpanded = !cpuExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = selectedCPU,
-                        onValueChange = {},
-                        modifier = Modifier.menuAnchor(),
-                        label = { Text("CPU *") }, readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(cpuExpanded) }
-
-                    )
-                    ExposedDropdownMenu(
-                        expanded = cpuExpanded,
-                        onDismissRequest = { cpuExpanded = false }
-                    ) {
-                        cpuOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option) },
-                                onClick = {
-                                    selectedCPU = option
-                                    cpuExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-                // RAM
-                ExposedDropdownMenuBox(
-                    expanded = ramExpanded,
-                    onExpandedChange = { ramExpanded = !ramExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = selectedRAM,
-                        onValueChange = {},
-                        modifier = Modifier.menuAnchor(),
-                        label = { Text("RAM *") }, readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(ramExpanded) }
-                    )
-                    ExposedDropdownMenu(
-                        expanded = ramExpanded,
-                        onDismissRequest = { ramExpanded = false }
-                    ) {
-                        ramOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option) },
-                                onClick = {
-                                    selectedRAM = option
-                                    ramExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-                // Card màn hình
-                ExposedDropdownMenuBox(
-                    expanded = cardExpanded,
-                    onExpandedChange = { cardExpanded = !cardExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = selectedCard,
-                        onValueChange = {},
-                        modifier = Modifier.menuAnchor(),
-                        label = { Text("Card màn hình *") }, readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(cardExpanded) }
-                    )
-                    ExposedDropdownMenu(
-                        expanded = cardExpanded,
-                        onDismissRequest = { cardExpanded = false }
-                    ) {
-                        cardOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option) },
-                                onClick = {
-                                    selectedCard = option
-                                    cardExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-                // SSD
-                ExposedDropdownMenuBox(
-                    expanded = ssdExpanded,
-                    onExpandedChange = { ssdExpanded = !ssdExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = selectedSSD,
-                        onValueChange = {},
-                        modifier = Modifier.menuAnchor(),
-                        label = { Text("SSD *") }, readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(ssdExpanded) }
-                    )
-                    ExposedDropdownMenu(
-                        expanded = ssdExpanded,
-                        onDismissRequest = { ssdExpanded = false }
-                    ) {
-                        ssdOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option) },
-                                onClick = {
-                                    selectedSSD = option
-                                    ssdExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-                // Màn hình
-                ExposedDropdownMenuBox(
-                    expanded = manHinhExpanded,
-                    onExpandedChange = { manHinhExpanded = !manHinhExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = selectedManHinh,
-                        onValueChange = {},
-                        modifier = Modifier.menuAnchor(),
-                        label = { Text("Màn hình *") }, readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(manHinhExpanded) }
-                    )
-                    ExposedDropdownMenu(
-                        expanded = manHinhExpanded,
-                        onDismissRequest = { manHinhExpanded = false }
-                    ) {
-                        manHinhOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option) },
-                                onClick = {
-                                    selectedManHinh = option
-                                    manHinhExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-                // Màu sắc
-                ExposedDropdownMenuBox(
-                    expanded = mauSacExpanded,
-                    onExpandedChange = { mauSacExpanded = !mauSacExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = mauSacOptions.find { it.first == selectedMauSac }?.second ?: "Chưa chọn",
-                        onValueChange = {},
-                        modifier = Modifier.menuAnchor(),
-                        label = { Text("Màu sắc *") },
-                        readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = mauSacExpanded) }
-                    )
-                    ExposedDropdownMenu(
-                        expanded = mauSacExpanded,
-                        onDismissRequest = { mauSacExpanded = false }
-                    ) {
-                        mauSacOptions.forEach { (maMau, tenMau) ->
-                            DropdownMenuItem(
-                                text = { Text(tenMau) },
-                                onClick = {
-                                    selectedMauSac = maMau
-                                    mauSacExpanded = false
-                                }
-                            )
-                        }
+                } else {
+                    sanPham?.HinhAnh?.takeIf { it.isNotBlank() }?.let {
+                        AsyncImage(
+                            model = it,
+                            contentDescription = "Ảnh cũ",
+                            modifier = Modifier
+                                .height(150.dp)
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
                     }
                 }
 
-                // Trạng thái
-                ExposedDropdownMenuBox(
-                    expanded = trangThaiExpanded,
-                    onExpandedChange = { trangThaiExpanded = !trangThaiExpanded }
-                ) {
-                    OutlinedTextField(
-                        value = selectedTrangThai.first,
-                        onValueChange = {},
-                        modifier = Modifier.menuAnchor(),
-                        label = { Text("Trạng thái *") }, readOnly = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(trangThaiExpanded) }
-                    )
-                    ExposedDropdownMenu(
-                        expanded = trangThaiExpanded,
-                        onDismissRequest = { trangThaiExpanded = false }
-                    ) {
-                        trangThaiOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option.first) },
-                                onClick = {
-                                    selectedTrangThai = option
-                                    trangThaiExpanded = false
-                                }
-                            )
-                        }
-                    }
+                // Gợi ý dropdown - bạn dùng CustomDropdown của bạn
+                CustomDropdown("Loại sản phẩm", selectedLoai.second, maloaiOptions.map { it.second }) {
+                    selectedLoai = maloaiOptions[it]
+                }
+                CustomDropdown("CPU", selectedCPU, cpuOptions) { selectedCPU = cpuOptions[it] }
+                CustomDropdown("RAM", selectedRAM, ramOptions) { selectedRAM = ramOptions[it] }
+                CustomDropdown("Card", selectedCard, cardOptions) { selectedCard = cardOptions[it] }
+                CustomDropdown("SSD", selectedSSD, ssdOptions) { selectedSSD = ssdOptions[it] }
+                CustomDropdown("Màn hình", selectedManHinh, manHinhOptions) { selectedManHinh = manHinhOptions[it] }
+                CustomDropdown("Màu sắc", mauSacOptions.firstOrNull { it.first == selectedMauSac }?.second ?: "", mauSacOptions.map { it.second }) {
+                    selectedMauSac = mauSacOptions[it].first
+                }
+                CustomDropdown("Trạng thái", selectedTrangThai.first, trangThaiOptions.map { it.first }) {
+                    selectedTrangThai = trangThaiOptions[it]
                 }
             }
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomDropdown(label: String, value: String, options: List<String>, onSelected: (Int) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {},
+            label = { Text(label) },
+            readOnly = true,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+            modifier = Modifier.menuAnchor()
+        )
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEachIndexed { index, option ->
+                DropdownMenuItem(text = { Text(option) }, onClick = {
+                    onSelected(index)
+                    expanded = false
+                })
+            }
+        }
+    }
 }

@@ -8,7 +8,8 @@ data class ThongKeData(
     val total_orders: Int,
     val total_revenue: Long,
     val total_users: Int,
-    val monthly_revenue: List<MonthlyRevenue>
+    val monthly_revenue: List<MonthlyRevenue>,
+    val orders: List<Order>
 )
 
 data class MonthlyRevenue(
@@ -31,3 +32,16 @@ data class SanPhamThongKe(
     val TenSanPham: String,
     val totalQty: Int
 )
+data class Order(
+    val MaHoaDonBan: Int,
+    val NgayDatHang: String,
+    val TrangThai: String,
+    val TongTien: Long
+)
+
+
+data class OrderResponse(
+    val success: Boolean,
+    val data: List<Order>
+)
+

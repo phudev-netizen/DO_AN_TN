@@ -73,7 +73,8 @@ fun ProductCard(
                     Column(
                         modifier = Modifier.padding(10.dp),
                         verticalArrangement = Arrangement.SpaceEvenly
-                    ) {
+                    )
+                    {
                         Text("CPU: ${sanpham.CPU}", fontSize = 14.sp)
                         Text("Card: ${sanpham.CardManHinh}", fontSize = 14.sp)
                         Text("RAM: ${sanpham.RAM}", fontSize = 14.sp)

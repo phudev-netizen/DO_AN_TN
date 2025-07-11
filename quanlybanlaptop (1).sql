@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th7 07, 2025 lúc 06:38 PM
+-- Thời gian đã tạo: Th7 10, 2025 lúc 05:33 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.1.25
 
@@ -159,7 +159,21 @@ INSERT INTO `chitiethoadonban` (`MaChiTietHoaDonBan`, `MaHoaDonBan`, `MaSanPham`
 (138, 231, 2, 1, 8099000, 0),
 (139, 232, 2, 1, 8099000, 0),
 (140, 233, 1, 1, 29790000, 8937000),
-(141, 234, 2, 3, 8099000, 0);
+(141, 234, 2, 3, 8099000, 0),
+(142, 235, 2, 1, 8099000, 0),
+(143, 236, 2, 1, 8099000, 0),
+(144, 237, 1, 1, 29790000, 8937000),
+(145, 237, 2, 1, 8099000, 0),
+(146, 238, 2, 1, 8099000, 0),
+(147, 239, 2, 1, 8099000, 0),
+(148, 240, 1, 1, 29790000, 8937000),
+(149, 241, 7, 1, 10690000, 0),
+(150, 242, 8, 1, 24205000, 0),
+(151, 243, 7, 1, 10690000, 0),
+(152, 244, 17, 1, 10990000, 0),
+(153, 245, 2, 1, 8099000, 0),
+(154, 246, 10, 1, 22490000, 4947800),
+(155, 247, 5, 1, 13399000, 0);
 
 -- --------------------------------------------------------
 
@@ -235,7 +249,12 @@ INSERT INTO `giohang` (`MaGioHang`, `MaKhachHang`, `MaSanPham`, `SoLuong`, `Tran
 (279, 5, 1, 1, 1),
 (280, 5, 2, 1, 1),
 (281, 5, 5, 1, 1),
-(282, 5, 7, 2, 1);
+(282, 5, 7, 2, 1),
+(285, 11, 2, 1, 1),
+(286, 11, 6, 1, 1),
+(287, 11, 7, 1, 1),
+(288, 11, 5, 1, 1),
+(289, 11, 17, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -304,20 +323,38 @@ INSERT INTO `hinhanh` (`MaHinhAnh`, `DuongDan`, `MacDinh`, `MaSanPham`) VALUES
 (57, 'https://i.postimg.cc/Y0TrnDHj/120-73258-ram-laptop-kingston-kvr48s40bd8-32-32gb-1x32gb-ddr5-4800mhz-1.jpg', 1, 12),
 (58, 'https://i.postimg.cc/0NF81ddD/55947-ram-laptop-kingston-kvr32s22s8-16.png', 0, 12),
 (59, 'https://i.postimg.cc/wMt12xHz/R.png', 0, 12),
-(60, 'https://i.postimg.cc/0NF81ddD/55947-ram-laptop-kingston-kvr32s22s8-16.png', 1, 13),
-(61, 'https://i.postimg.cc/vZrYhvSH/55947-ram-laptop-kingston-kvr32s22s8-16.png', 0, 13),
-(62, 'https://i.postimg.cc/3JmnN0qs/ktc-product-memory-impact-ddr5-d-1.webp', 1, 14),
-(63, 'https://i.postimg.cc/P5hs5jSM/ktc-product-memory-impact-ddr5-d-1-1.webp', 0, 14),
-(64, 'https://i.postimg.cc/yxnts74t/sd128.jpg ', 1, 15),
-(65, 'https://i.postimg.cc/vBzDF2XT/sd1282.jpg', 0, 15),
-(66, 'https://i.postimg.cc/9MJXNRFq/SD5-SG2-128-G-1052-E-lg.jpg', 0, 15),
-(67, 'https://i.postimg.cc/gj1Mx8vf/Lexar.png', 1, 17),
-(68, 'https://i.postimg.cc/Kctj4ZZK/t-i-xu-ng-2022-12-27t232754-273.webp', 0, 17),
-(69, 'https://i.postimg.cc/prgnt3KG/ziyoulang.png', 1, 18),
-(72, 'https://i.postimg.cc/j59m5tMF/ssd-nvme-1tb-tot-nhat-2.jpg', 1, 16),
-(73, 'https://i.postimg.cc/mZvKWZzc/ny3swjwftnucimrgapdqud-27515f4843bc46e5a921d9b0f5dcc693.webp ', 0, 16),
-(74, 'http://192.168.3.49/lap_store_api/uploads/sanpham/sanpham_1751474103.jpg', 1, 0),
-(75, 'http://192.168.3.49/lap_store_api/uploads/sanpham/sanpham_1751474659.jpg', 1, 53);
+(60, 'https://i.postimg.cc/Sx7B2bKB/Lenovo-LOQ-Gaming-15-IAX9-i5-12450-H-1.jpg', 1, 13),
+(61, 'https://i.postimg.cc/h4k62tQF/Lenovo-LOQ-Gaming-15-IAX9-i5-12450-H-2.jpg', 0, 13),
+(62, 'https://i.postimg.cc/yY05tC0D/Lenovo-LOQ-Gaming-15-IAX9-i5-12450-H-3.jpg', 0, 13),
+(63, 'https://i.postimg.cc/g02TxwQh/Lenovo-LOQ-Gaming-15-IAX9-i5-12450-H-4.jpg', 0, 13),
+(64, 'https://i.postimg.cc/NGHP2vJd/Lenovo-LOQ-Gaming-15-IAX9-i5-12450-H-5.jpg', 0, 13),
+(65, 'https://i.postimg.cc/8cRHKDxD/HP-Victus-16-r0130-TX-i5-13500-H-1.jpg', 1, 14),
+(66, 'https://i.postimg.cc/FsvGfdJK/HP-Victus-16-r0130-TX-i5-13500-H-2.jpg', 0, 14),
+(67, 'https://i.postimg.cc/htPrrksW/HP-Victus-16-r0130-TX-i5-13500-H-3.jpg', 0, 14),
+(68, 'https://i.postimg.cc/7L5NvSjK/HP-Victus-16-r0130-TX-i5-13500-H-4.jpg', 0, 14),
+(69, 'https://i.postimg.cc/G3Fx1LSn/HP-OMEN-Transcend-14-fb0135-TX-Ultra-7-1.jpg', 1, 15),
+(70, 'https://i.postimg.cc/dtJmsbzk/HP-OMEN-Transcend-14-fb0135-TX-Ultra-7-2.jpg', 0, 15),
+(71, 'https://i.postimg.cc/520Bvw9f/HP-OMEN-Transcend-14-fb0135-TX-Ultra-7-3.jpg', 0, 15),
+(72, 'https://i.postimg.cc/Y0RFLSJ4/HP-OMEN-Transcend-14-fb0135-TX-Ultra-7-4.jpg', 0, 15),
+(73, 'https://i.postimg.cc/pXVzbDFK/HP-OMEN-16-xf0071-AX-R7-7840-HS-1.jpg', 1, 16),
+(74, 'https://i.postimg.cc/Qx65XHQw/HP-OMEN-16-xf0071-AX-R7-7840-HS-2.jpg', 0, 16),
+(75, 'https://i.postimg.cc/Dw8Gmn5Z/HP-OMEN-16-xf0071-AX-R7-7840-HS-3.jpg', 0, 16),
+(76, 'https://i.postimg.cc/3RH0Lph4/HP-OMEN-16-xf0071-AX-R7-7840-HS-4.jpg', 0, 16),
+(77, 'https://i.postimg.cc/yxLJYbZc/Lenovo-Ideapad-Slim-3-15-ABR8-R7-7730-U-1.jpg', 1, 17),
+(78, 'https://i.postimg.cc/05nKfbBj/Lenovo-Ideapad-Slim-3-15-ABR8-R7-7730-U-2.jpg', 0, 17),
+(79, 'https://i.postimg.cc/QxM9nh2b/Lenovo-Ideapad-Slim-3-15-ABR8-R7-7730-U-3.jpg', 0, 17),
+(80, 'https://i.postimg.cc/jSwWtvdn/Lenovo-Idea-Pad-5-15-IAL7-i5-1235-U-1.jpg', 1, 18),
+(81, 'https://i.postimg.cc/HLbV7xMp/Lenovo-Idea-Pad-5-15-IAL7-i5-1235-U-2.jpg', 0, 18),
+(82, 'https://i.postimg.cc/BbR0g5WR/Lenovo-Idea-Pad-5-15-IAL7-i5-1235-U-4.jpg', 0, 18),
+(83, 'https://i.postimg.cc/5NF1trLJ/Lenovo-Idea-Pad-5-15-IAL7-i5-1235-U-5.jpg', 0, 18),
+(84, 'https://i.postimg.cc/1tt117sL/Dell-XPS-13-9340-Ultra-5-125-H-1.jpg', 1, 19),
+(85, 'https://i.postimg.cc/NjcMvtVS/Dell-XPS-13-9340-Ultra-5-125-H-2.jpg', 0, 19),
+(86, 'https://i.postimg.cc/mDJLXWCd/Dell-XPS-13-9340-Ultra-5-125-H-3.jpg', 0, 19),
+(87, 'https://i.postimg.cc/c1t4K6GP/Dell-XPS-13-9340-Ultra-5-125-H-4.jpg', 0, 19),
+(88, 'https://i.postimg.cc/Jzx1wkjH/Acer-Nitro-V-ANV15-51-i5-12500-H-1.webp', 1, 20),
+(89, 'https://i.postimg.cc/BvvJJnCY/Acer-Nitro-V-ANV15-51-i5-12500-H-2.webp', 0, 20),
+(90, 'https://i.postimg.cc/0NHPj1W8/Acer-Nitro-V-ANV15-51-i5-12500-H-3.webp', 0, 20),
+(91, 'https://i.postimg.cc/wxNgqPhp/Acer-Nitro-V-ANV15-51-i5-12500-H-4.webp', 0, 20);
 
 -- --------------------------------------------------------
 
@@ -417,9 +454,22 @@ INSERT INTO `hoadonban` (`MaHoaDonBan`, `MaKhachHang`, `NgayDatHang`, `MaDiaChi`
 (229, 12, '2025-07-06', 34, 14182000, 'Thanh toán khi nhận hàng', '6'),
 (230, 5, '2025-07-07', 41, 34809000, 'Thanh toán qua Momo', '4'),
 (231, 5, '2025-07-07', 41, 8129000, 'Thanh toán qua Momo', '4'),
-(232, 12, '2025-07-07', 34, 8129000, 'Thanh toán qua Momo', '4'),
-(233, 12, '2025-07-07', 34, 20883000, 'Thanh toán qua Momo', '4'),
-(234, 14, '2025-07-07', 38, 24327000, 'Thanh toán khi nhận hàng', '4');
+(232, 12, '2025-07-07', 34, 8129000, 'Thanh toán qua Momo', '7'),
+(233, 12, '2025-07-07', 34, 20883000, 'Thanh toán qua Momo', '8'),
+(234, 14, '2025-07-07', 38, 24327000, 'Thanh toán khi nhận hàng', '4'),
+(235, 12, '2025-07-10', 34, 8129000, 'Thanh toán khi nhận hàng', '4'),
+(236, 12, '2025-07-10', 34, 8129000, 'Thanh toán khi nhận hàng', '6'),
+(237, 12, '2025-07-10', 34, 28982000, 'Thanh toán khi nhận hàng', '6'),
+(238, 12, '2025-07-10', 34, 8129000, 'Thanh toán khi nhận hàng', '6'),
+(239, 12, '2025-07-10', 34, 8129000, 'Thanh toán khi nhận hàng', '6'),
+(240, 12, '2025-07-10', 34, 20883000, 'Thanh toán khi nhận hàng', '6'),
+(241, 12, '2025-07-10', 34, 10720000, 'Thanh toán khi nhận hàng', '5'),
+(242, 12, '2025-07-10', 34, 24235000, 'Thanh toán khi nhận hàng', '5'),
+(243, 12, '2025-07-10', 34, 10720000, 'Thanh toán khi nhận hàng', '5'),
+(244, 11, '2025-07-10', 33, 11020000, 'Thanh toán khi nhận hàng', '7'),
+(245, 11, '2025-07-10', 33, 8129000, 'Thanh toán khi nhận hàng', '5'),
+(246, 11, '2025-07-10', 33, 17572200, 'Thanh toán khi nhận hàng', '5'),
+(247, 11, '2025-07-10', 33, 13429000, 'Thanh toán khi nhận hàng', '5');
 
 -- --------------------------------------------------------
 
@@ -554,29 +604,26 @@ CREATE TABLE `sanpham` (
 --
 
 INSERT INTO `sanpham` (`MaSanPham`, `TenSanPham`, `MaLoaiSanPham`, `CPU`, `RAM`, `CardManHinh`, `SSD`, `ManHinh`, `MaMauSac`, `Gia`, `SoLuong`, `MoTa`, `TrangThai`) VALUES
-(1, 'Laptop gaming ASUS TUF Gaming F15 FX507VV LP304W', 2, 'INTEL CORE I9 12900K', 'RAM 16 GB', 'RTX 4060', ' 512 GB', '1920x1080', 2, 29790000, 100, 'Laptop gaming RTX 40 Series mạnh nhất cho học sinh, sinh viên\n\nHoạt động bền bỉ, làm chủ trận chiến trên chiếc laptop ASUS TUF Gaming F15 (2023), sử dụng bộ vi xử lý Intel Core™ i7-13620H với sự kết hợp giữa lõi hiệu năng (P-core) và lõi tiết kiệm điện (E-core) cân bằng sức mạnh chơi game và khả năng đa nhiệm tuyệt vời. ASUS TUF Gaming F15 còn được trang bị đồ họa NVIDIA GeForce RTX™ 40 series mới nhất hỗ trợ G-SYNC® và có TGP tối đa là 140 W với Dynamic Boost. Sự kết hợp giữa CPU mạnh mẽ và GPU hiệu suất cao mang lại khả năng chơi game đáng kinh ngạc trên cả các tựa game mới nhất. Màn hình FHD 144Hz cho trải nghiệm gaming mượt mà, tận hưởng không gian giải trí đắm chìm. ', 1),
-(2, 'Laptop MSI Modern 14 C11M 011VN', 1, 'Intel i5', '4GB', 'Integrated', '128GB', '13.3&amp;amp;amp;amp;amp;amp;amp FHD', 1, 8099000, 93, 'MSI Modern 14 C11M-011VN nằm trong phân khúc laptop 9 triệu được trang bị màn hình rộng 14 inch có độ phân giải Full HD cùng tần số quét ở mức cơ bản 60Hz. Màn hình IPS này sẽ đủ sắc nét để người dùng có thể thoải mái sử dụng trong học tập, nghiên cứu và làm việc.', 1),
+(1, 'Laptop gaming ASUS TUF Gaming F15 FX507VV LP304W', 2, 'INTEL CORE I9 12900K', ' 16 GB', 'NVIDIA RTX 4060', '512 GB', '1920x1080', 2, 29790000, 100, 'Laptop gaming RTX 40 Series mạnh nhất cho học sinh, sinh viên\n\nHoạt động bền bỉ, làm chủ trận chiến trên chiếc laptop ASUS TUF Gaming F15 (2023), sử dụng bộ vi xử lý Intel Core™ i7-13620H với sự kết hợp giữa lõi hiệu năng (P-core) và lõi tiết kiệm điện (E-core) cân bằng sức mạnh chơi game và khả năng đa nhiệm tuyệt vời. ASUS TUF Gaming F15 còn được trang bị đồ họa NVIDIA GeForce RTX™ 40 series mới nhất hỗ trợ G-SYNC® và có TGP tối đa là 140 W với Dynamic Boost. Sự kết hợp giữa CPU mạnh mẽ và GPU hiệu suất cao mang lại khả năng chơi game đáng kinh ngạc trên cả các tựa game mới nhất. Màn hình FHD 144Hz cho trải nghiệm gaming mượt mà, tận hưởng không gian giải trí đắm chìm. ', 1),
+(2, 'Laptop MSI Modern 14 C11M 011VN', 1, 'Intel i5', '32GB', 'Integrated', '128GB', '13.3&amp;amp; FHD', 1, 8099000, 92, 'MSI Modern 14 C11M-011VN nằm trong phân khúc laptop 9 triệu được trang bị màn hình rộng 14 inch có độ phân giải Full HD cùng tần số quét ở mức cơ bản 60Hz. Màn hình IPS này sẽ đủ sắc nét để người dùng có thể thoải mái sử dụng trong học tập, nghiên cứu và làm việc.', 1),
 (3, 'Laptop gaming ASUS Vivobook 16X K3605ZF RP634W', 2, 'Intel i5', '4GB', 'Integrated', '128GB', '13.3&amp;quot; FHD', 1, 17290000, 100, 'Bên trong ASUS Gaming Vivobook K3605ZF-RP634W là bộ vi xử lý Intel Core i5-12500H với 4 nhân hiệu năng cao và 8 nhân tiết kiệm điện, cùng với bộ nhớ đệm 18MB, đạt tốc độ tối đa lên đến 4.5 GHz. Cấu hình này không chỉ đáp ứng tốt các tựa game phổ biến mà còn tối ưu cho các tác vụ đa nhiệm và xử lý đồ họa nặng.', 1),
-(4, 'Laptop ASUS Vivobook 14 OLED A1405VA KM095W', 1, 'INTEL CORE I7 12500H', 'RAM 8 GB', 'INTEL ARISXE', 'SSD 1TB', '1920x1080', 1, 17000000, 0, 'Tỏa sáng với cả thế giới cùng ASUS Vivobook 14 OLED mạnh mẽ, chiếc laptop tích hợp nhiều tính năng với màn hình OLED rực rỡ, gam màu DCI-P3 đẳng cấp điện ảnh. Mọi thứ trở nên dễ dàng hơn nhờ những tiện ích thân thiện với người dùng bao gồm bản lề duỗi thẳng 180°, nắp che webcam vật lý và các phím chức năng chuyên dụng. Bảo vệ sức khỏe an toàn với ASUS kháng khuẩn Guard Plus trên các bề mặt thường xuyên chạm vào. Bắt đầu ngày mới đầy hứng khởi với ASUS Vivobook 14 OLED!', 1),
-(5, 'Laptop Acer Swift 14 AI SF14 51 53P9', 1, 'Intel® Core™ Ultra 5 Processor 226V', 'RAM 16GB', 'Intel® Arc™ Graphic', 'SSD 1TB', '14&amp;amp;amp;amp;amp;quot; 3K (2880 x 1800) OLED', 1, 13399000, 140, 'Acer Swift 14 AI SF14 51 53P9 tiếp tục thừa hưởng ngôn ngữ thiết kế tối giản, thanh lịch của dòng Swift. Vỏ máy được chế tác từ hợp kim nhôm cao cấp, mang đến vẻ ngoài sang trọng và độ bền bỉ cao. Với độ mỏng ấn tượng chỉ 15.95mm và trọng lượng siêu nhẹ 1.26kg, chiếc laptop ai này là người bạn đồng hành lý tưởng cho những người thường xuyên di chuyển. ', 1),
-(6, 'Laptop gaming MSI Stealth 16 AI Studio A1VHG 241VN', 2, 'Intel® Core™ Ultra 9 processor 185H with Intel® AI', 'RAM: 64GB', 'NVIDIA® GeForce RTX™', 'SSD: 1TB', '16&amp;amp; QHD+(2560x1600), 240Hz', 1, 73990000, 130, 'Chiếc laptop gaming được trang bị con chip Intel Core Ultra 9 - 185H với 16 lõi, 22 luồng kết hợp với VGA NVIDIA GeForece RTX 4070 giúp trải nghiệm chơi các game AAA và render hình ảnh, video một cách mượt mà không xảy ra hiện tượng giật lag. \r\n\r\n', 1),
-(7, 'Laptop Acer Aspire Go AG15', 1, 'Intel Core i3 Alder Lake', 'Ram:16GB', ' Intel UHD Graphics', '128GB', '1920 x 1080', 1, 10690000, 190, 'Acer Aspire Go 15 AG15‑31P‑30M4 (i3‑N305/8 GB/256 GB/Win11) là lựa chọn hợp lý cho người tìm laptop văn phòng nhẹ, ổn định, màn hình lớn, pin tốt với mức giá phải chăng. Tuy nhiên, nếu bạn cần RAM cao hơn hoặc xử lý đồ họa/phim ảnh/đồ họa nặng, bạn nên cân nhắc nâng cấp hoặc chọn cấu hình cao hơn.', 1),
-(8, 'Laptop Acer Gaming Nitro V 15', 2, 'AMD Ryzen 5', 'Ram:8GB', 'RTX 2050', '128GB', '1920 x 1080', 1, 24205000, 70, 'Acer Nitro V 15 là mẫu laptop gaming phổ thông có hiệu năng mạnh mẽ, phù hợp cho game thủ tầm trung và sinh viên cần một chiếc máy chơi game tốt mà vẫn gọn nhẹ. Máy được trang bị vi xử lý Intel Core i5-13420H thế hệ 13 kết hợp với card đồ họa rời NVIDIA GeForce RTX 3050 hoặc RTX 4050, giúp chơi mượt các tựa game eSports và AAA ở độ phân giải Full HD', 1),
-(9, 'Laptop HP Gaming VICTUS 15 fa1139TX', 2, 'Intel Core i5 Alder Lake', 'Ram:16GB', 'RTX 3060', '128GB', '1920x1080', 2, 17690000, 70, 'HP Gaming Victus 15 fa1139TX là mẫu laptop gaming tầm trung nổi bật với cấu hình ổn định, thiết kế hiện đại và mức giá dễ tiếp cận. Máy sử dụng vi xử lý Intel Core i5-12450H (thế hệ 12) kết hợp với card đồ họa rời NVIDIA GeForce RTX 2050, mang đến hiệu năng khá tốt cho các tựa game eSports, game online phổ biến và cả một số game offline tầm trung ở mức thiết lập vừa phải. Bộ nhớ RAM 16GB DDR4 (2 thanh 8GB, hỗ trợ nâng cấp) cùng ổ SSD 512GB NVMe giúp máy hoạt động mượt mà, khởi động nhanh và xử lý đa nhiệm hiệu quả', 1),
-(10, 'Laptop Dell Inspiron 15', 1, 'Intel Core i7 Raptor Lake', 'Ram:16GB', 'Intel Iris ', '128GB', '1920x1080', 2, 22490000, 60, 'Dell Inspiron 15 là dòng phổ thông, phù hợp cho học tập và công việc nhẹ. Có nhiều cấu hình khác nhau: phổ biến là Core i5 + 8 GB RAM + SSD 512 GB hoặc HDD 1 TB. Màn hình 15.6″ FHD IPS (120–144Hz) hiển thị mượt, tuy màu sắc không quá nổi bật. Thiết kế bền, trọng lượng từ 1.65–2.2 kg tùy bản, pin dùng khoảng 6–9 giờ. Máy hỗ trợ nâng cấp RAM/SSD, cổng kết nối đa dạng, hiệu năng đủ cho đa nhiệm, làm văn phòng, học trực tuyến .', 1),
-(11, 'Laptop MSI Gaming Thin 15', 2, 'Intel Core i7 Raptor Lake', 'Ram:8GB', 'RTX 3060', '512GB', '1920x1080', 2, 22790000, 70, 'MSI Thin 15 là chiếc laptop gaming mỏng nhẹ nhưng vẫn mạnh mẽ, thường có cấu hình Core i5‑13420H hoặc i7‑13620H kết hợp card đồ họa RTX 3050, RTX 4050, thậm chí RTX 4060, phù hợp chơi game Full HD ở thiết lập cao với mức giá rất cạnh tranh, chỉ từ khoảng 16–17 triệu cho bản RTX 3050', 1),
-(13, 'RAM Laptop DDR4 8GB Bus 3200MHz', 3, 'ADM 5570', 'RAM: 16GB', 'NVIDIA® GeForce RTX™', 'BUS:3200MHz', 'Kích thước 13.8cm', 1, 850000, 12, 'RAM Laptop DDR4 8GB Bus 3200MHz – nâng cấp hiệu năng, chạy đa nhiệm mượt mà, tiết kiệm điện, tương thích nhiều dòng máy.\"', 1),
-(14, 'RAM laptop Kingston CL42  DDR5  (KVR52S42BS8-16)', 3, 'AMD Ryzen 3', 'RAM:16GB', 'NVIDIA® GeForce RTX™', 'BUS :5200MHz', 'Kích thước 13.8cm', 2, 124900, 15, 'Nâng cấp hiệu suất cho chiếc laptop của bạn với RAM Laptop DDR4 8GB Bus 3200MHz – giải pháp tối ưu giúp tăng tốc độ xử lý, cải thiện đa nhiệm và mang đến trải nghiệm mượt mà hơn trong công việc lẫn giải trí.', 1),
-(15, 'SSD KingSton ', 3, 'AMD Ryzen7', 'RAM:2TB', 'RTX 3060', 'BUS:3200MHz', 'Kích thước 8cm', 1, 1099000, 30, 'SSD laptop lưu trữ nhiều dữ liệu còn nhanh nữa chứ ', 1),
-(16, 'SSD SanDisk 12', 1, 'Intel i5', '4GB', 'Integrated', '128GB', '13.3&quot; FHD', 2, 1300000, 50, 'SSD Laptop 128GB – tăng tốc khởi động máy, truy xuất dữ liệu nhanh, nhỏ gọn, tiết kiệm điện, phù hợp nâng cấp cho laptop cũ.', 1),
-(17, 'RAM laptop Lexar LD4AS016G-B3200GSST  DDR4  (LD4AS016G-B3200GSST (L))', 3, 'AMD Ryzen 3', 'Ram:16GB', 'RTX 3060', 'BUS:3200MHz', 'Kích thước 8cm', 2, 1090000, 25, 'Ram Laptop Lexar DDR4 16G (1x 16Gb) 3200Mhz hiệu năng cao đã được chọn lọc và hoàn toàn đáng tin cậy. Ram Lexar 32GB dành cho laptop với độ trễ thấp, mang lại một tốc độ đáp ứng gần như tức thì cho mọi ứng dụng, tối ưu trải nghiệm của bạn với hiệu năng cải thiện đáng kể.\nLắp đặt dễ dàng, ít tiêu tốn điện năng \nRam Laptop Lexar DDR4 16G (1x 16Gb) 3200Mhz cho phép bạn lắp đặt ngay mà không thông qua trình cài đặt phức tạp, dễ dàng nâng cấp cấu hình của chiếc máy tính ngay lập tức để tận hưởng hiệu năng mong muốn. Quá trình kiểm tra nghiêm ngặt đảm bảo độ tin cậy cho Ram Lexar DDR4.', 1),
-(47, 'acer', 1, '', '', '', '', '', 1, 20000, 10, 'ổn', 1),
-(48, 'đuu', 1, '', '', '', '', '', 0, 1258, 10, 'agagag', 1),
-(49, 'ok', 1, 'Intel i5', '4GB', 'Integrated', '128GB', '13.3&quot; FHD', 0, 12000, 10, 'đjdjj', 1),
-(50, 'xx', 1, 'Intel i5', '4GB', 'Integrated', '128GB', '13.3&quot; FHD', 1, 88, 8, 'dx', 1),
-(51, 'acer', 1, 'Intel i5', '4GB', 'Integrated', '128GB', '13.3&quot; FHD', 1, 1200000, 10, 'sjsjh', 1),
-(52, 'giang', 1, 'Intel i5', '4GB', 'Integrated', '128GB', '13.3&quot; FHD', 2, 12000, 10, 'như cc', 1),
-(53, 'alptop bans khoong duocwj', 1, 'Intel i5', '4GB', 'Integrated', '128GB', '13.3&quot; FHD', 0, 7979000, 12, 'như shit', 1);
+(4, 'Laptop ASUS Vivobook 14 OLED A1405VA KM095W', 1, 'INTEL CORE I7 12500H', ' 8 GB', 'INTEL ARISXE', '1TB', '1920x1080', 1, 17000000, 0, 'Tỏa sáng với cả thế giới cùng ASUS Vivobook 14 OLED mạnh mẽ, chiếc laptop tích hợp nhiều tính năng với màn hình OLED rực rỡ, gam màu DCI-P3 đẳng cấp điện ảnh. Mọi thứ trở nên dễ dàng hơn nhờ những tiện ích thân thiện với người dùng bao gồm bản lề duỗi thẳng 180°, nắp che webcam vật lý và các phím chức năng chuyên dụng. Bảo vệ sức khỏe an toàn với ASUS kháng khuẩn Guard Plus trên các bề mặt thường xuyên chạm vào. Bắt đầu ngày mới đầy hứng khởi với ASUS Vivobook 14 OLED!', 1),
+(5, 'Laptop Acer Swift 14 AI SF14 51 53P9', 1, 'Intel® Core™ Ultra 5 Processor 226V', ' 16GB', 'NVIDIA RTX 4060', '1TB', '14&amp; 3K (2880 x 1800) OLED', 1, 13399000, 140, 'Acer Swift 14 AI SF14 51 53P9 tiếp tục thừa hưởng ngôn ngữ thiết kế tối giản, thanh lịch của dòng Swift. Vỏ máy được chế tác từ hợp kim nhôm cao cấp, mang đến vẻ ngoài sang trọng và độ bền bỉ cao. Với độ mỏng ấn tượng chỉ 15.95mm và trọng lượng siêu nhẹ 1.26kg, chiếc laptop ai này là người bạn đồng hành lý tưởng cho những người thường xuyên di chuyển. ', 1),
+(6, 'Laptop gaming MSI Stealth 16 AI Studio A1VHG 241VN', 2, 'Intel® Core™ Ultra 9 processor 185H with Intel® AI', '32GB', 'NVIDIA® GeForce RTX™', ' 1TB', '16&amp;amp; QHD+(2560x1600), 240Hz', 1, 73990000, 130, 'Chiếc laptop gaming được trang bị con chip Intel Core Ultra 9 - 185H với 16 lõi, 22 luồng kết hợp với VGA NVIDIA GeForece RTX 4070 giúp trải nghiệm chơi các game AAA và render hình ảnh, video một cách mượt mà không xảy ra hiện tượng giật lag. \r\n\r\n', 1),
+(7, 'Laptop Acer Aspire Go AG15', 1, 'Intel Core i3 Alder Lake', '16GB', ' Intel UHD Graphics', '128GB', '1920 x 1080', 1, 10690000, 190, 'Acer Aspire Go 15 AG15‑31P‑30M4 (i3‑N305/8 GB/256 GB/Win11) là lựa chọn hợp lý cho người tìm laptop văn phòng nhẹ, ổn định, màn hình lớn, pin tốt với mức giá phải chăng. Tuy nhiên, nếu bạn cần RAM cao hơn hoặc xử lý đồ họa/phim ảnh/đồ họa nặng, bạn nên cân nhắc nâng cấp hoặc chọn cấu hình cao hơn.', 1),
+(8, 'Laptop Acer Gaming Nitro V 15', 2, 'AMD Ryzen 5', '8GB', 'NVIDIA RTX 3050', '128GB', '1920 x 1080', 2, 24205000, 70, 'Acer Nitro V 15 là mẫu laptop gaming phổ thông có hiệu năng mạnh mẽ, phù hợp cho game thủ tầm trung và sinh viên cần một chiếc máy chơi game tốt mà vẫn gọn nhẹ. Máy được trang bị vi xử lý Intel Core i5-13420H thế hệ 13 kết hợp với card đồ họa rời NVIDIA GeForce RTX 3050 hoặc RTX 4050, giúp chơi mượt các tựa game eSports và AAA ở độ phân giải Full HD', 1),
+(9, 'Laptop HP Gaming VICTUS 15 fa1139TX', 2, 'Intel Core i5 Alder Lake', '16GB', 'NVIDIA RTX 3060', '128GB', '1920x1080', 2, 17690000, 70, 'HP Gaming Victus 15 fa1139TX là mẫu laptop gaming tầm trung nổi bật với cấu hình ổn định, thiết kế hiện đại và mức giá dễ tiếp cận. Máy sử dụng vi xử lý Intel Core i5-12450H (thế hệ 12) kết hợp với card đồ họa rời NVIDIA GeForce RTX 2050, mang đến hiệu năng khá tốt cho các tựa game eSports, game online phổ biến và cả một số game offline tầm trung ở mức thiết lập vừa phải. Bộ nhớ RAM 16GB DDR4 (2 thanh 8GB, hỗ trợ nâng cấp) cùng ổ SSD 512GB NVMe giúp máy hoạt động mượt mà, khởi động nhanh và xử lý đa nhiệm hiệu quả', 1),
+(10, 'Laptop Dell Inspiron 15', 1, 'Intel Core i7 Raptor Lake', '16GB', 'Intel Iris ', '128GB', '1920x1080', 1, 22490000, 60, 'Dell Inspiron 15 là dòng phổ thông, phù hợp cho học tập và công việc nhẹ. Có nhiều cấu hình khác nhau: phổ biến là Core i5 + 8 GB RAM + SSD 512 GB hoặc HDD 1 TB. Màn hình 15.6″ FHD IPS (120–144Hz) hiển thị mượt, tuy màu sắc không quá nổi bật. Thiết kế bền, trọng lượng từ 1.65–2.2 kg tùy bản, pin dùng khoảng 6–9 giờ. Máy hỗ trợ nâng cấp RAM/SSD, cổng kết nối đa dạng, hiệu năng đủ cho đa nhiệm, làm văn phòng, học trực tuyến .', 1),
+(11, 'Laptop MSI Gaming Thin 15', 2, 'Intel Core i7 Raptor Lake', '8GB', 'NVIDIA RTX 3060', '512GB', '1920x1080', 2, 22790000, 70, 'MSI Thin 15 là chiếc laptop gaming mỏng nhẹ nhưng vẫn mạnh mẽ, thường có cấu hình Core i5‑13420H hoặc i7‑13620H kết hợp card đồ họa RTX 3050, RTX 4050, thậm chí RTX 4060, phù hợp chơi game Full HD ở thiết lập cao với mức giá rất cạnh tranh, chỉ từ khoảng 16–17 triệu cho bản RTX 3050', 1),
+(13, 'Lenovo LOQ Gaming 15IAX9 i5-12450H', 2, 'Intel Core i5-12450H', '16GB', 'NVIDIA RTX 3050', '512GB', '15.6\" FHD 120Hz', 1, 18500000, 70, 'Lenovo LOQ Gaming 15IAX9 i5 12450HX (83GS000JVN) là chiếc laptop gaming mang thiết kế mạnh mẽ, hiện đại, phù hợp với học sinh – sinh viên cần hiệu năng cao cho cả học tập lẫn giải trí. Máy sở hữu vi xử lý Intel Core i5-12450HX, card đồ họa RTX 3050 6GB và chip AI LA1 tối ưu hiệu năng tự động giữa CPU và GPU.\n\nRAM 16GB nâng cấp tối đa 32GB cùng SSD 512GB (có thể mở rộng đến 1TB) đáp ứng tốt các nhu cầu game và đồ họa. Màn hình 15.6 inch FHD IPS, 144Hz, hỗ trợ G-Sync, phủ màu 100% sRGB, kết hợp công nghệ chống chói và lọc ánh sáng xanh, cho trải nghiệm hình ảnh mượt mà, bảo vệ mắt.\n\nÂm thanh sống động với công nghệ Nahimic Audio, webcam có khóa vật lý, bàn phím có đèn nền, khung máy hầm hố nhưng vẫn linh hoạt với trọng lượng 2.38kg. Cổng kết nối đa dạng, phù hợp cho nhu cầu học, làm và chơi game. Đây là lựa chọn lý tưởng trong tầm giá 20–25 triệu.', 1),
+(14, 'HP Victus 16 r0130TX i5-13500H', 2, 'Intel Core i5-13500H', '16GB', 'NVIDIA RTX 3060', '512GB', '16.1\" FHD 144Hz', 2, 1249000, 15, 'HP Gaming VICTUS 16 r0130TX i5 13500H (8C5N5PA) là phiên bản nâng cấp từ dòng VICTUS 15, mang đến hiệu năng mạnh mẽ và thiết kế tinh tế. Máy sử dụng vi xử lý Intel Core i5-13500H kết hợp card đồ họa RTX 3050 6GB, giúp xử lý tốt cả công việc văn phòng, thiết kế 2D, 3D nhẹ và chơi các tựa game AAA phổ biến với FPS ổn định.\n\nRAM 16GB DDR5 (hỗ trợ nâng cấp đến 32GB) cho khả năng đa nhiệm mượt mà. SSD 512GB PCIe giúp khởi động và truy xuất dữ liệu nhanh. Màn hình 16.1 inch FHD, tấm nền IPS, tần số quét 144Hz, độ phủ màu tốt cho trải nghiệm hình ảnh rộng rãi và sắc nét.\n\nÂm thanh chất lượng cao nhờ công nghệ Realtek HD, B&O và HP Audio Boost. Thiết kế tối giản nhưng mạnh mẽ, khung máy bền, logo V nổi bật, bàn phím fullsize có RGB 1 vùng dễ tùy chỉnh, touchpad mượt.\n\nNgoài ra, máy hỗ trợ đầy đủ các cổng kết nối phổ biến như USB-C, HDMI, LAN... Với trọng lượng 2.34 kg, đây là một lựa chọn đáng giá cho sinh viên hoặc người dùng cần một laptop gaming mạnh, giá hợp lý, phục vụ cả học tập lẫn giải trí hiệu quả.', 1),
+(15, 'HP OMEN Transcend 14 fb0135TX Ultra 7', 1, 'Intel Core i7-13620H', '16GB', 'NVDIA RTX 3060', '512GB', '14\" FHD 144Hz', 1, 1099000, 30, 'HP OMEN Transcend 14 fb0135TX Ultra 7 155H (AY8V1PA) là sự kết hợp hoàn hảo giữa ultrabook mỏng nhẹ và laptop gaming hiệu năng cao. Máy trang bị CPU Intel Core Ultra 7 155H thế hệ mới, tích hợp nhân AI, đi kèm GPU RTX 4060 mạnh mẽ – sẵn sàng chiến các tựa game AAA, render đồ hoạ phức tạp hay xử lý AI chuyên sâu.\n\nRAM 16GB LPDDR5X tốc độ cao, SSD 1TB NVMe giúp đa nhiệm mượt và lưu trữ thoải mái. Màn hình OLED 14 inch 2.8K, tần số quét 120Hz, 100% DCI-P3 mang đến hình ảnh sắc nét, màu sắc chân thực – phù hợp cho game thủ lẫn dân thiết kế.\n\nÂm thanh DTS:X Ultra sống động, webcam Full HD, bảo mật khuôn mặt với camera IR. Bàn phím RGB 4 vùng, thân máy kim loại cao cấp chỉ nặng 1.63kg – cực kỳ linh hoạt. Kết nối đầy đủ (Thunderbolt 4, HDMI, USB-C...) và pin 71Wh dùng tốt cả ngày.\n\nĐây là lựa chọn lý tưởng cho người dùng yêu cầu cấu hình mạnh, thiết kế tinh gọn, phục vụ tốt cho cả chơi game, học tập và sáng tạo nội dung.', 1),
+(16, 'HP OMEN 16 xf0071AX R7-7840HS', 1, 'AMD Ryzen 7 7840HS', '16GB', 'NVIDIA RTX 4060', '256GB', '13.3&quot; FHD', 2, 1300000, 50, 'HP OMEN 16 xf0071AX R7 7840HS là mẫu laptop gaming cao cấp với hiệu năng vượt trội, trang bị vi xử lý AMD Ryzen 7 7840HS và card đồ họa RTX 4060 8GB, phù hợp cho cả chơi game AAA, livestream và thiết kế 3D chuyên sâu. RAM 32GB DDR5 (hỗ trợ nâng đến 64GB) và SSD 1TB NVMe mang lại khả năng đa nhiệm mượt mà, lưu trữ lớn và tốc độ truy xuất nhanh chóng.\n\nMàn hình 16.1 inch QHD (2K), tấm nền IPS, tần số quét 240Hz, độ phủ màu 100% sRGB cho trải nghiệm hình ảnh cực sắc nét và mượt, phù hợp với game thủ và nhà sáng tạo nội dung. Âm thanh sống động nhờ công nghệ DTS:X Ultra, HP Audio Boost và B&O, tạo cảm giác đắm chìm trong game và giải trí.\n\nThiết kế mạnh mẽ nhưng vẫn tinh tế với trọng lượng 2.37kg, bàn phím RGB 4 vùng và đầy đủ cổng kết nối như USB-C, HDMI, LAN… Đây là lựa chọn lý tưởng cho người dùng cần một chiếc laptop gaming - đồ họa cao cấp, vừa mạnh vừa sang trọng, trong tầm giá hợp lý.', 1),
+(17, 'Lenovo Ideapad Slim 3 15ABR8 R7-7730U', 1, 'AMD Ryzen 7 7730U', '16GB', 'NVIDIA RTX 3060', '512GB', '14&quot; FHD OLED', 2, 10990000, 49, 'Lenovo Ideapad Slim 5 OLED 14AKP10 R5 AI 340 (83HX001KVN) là lựa chọn hoàn hảo cho học sinh, sinh viên và dân văn phòng cần một chiếc laptop mỏng nhẹ, bền bỉ, hiệu năng mạnh và màn hình xuất sắc. Máy dùng CPU AMD Ryzen AI 5 340, 6 nhân 12 luồng, tích hợp NPU AMD XDNA xử lý AI tới 50 TOPS, kết hợp RAM 24GB DDR5 và SSD 512GB, đảm bảo xử lý mượt mọi tác vụ văn phòng, học tập, giải trí và đa nhiệm.\n\nMàn hình 14 inch OLED WUXGA, phủ màu 100% DCI-P3, đạt chuẩn DisplayHDR True Black 500 mang lại trải nghiệm hình ảnh sắc nét, sống động và chân thực. Tích hợp loa Dolby Audio cho âm thanh sống động, hạn chế mỏi mắt nhờ công nghệ Low Blue Light.\n\nThiết kế kim loại cao cấp, chỉ 1.39kg, mỏng 16.9mm, đạt chuẩn độ bền MIL-STD-810H, kèm đèn nền phím trắng và camera IR hỗ trợ mở khóa khuôn mặt. Máy có đầy đủ cổng USB-C, HDMI, SD card, Wi-Fi 7, Bluetooth 5.4, pin 60Wh dùng dài lâu.\n\nTóm lại, đây là mẫu laptop AI mỏng nhẹ, pin trâu, cấu hình cao, rất phù hợp cho người cần thiết bị đa năng, linh hoạt cho học tập – làm việc – giải trí.', 1),
+(18, 'Lenovo IdeaPad 5 15IAL7 i5-1235U', 1, 'Intel Core i5-1235U', '8GB', 'Intel Iris Xe', '512GB', '15.6\" FHD', 1, 17900000, 30, 'Lenovo Ideapad 5 15IAL7 i5 1235U (82SF005HVN) là mẫu laptop văn phòng lý tưởng cho học sinh, sinh viên và người đi làm nhờ thiết kế thanh lịch, hiệu năng ổn định và độ bền chuẩn quân đội MIL-STD-810H. Máy được trang bị CPU Intel Core i5-1235U Gen 12, kết hợp Intel Iris Xe Graphics, RAM 8GB DDR4, ổ SSD 512GB NVMe tốc độ cao, đủ sức đáp ứng tốt các tác vụ học tập, làm việc, thiết kế cơ bản và giải trí.\n\nMàn hình 15.6 inch Full HD IPS, viền mỏng, có chống chói và Low Blue Light, phù hợp dùng lâu dài không mỏi mắt. Âm thanh Dolby Audio mang lại trải nghiệm giải trí sống động. Bàn phím full size có đèn nền, hỗ trợ tốt khi làm việc ban đêm.\n\nMáy nặng 1.85kg, vỏ kim loại chắc chắn, pin 57Wh dùng được khoảng 6 tiếng. Webcam Full HD, khóa camera, bảo mật vân tay giúp tăng tính riêng tư. Đầy đủ cổng HDMI, USB-C, khe thẻ SD... và hỗ trợ nâng cấp SSD/HDD tiện lợi. Đây là mẫu laptop cân đối giữa giá – hiệu năng – tính di động trong phân khúc phổ thông đáng mua.', 1),
+(19, 'Dell XPS 13 9340 Ultra 5-125H', 1, 'Intel Core Ultra 5 125H', '8GB', 'Intel Integrated', '512GB', '13.4\" FHD', 1, 17800000, 40, 'Dell XPS 13 9340 Ultra 5 125H (XPSU5934W1) là mẫu laptop cao cấp nổi bật với thiết kế siêu mỏng nhẹ chỉ 1.22 kg, bàn phím tràn viền độc đáo và touchpad ẩn, mang lại vẻ hiện đại tối giản nhưng cực kỳ tinh tế. Máy sử dụng Intel Core Ultra 5 125H Gen 14, RAM 16GB LPDDR5X, SSD 2TB và đồ họa Intel Arc, xử lý mượt các tác vụ nặng như thiết kế, chỉnh sửa video hay đa nhiệm văn phòng.\n\nMàn hình 13.4 inch QHD+ (2560 x 1600) công nghệ WVA, tần số quét 120Hz, độ phủ màu 100% sRGB, hỗ trợ cảm ứng, hiển thị sắc nét, màu chuẩn, kết hợp Eyesafe & Anti Glare giúp bảo vệ mắt khi dùng lâu.\n\nÂm thanh sống động nhờ Realtek Audio, webcam sắc nét, bàn phím có đèn nền, mở khóa bằng vân tay tiện lợi. Máy có 2 cổng Thunderbolt 4 cho tốc độ truyền tải cao, dễ dàng mở rộng kết nối qua hub rời. Đây là chiếc laptop lý tưởng cho người dùng sáng tạo, doanh nhân hay làm việc di động cần một thiết bị vừa đẹp – nhẹ – mạnh mẽ.\n', 1),
+(20, 'Acer Nitro V ANV15-51 i5-12500H', 2, 'Intel Core i5-12500H', '8GB', 'NVIDIA RTX 3050', '512GB', '15.6\" FHD', 2, 25790000, 30, 'Acer Nitro V ANV15-51-58AN là mẫu laptop gaming quốc dân nổi bật với thiết kế cá tính, hiệu năng mạnh mẽ từ Intel Core i5-13420H Gen 13 và card rời NVIDIA GeForce RTX 2050. Máy trang bị RAM 16GB DDR5 và SSD 512GB (hỗ trợ nâng cấp lên 2TB), dễ dàng đáp ứng các tựa game AAA, E-Sports và các phần mềm đồ họa.\n\nMàn hình 15.6 inch FHD IPS, tần số quét 144Hz, công nghệ ComfyView, tái hiện hình ảnh sắc nét, mượt mà. Hệ thống tản nhiệt kép Dual-Fan giúp duy trì hiệu suất cao trong thời gian dài. Thiết kế đậm chất gaming với tông đen - tím hiện đại, khối lượng vừa phải dễ mang theo.\n\nMáy hỗ trợ đầy đủ cổng kết nối gồm USB-C, 3 cổng USB-A, HDMI 2.1, LAN RJ45, Wi-Fi 6, tiện lợi cho mọi nhu cầu học tập, chơi game hay làm việc. Đây là lựa chọn lý tưởng cho game thủ phổ thông hoặc sinh viên ngành đồ họa cần cấu hình mạnh, giá tốt.', 1),
+(21, '[value-2]', 0, '[value-4]', '[value-5]', '[value-6]', '[value-7]', '[value-8]', 0, 0, 0, '[value-12]', 0);
 
 -- --------------------------------------------------------
 
@@ -600,12 +647,12 @@ INSERT INTO `taikhoan` (`TenTaiKhoan`, `MaKhachHang`, `MatKhau`, `LoaiTaiKhoan`,
 ('admin', 1, '1', 1, 1),
 ('bùa', 14, '123@4567', 0, 1),
 ('khay', 12, '123@4567', 0, 1),
-('khaylodepzai', 11, 'khay22444', 0, 1),
+('khaylodepzai', 11, 'khay22444@', 0, 1),
 ('lamvanc', 5, '123@456789', 0, 1),
 ('nguyenp', 18, '123@456789', 0, 1),
-('nguyenthibetu', 10, '12345678', 0, 1),
-('nguyenthitele', 6, '12345678', 0, 1),
-('nguyenvanaa', 9, '23092004', 0, 1),
+('nguyenthibetu', 10, '12345678@', 0, 1),
+('nguyenthitele', 6, '12345678!@#', 0, 1),
+('nguyenvanaa', 9, '23092004@@@', 0, 1),
 ('phanvan', 16, '123@5678', 0, 1),
 ('phu', 13, '123@4567', 0, 1),
 ('phuth', 16, '123@4567', 0, 1);
@@ -633,7 +680,6 @@ INSERT INTO `yeuthich` (`ID`, `MaKhachHang`, `MaSanPham`, `NgayYeuThich`) VALUES
 (8, 12, 2, '2025-06-22 22:05:34'),
 (10, 12, 1, '2025-06-22 22:20:59'),
 (11, 13, 1, '2025-06-23 09:20:53'),
-(12, 12, 7, '2025-06-24 09:13:43'),
 (15, 16, 1, '2025-07-04 20:09:46'),
 (16, 16, 2, '2025-07-04 20:09:48'),
 (17, 16, 4, '2025-07-04 20:09:49'),
@@ -643,7 +689,10 @@ INSERT INTO `yeuthich` (`ID`, `MaKhachHang`, `MaSanPham`, `NgayYeuThich`) VALUES
 (22, 18, 1, '2025-07-07 23:18:25'),
 (23, 14, 2, '2025-07-07 23:27:27'),
 (24, 14, 4, '2025-07-07 23:27:28'),
-(26, 14, 10, '2025-07-07 23:35:42');
+(26, 14, 10, '2025-07-07 23:35:42'),
+(27, 12, 19, '2025-07-10 12:26:35'),
+(28, 11, 2, '2025-07-10 20:41:13'),
+(29, 11, 1, '2025-07-10 20:41:14');
 
 --
 -- Chỉ mục cho các bảng đã đổ
@@ -760,7 +809,7 @@ ALTER TABLE `binhluandanhgia`
 -- AUTO_INCREMENT cho bảng `chitiethoadonban`
 --
 ALTER TABLE `chitiethoadonban`
-  MODIFY `MaChiTietHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=142;
+  MODIFY `MaChiTietHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=156;
 
 --
 -- AUTO_INCREMENT cho bảng `diachi`
@@ -778,19 +827,19 @@ ALTER TABLE `email_otp`
 -- AUTO_INCREMENT cho bảng `giohang`
 --
 ALTER TABLE `giohang`
-  MODIFY `MaGioHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=283;
+  MODIFY `MaGioHang` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=290;
 
 --
 -- AUTO_INCREMENT cho bảng `hinhanh`
 --
 ALTER TABLE `hinhanh`
-  MODIFY `MaHinhAnh` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
+  MODIFY `MaHinhAnh` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=94;
 
 --
 -- AUTO_INCREMENT cho bảng `hoadonban`
 --
 ALTER TABLE `hoadonban`
-  MODIFY `MaHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=235;
+  MODIFY `MaHoaDonBan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=248;
 
 --
 -- AUTO_INCREMENT cho bảng `khachhang`
@@ -820,13 +869,13 @@ ALTER TABLE `mausac`
 -- AUTO_INCREMENT cho bảng `sanpham`
 --
 ALTER TABLE `sanpham`
-  MODIFY `MaSanPham` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `MaSanPham` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT cho bảng `yeuthich`
 --
 ALTER TABLE `yeuthich`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- Các ràng buộc cho các bảng đã đổ

@@ -10,8 +10,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -72,6 +75,7 @@ fun PayScreen(
     val danhsachsanpham by sanPhamViewModel.danhsachSanPham.collectAsState(initial = emptyList())
     val systemUiController = rememberSystemUiController()
 
+
     var selectedPaymentMethod by remember { mutableStateOf("Thanh toán khi nhận hàng") }
     var showQR by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
@@ -87,7 +91,7 @@ fun PayScreen(
     LaunchedEffect(Unit) {
         khuyenMaiViewModel.fetchTatCaKhuyenMai()
     }
-
+    // Chuyển đổi selectedProducts từ String sang List<Triple<Int, Int, Int>>
     val tongTienHang = remember(selectedProducts, danhsachsanpham) {
         selectedProducts.sumOf { triple ->
             val sp = danhsachsanpham.find { it.MaSanPham == triple.first }
@@ -95,7 +99,7 @@ fun PayScreen(
             giaGoc * triple.second
         }
     }
-
+    // Tính tổng tiền hàng với giá đã giảm (nếu có)
     val tongGiamGia = remember(selectedProducts, danhsachsanpham, listKhuyenMai) {
         selectedProducts.sumOf { triple ->
             val sp = danhsachsanpham.find { it.MaSanPham == triple.first }
@@ -110,11 +114,15 @@ fun PayScreen(
     val tongTienThanhToan = if (tongTienSauGiam < 0) 0 else tongTienSauGiam
     val tongTien = tongTienThanhToan + phiVanChuyen
 
+
+
     // Địa chỉ được chọn
     var selectedAddress by remember { mutableStateOf<DiaChi?>(null) }
     val addressToUse = selectedAddress ?: diachimacdinh
 
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
+
+
 
     LaunchedEffect(navBackStackEntry) {
         val id = navBackStackEntry?.savedStateHandle?.get<Int>("selectedAddressId")
@@ -151,6 +159,7 @@ fun PayScreen(
         systemUiController.setStatusBarColor(color = Color.White, darkIcons = true)
     }
 
+
     Scaffold(
         containerColor = Color.White,
         topBar = {
@@ -180,11 +189,13 @@ fun PayScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "Tổng tiền: ${formatGiaTien(tongtien + 30000)}",
+//                        text = "Tổng tiền: ${formatGiaTien(tongtien + 30000)}",
+                        text = "Tổng tiền: ${formatGiaTien(tongTienThanhToan + phiVanChuyen)}",
                         fontWeight = FontWeight.Bold,
                         color = Color.Red,
                         fontSize = 20.sp
                     )
+                    Spacer(modifier = Modifier.width(10.dp))
                     if (isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(50.dp),
@@ -398,10 +409,95 @@ fun PayScreen(
                 }
             }
 
-            // Hiển thị sản phẩm mua ngay (khi chỉ có 1 sản phẩm và có tên/hình)
+             //Hiển thị sản phẩm mua ngay (khi chỉ có 1 sản phẩm và có tên/hình)
+//            item {
+//                if (selectedProducts.size == 1 && tensanpham.isNotBlank() && hinhanh.isNotBlank()) {
+//                    val triple = selectedProducts.getOrNull(0) ?: return@item
+//                    val soluong = remember { mutableIntStateOf(triple.second) }
+//                    val giaSauGiam = triple.third // đã tính sẵn giá (nếu có giảm giá)
+//                    val tongTien by remember {
+//                        derivedStateOf { soluong.value * giaSauGiam }
+//                    }
+//
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    Card(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(4.dp),
+//                        elevation = CardDefaults.cardElevation(2.dp),
+//                        colors = CardDefaults.cardColors(containerColor = Color.White),
+//                        shape = RoundedCornerShape(12.dp)
+//                    ) {
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(8.dp),
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            AsyncImage(
+//                                model = hinhanh,
+//                                contentDescription = "Ảnh sản phẩm",
+//                                modifier = Modifier
+//                                    .size(120.dp)
+//                                    .padding(4.dp),
+//                                contentScale = ContentScale.Crop,
+//                            )
+//
+//                            Spacer(modifier = Modifier.width(12.dp))
+//                            Column {
+//                                Text(
+//                                    text = tensanpham,
+//                                    fontWeight = FontWeight.Bold,
+//                                    fontSize = 18.sp
+//                                )
+//                                Text(
+//                                    text = "Giá: ${formatGiaTien(tongtien)}",
+//                                    color = Color.Red,
+//                                    fontWeight = FontWeight.Bold
+//                                )
+//                                Row(
+//                                    verticalAlignment = Alignment.CenterVertically
+//                                ) {
+//                                    Text(text = "Số lượng: ")
+//
+//                                    IconButton(onClick = {
+//                                        if (soluong.value > 1) soluong.value--
+//                                    }) {
+//                                        Icon(Icons.Default.Remove, contentDescription = "Giảm")
+//                                    }
+//
+//                                    Text(
+//                                        text = soluong.value.toString(),
+//                                        modifier = Modifier.width(32.dp),
+//                                        textAlign = TextAlign.Center
+//                                    )
+//
+//                                    IconButton(onClick = {
+//                                        soluong.value++
+//                                    }) {
+//                                        Icon(Icons.Default.Add, contentDescription = "Tăng")
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                }
+//            }
             item {
                 if (selectedProducts.size == 1 && tensanpham.isNotBlank() && hinhanh.isNotBlank()) {
                     val triple = selectedProducts.getOrNull(0) ?: return@item
+                    val soluong = remember { mutableIntStateOf(triple.second) }
+                    // Tìm giá trong danh sách sản phẩm
+                    val sanpham = danhsachsanpham.find { it.MaSanPham == triple.first }
+                    val km = listKhuyenMai.find { it.MaSanPham == triple.first }
+                    val giaGoc = sanpham?.Gia ?: 0
+                    val giaSauGiam = getGiaSauGiam(giaGoc, km?.PhanTramGiam)
+                    val tongTien by remember {
+                        derivedStateOf { soluong.value * giaSauGiam }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -433,13 +529,34 @@ fun PayScreen(
                                     fontSize = 18.sp
                                 )
                                 Text(
-                                    text = "Giá: ${formatGiaTien(tongtien)}",
+                                    text = "Giá: ${formatGiaTien(giaSauGiam)}",
                                     color = Color.Red,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Text(
-                                    text = "Số lượng: ${triple.second}"
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(text = "Số lượng: ")
+
+                                    IconButton(onClick = {
+                                        if (soluong.value > 1) soluong.value--
+                                    }) {
+                                        Icon(Icons.Default.Remove, contentDescription = "Giảm")
+                                    }
+
+                                    Text(
+                                        text = soluong.value.toString(),
+                                        modifier = Modifier.width(32.dp),
+                                        textAlign = TextAlign.Center
+                                    )
+
+                                    IconButton(onClick = {
+                                        soluong.value++
+                                    }) {
+                                        Icon(Icons.Default.Add, contentDescription = "Tăng")
+                                    }
+
+                                }
                             }
                         }
                     }

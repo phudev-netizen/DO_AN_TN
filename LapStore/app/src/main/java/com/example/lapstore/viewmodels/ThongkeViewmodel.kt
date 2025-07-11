@@ -21,6 +21,13 @@ class ThongKeViewModel : ViewModel() {
     private val _loading = mutableStateOf(false)
     val loading: State<Boolean> = _loading
 
+    private val _orders = mutableStateOf<List<Order>>(emptyList())
+    val orders: State<List<Order>> = _orders
+
+    private val _ordersLoading = mutableStateOf(false)
+    val ordersLoading: State<Boolean> = _ordersLoading
+
+
 
     fun fetchThongKe() {
         viewModelScope.launch {
@@ -69,6 +76,21 @@ class ThongKeViewModel : ViewModel() {
                 Log.e("ThongKeSanPham", "Lỗi: ${e.message}")
             } finally {
                 _loading.value = false
+            }
+        }
+    }
+    fun fetchOrders() {
+        viewModelScope.launch {
+            _ordersLoading.value = true
+            try {
+                val response = api.getOrders()
+                if (response.isSuccessful && response.body()?.success == true) {
+                    _orders.value = response.body()!!.data
+                }
+            } catch (e: Exception) {
+                Log.e("ThongKeViewModel", "Lỗi: ${e.message}")
+            } finally {
+                _ordersLoading.value = false
             }
         }
     }

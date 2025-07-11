@@ -15,7 +15,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 data class SanPhamResponse(
-    val sanpham: List<SanPham>
+    val sanpham: List<SanPham>?
 )
 
 interface SanPhamAPIService{
@@ -37,8 +37,17 @@ interface SanPhamAPIService{
         @Query("MaSanPham") MaSanPham: String
     ): SanPham
 
+//    @GET("SanPham/searchSanPham.php")
+//    suspend fun searchSanPham(@Query("search") search: String): SanPhamResponse
     @GET("SanPham/searchSanPham.php")
-    suspend fun searchSanPham(@Query("search") search: String): SanPhamResponse
+    suspend fun searchSanPham(
+        @Query("ten") ten: String?    = null,
+        @Query("cpu") cpu: String?    = null,
+        @Query("ram") ram: String?    = null,
+        @Query("card") card: String?  = null,
+        @Query("giatu") giaTu: Int?    = null,
+        @Query("giaden") giaDen: Int?  = null
+    ): SanPhamResponse
 
     @GET("SanPham/laysanphamtheohoadon.php")
     suspend fun getSanPhamTheoHoaDon(
@@ -74,3 +83,5 @@ data class ImageUploadResponse(
     val success: Boolean,
     val imageUrl: String?
 )
+
+

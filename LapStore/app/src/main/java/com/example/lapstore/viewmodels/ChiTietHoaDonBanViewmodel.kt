@@ -21,11 +21,16 @@ class ChiTietHoaDonBanViewmodel:ViewModel() {
 
     var danhsachchitethoadon by mutableStateOf<List<ChiTietHoaDonBan>>(emptyList())
 
+    private val _danhsach = MutableStateFlow<List<ChiTietHoaDonBan>>(emptyList())
+
     fun addHoaDon(chitiethoadonban: ChiTietHoaDonBan) {
         viewModelScope.launch {
             try {
                 // Gọi API để thêm sản phẩm vào giỏ hàng trên server
-                val response = QuanLyBanLaptopRetrofitClient.chiTietHoaDonBanAPIService.addChiTietHoaDonBan(chitiethoadonban)
+                val response =
+                    QuanLyBanLaptopRetrofitClient.chiTietHoaDonBanAPIService.addChiTietHoaDonBan(
+                        chitiethoadonban
+                    )
                 chitiethoadonAddResult = if (response.success) {
                     "Cập nhật thành công: ${response.message}"
                 } else {
@@ -50,4 +55,5 @@ class ChiTietHoaDonBanViewmodel:ViewModel() {
             }
         }
     }
+
 }

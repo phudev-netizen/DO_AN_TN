@@ -3,7 +3,7 @@ class SanPham
 {
     private $conn;
 
-    //Thuoc tinh
+    // Thuộc tính
     public $MaSanPham;
     public $TenSanPham;
     public $MaLoaiSanPham;
@@ -20,97 +20,122 @@ class SanPham
     public $TrangThai;
 
     public $MaKhachHang;
-
     public $SoLuongTrongGioHang;
 
-    //connect db
-
+    // connect db
     public function __construct($database)
     {
         $this->conn = $database;
     }
 
-    //Doc dữ liệu
-
+    // Doc du lieu
     public function GetAllSanPham()
     {
-        $query = "SELECT sp.*,ha.DuongDan FROM SanPham sp 
-              join hinhanh ha on sp.MaSanPham = ha.MaSanPham where ha.MacDinh = 1";
+        $query = "SELECT sp.*, ha.DuongDan FROM SanPham sp 
+              JOIN hinhanh ha ON sp.MaSanPham = ha.MaSanPham WHERE ha.MacDinh = 1";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-        return $stmt; // Trả về PDOStatement
+        return $stmt;
     }
 
     public function GetSanPhamById()
     {
         $query = "SELECT sp.*, ha.DuongDan FROM SanPham sp 
               JOIN hinhanh ha ON sp.MaSanPham = ha.MaSanPham
-              WHERE ha.MacDinh = 1 and sp.MaSanPham = ? LIMIT 1";
+              WHERE ha.MacDinh = 1 AND sp.MaSanPham = ? LIMIT 1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $this->MaSanPham);
         $stmt->execute();
 
-        // Lấy kết quả
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
         if ($row) {
-            // Gán giá trị từ kết quả vào các thuộc tính của đối tượng
-            $this->TenSanPham = $row['TenSanPham'] ?? null;
-            $this->MaLoaiSanPham = $row['MaLoaiSanPham'] ?? null;
-            $this->CPU = $row['CPU'] ?? null;
-            $this->RAM = $row['RAM'] ?? null;
-            $this->CardManHinh = $row['CardManHinh'] ?? null;
-            $this->SSD = $row['SSD'] ?? null;
-            $this->ManHinh = $row['ManHinh'] ?? null;
-            $this->MaMauSac = $row['MaMauSac'] ?? null;
-            $this->Gia = $row['Gia'] ?? null;
-            $this->SoLuong = $row['SoLuong'] ?? null;
-            $this->MoTa = $row['MoTa'] ?? null;
-            $this->HinhAnh = $row['DuongDan'] ?? null;
-            $this->TrangThai = $row['TrangThai'] ?? null;
+            $this->TenSanPham      = $row['TenSanPham'];
+            $this->MaLoaiSanPham   = $row['MaLoaiSanPham'];
+            $this->CPU             = $row['CPU'];
+            $this->RAM             = $row['RAM'];
+            $this->CardManHinh     = $row['CardManHinh'];
+            $this->SSD             = $row['SSD'];
+            $this->ManHinh         = $row['ManHinh'];
+            $this->MaMauSac        = $row['MaMauSac'];
+            $this->Gia             = $row['Gia'];
+            $this->SoLuong         = $row['SoLuong'];
+            $this->MoTa            = $row['MoTa'];
+            $this->HinhAnh         = $row['DuongDan'];
+            $this->TrangThai       = $row['TrangThai'];
         } else {
-            // Không tìm thấy sản phẩm, có thể thông báo lỗi
             echo "Sản phẩm không tồn tại.";
             return false;
         }
-
-        // Giải phóng bộ nhớ
         unset($row);
     }
 
     public function GetSanPhamBySearch($searchTerm)
     {
-        $query = "SELECT sp.* ,ha.DuongDan
+        $query = "SELECT sp.*, ha.DuongDan
           FROM SanPham sp
           JOIN HinhAnh ha ON sp.MaSanPham = ha.MaSanPham
           WHERE ha.MacDinh = 1 AND (
-          sp.TenSanPham LIKE ? 
-          OR sp.MoTa LIKE ? 
-          OR sp.CPU LIKE ? 
-          OR sp.RAM LIKE ? 
-          OR sp.CardManHinh LIKE ? 
-          OR sp.SSD LIKE ?
-        )";
+            sp.TenSanPham LIKE ? 
+            OR sp.MoTa LIKE ? 
+            OR sp.CPU LIKE ? 
+            OR sp.RAM LIKE ? 
+            OR sp.CardManHinh LIKE ? 
+            OR sp.SSD LIKE ?
+          )";
         $stmt = $this->conn->prepare($query);
-        $searchTerm = "%" . $searchTerm . "%"; // Thêm dấu '%' để tìm kiếm theo kiểu "like"
-        $stmt->bindParam(1, $searchTerm);
-        $stmt->bindParam(2, $searchTerm);
-        $stmt->bindParam(3, $searchTerm);
-        $stmt->bindParam(4, $searchTerm);
-        $stmt->bindParam(5, $searchTerm);
-        $stmt->bindParam(6, $searchTerm);
+        $term = "%" . $searchTerm . "%";
+        for ($i = 1; $i <= 6; $i++) {
+            $stmt->bindValue($i, $term);
+        }
         $stmt->execute();
         return $stmt;
     }
 
+    /**
+     * Tìm kiếm sản phẩm theo nhiều tiêu chí: tên, CPU, RAM, card, khoảng giá
+     */
+    public function SearchMultiCriteria($ten, $cpu, $ram, $card, $giaTu, $giaDen)
+    {
+        $sql = "SELECT sp.*, ha.DuongDan FROM SanPham sp
+                JOIN HinhAnh ha ON sp.MaSanPham = ha.MaSanPham
+                WHERE ha.MacDinh = 1";
+        $params = [];
+
+        if (!empty($ten)) {
+            $sql .= " AND sp.TenSanPham LIKE :ten";
+            $params[':ten'] = "%{$ten}%";
+        }
+        if (!empty($cpu)) {
+            $sql .= " AND sp.CPU LIKE :cpu";
+            $params[':cpu'] = "%{$cpu}%";
+        }
+        if (!empty($ram)) {
+            $sql .= " AND sp.RAM LIKE :ram";
+            $params[':ram'] = "%{$ram}%";
+        }
+        if (!empty($card)) {
+            $sql .= " AND sp.CardManHinh LIKE :card";
+            $params[':card'] = "%{$card}%";
+        }
+        // Khoảng giá
+        $sql .= " AND sp.Gia BETWEEN :giaTu AND :giaDen";
+        $params[':giaTu'] = $giaTu;
+        $params[':giaDen'] = $giaDen;
+
+        $stmt = $this->conn->prepare($sql);
+        foreach ($params as $key => &$val) {
+            $stmt->bindParam($key, $val);
+        }
+        $stmt->execute();
+        return $stmt;
+    }
 
     public function GetSanPhamByLoai()
     {
-        $query = "SELECT sp.*,ha.DuongDan 
-                  FROM SanPham sp 
-                  join hinhanh ha on sp.MaSanPham = ha.MaSanPham
-                  WHERE ha.MacDinh = 1 and sp.MaLoaiSanPham = ?
-                  ";
+        $query = "SELECT sp.*, ha.DuongDan
+                  FROM SanPham sp
+                  JOIN hinhanh ha ON sp.MaSanPham = ha.MaSanPham
+                  WHERE ha.MacDinh = 1 AND sp.MaLoaiSanPham = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $this->MaLoaiSanPham);
         $stmt->execute();
@@ -120,11 +145,10 @@ class SanPham
     public function GetSanPhamTrongHoaDon($mahoadon)
     {
         $query = "SELECT sp.*, ha.DuongDan
-                  FROM SanPham sp 
-                  join hinhanh ha on sp.MaSanPham = ha.MaSanPham 
-                  join ChiTietHoaDonBan cthd on sp.MaSanPham = cthd.MaSanPham
-                  WHERE ha.MacDinh = 1 and cthd.MaHoaDonBan = ?
-                  ";
+                  FROM SanPham sp
+                  JOIN hinhanh ha ON sp.MaSanPham = ha.MaSanPham
+                  JOIN ChiTietHoaDonBan cthd ON sp.MaSanPham = cthd.MaSanPham
+                  WHERE ha.MacDinh = 1 AND cthd.MaHoaDonBan = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $mahoadon);
         $stmt->execute();
@@ -134,10 +158,10 @@ class SanPham
     public function GetSanPhamByGioHang()
     {
         $query = "SELECT sp.*, ha.DuongDan
-                FROM sanpham sp 
-                JOIN giohang gh on sp.MaSanPham = gh.MaSanPham
-                JOIN hinhanh ha on sp.MaSanPham = ha.MaSanPham
-                WHERE ha.MacDinh = 1 and gh.MaKhachHang = ?";
+                FROM sanpham sp
+                JOIN giohang gh ON sp.MaSanPham = gh.MaSanPham
+                JOIN hinhanh ha ON sp.MaSanPham = ha.MaSanPham
+                WHERE ha.MacDinh = 1 AND gh.MaKhachHang = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $this->MaKhachHang);
         $stmt->execute();
@@ -147,29 +171,16 @@ class SanPham
     public function AddSanPham()
     {
         $query = "INSERT INTO SanPham 
-        (MaSanPham, TenSanPham, MaLoaiSanPham, CPU, RAM, CardManHinh, 
-        SSD, ManHinh, MaMauSac, Gia, SoLuong, MoTa, TrangThai) 
+        (MaSanPham, TenSanPham, MaLoaiSanPham, CPU, RAM, CardManHinh, SSD, ManHinh, MaMauSac, Gia, SoLuong, MoTa, TrangThai) 
         VALUES 
-        (:MaSanPham, :TenSanPham, :MaLoaiSanPham, :CPU, :RAM, :CardManHinh, 
-        :SSD, :ManHinh, :MaMauSac, :Gia, :SoLuong, :MoTa, :TrangThai)";
+        (:MaSanPham, :TenSanPham, :MaLoaiSanPham, :CPU, :RAM, :CardManHinh, :SSD, :ManHinh, :MaMauSac, :Gia, :SoLuong, :MoTa, :TrangThai)";
 
         $stmt = $this->conn->prepare($query);
-
-        $this->MaSanPham = htmlspecialchars(strip_tags($this->MaSanPham));
-        $this->TenSanPham = htmlspecialchars(strip_tags($this->TenSanPham));
-        $this->MaLoaiSanPham = htmlspecialchars(strip_tags($this->MaLoaiSanPham));
-        $this->CPU = htmlspecialchars(strip_tags($this->CPU));
-        $this->RAM = htmlspecialchars(strip_tags($this->RAM));
-        $this->CardManHinh = htmlspecialchars(strip_tags($this->CardManHinh));
-        $this->SSD = htmlspecialchars(strip_tags($this->SSD));
-        $this->ManHinh = htmlspecialchars(strip_tags($this->ManHinh));
-        $this->MaMauSac = htmlspecialchars(strip_tags($this->MaMauSac));
-        $this->Gia = htmlspecialchars(strip_tags($this->Gia));
-        $this->SoLuong = htmlspecialchars(strip_tags($this->SoLuong));
-        $this->MoTa = htmlspecialchars(strip_tags($this->MoTa));
-        $this->TrangThai = htmlspecialchars(strip_tags($this->TrangThai));
-
-
+        // Xử lý dữ liệu đầu vào
+        foreach (['MaSanPham','TenSanPham','MaLoaiSanPham','CPU','RAM','CardManHinh','SSD','ManHinh','MaMauSac','Gia','SoLuong','MoTa','TrangThai'] as $field) {
+            $this->$field = htmlspecialchars(strip_tags($this->$field));
+        }
+        
         $stmt->bindParam(':MaSanPham', $this->MaSanPham);
         $stmt->bindParam(':TenSanPham', $this->TenSanPham);
         $stmt->bindParam(':MaLoaiSanPham', $this->MaLoaiSanPham);
@@ -194,37 +205,25 @@ class SanPham
     public function UpdateSanPham()
     {
         $query = "UPDATE SanPham 
-        SET TenSanPham = :TenSanPham, 
-        MaLoaiSanPham = :MaLoaiSanPham, 
-        CPU = :CPU, 
-        RAM = :RAM, 
-        CardManHinh = :CardManHinh,
-        SSD = :SSD, 
-        ManHinh = :ManHinh, 
-        MaMauSac = :MaMauSac, 
-        Gia = :Gia, 
-        SoLuong = :SoLuong, 
-        MoTa = :MoTa, 
-        TrangThai = :TrangThai 
+        SET TenSanPham = :TenSanPham,
+            MaLoaiSanPham = :MaLoaiSanPham,
+            CPU = :CPU,
+            RAM = :RAM,
+            CardManHinh = :CardManHinh,
+            SSD = :SSD,
+            ManHinh = :ManHinh,
+            MaMauSac = :MaMauSac,
+            Gia = :Gia,
+            SoLuong = :SoLuong,
+            MoTa = :MoTa,
+            TrangThai = :TrangThai
         WHERE MaSanPham = :MaSanPham";
 
-
         $stmt = $this->conn->prepare($query);
-
-        $this->TenSanPham = htmlspecialchars(strip_tags($this->TenSanPham));
-        $this->MaLoaiSanPham = htmlspecialchars(strip_tags($this->MaLoaiSanPham));
-        $this->CPU = htmlspecialchars(strip_tags($this->CPU));
-        $this->RAM = htmlspecialchars(strip_tags($this->RAM));
-        $this->CardManHinh = htmlspecialchars(strip_tags($this->CardManHinh));
-        $this->SSD = htmlspecialchars(strip_tags($this->SSD));
-        $this->ManHinh = htmlspecialchars(strip_tags($this->ManHinh));
-        $this->MaMauSac = htmlspecialchars(strip_tags($this->MaMauSac));
-        $this->Gia = htmlspecialchars(strip_tags($this->Gia));
-        $this->SoLuong = htmlspecialchars(strip_tags($this->SoLuong));
-        $this->MoTa = htmlspecialchars(strip_tags($this->MoTa));
-        $this->TrangThai = htmlspecialchars(strip_tags($this->TrangThai));
-        $this->MaSanPham = htmlspecialchars(strip_tags($this->MaSanPham));
-
+        // Xử lý dữ liệu
+        foreach (['TenSanPham','MaLoaiSanPham','CPU','RAM','CardManHinh','SSD','ManHinh','MaMauSac','Gia','SoLuong','MoTa','TrangThai','MaSanPham'] as $field) {
+            $this->$field = htmlspecialchars(strip_tags($this->$field));
+        }
 
         $stmt->bindParam(':TenSanPham', $this->TenSanPham);
         $stmt->bindParam(':MaLoaiSanPham', $this->MaLoaiSanPham);
@@ -249,12 +248,9 @@ class SanPham
 
     public function DeleteSanPham()
     {
-        $query = "DELETE FROM SanPham WHERE MaSanPham=:MaSanPham";
-
+        $query = "DELETE FROM SanPham WHERE MaSanPham = :MaSanPham";
         $stmt = $this->conn->prepare($query);
-
         $this->MaSanPham = htmlspecialchars(strip_tags($this->MaSanPham));
-
         $stmt->bindParam(':MaSanPham', $this->MaSanPham);
 
         if ($stmt->execute()) {

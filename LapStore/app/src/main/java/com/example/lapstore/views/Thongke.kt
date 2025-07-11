@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -37,6 +38,11 @@ import java.util.Calendar
 import java.util.Locale
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
+//thêm
+import androidx.compose.ui.unit.Dp // Cho Dp
+import androidx.compose.ui.unit.TextUnit // Cho TextUnit
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 
 
 @Composable
@@ -51,14 +57,12 @@ fun ThongKeScreen(
 
     val currentYear = remember { Calendar.getInstance().get(Calendar.YEAR) }
     var selectedYear by remember { mutableStateOf(currentYear) }
-
-
+    var showOrderDialog by remember { mutableStateOf(false) }
 
     // Load khi chọn năm
     LaunchedEffect(selectedYear) {
         viewModel.fetchThongKeTheoNam(selectedYear)
     }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -134,9 +138,7 @@ fun ThongKeScreen(
                         }
                     }
                 }
-
             }
-
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -155,8 +157,6 @@ fun ThongKeScreen(
                                 .padding(20.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-
-
                             // Doanh thu theo tháng
                             Text(
                                 "📊 Doanh thu theo tháng năm $selectedYear",
@@ -167,15 +167,50 @@ fun ThongKeScreen(
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            // Tổng quan
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                StatCard("🖥", "Sản phẩm", "${data.total_products}")
-                                StatCard("📦", "Đơn hàng", "${data.total_orders}")
+                            StatCard(
+                                icon = "",
+                                value = "${formatCurrency(data.total_revenue)} VND",
+                                label = "Tổng doanh thu",
+                                modifier = Modifier.fillMaxWidth(),
+                                iconSize = 40.dp,
+                                valueFontSize = 26.sp,
+                                labelFontSize = 16.sp
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceEvenly, // Phân bổ đều khoảng cách
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                SmallStatCard(
+                                    icon = "🖥",
+                                    label = "Sản phẩm",
+                                    value = "${data.total_products}",
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                SmallStatCard(
+                                    icon = "📦",
+                                    label = "Đơn hàng",
+                                    value = "${data.total_orders}",
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clickable {
+                                            viewModel.fetchOrders() // <<< GỌI API thực
+                                            showOrderDialog = true
+                                        }
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                SmallStatCard(
+                                    icon = "👤",
+                                    label = "Người dùng",
+                                    value = "${data.total_users}",
+                                    modifier = Modifier.weight(1f)
+                                )
                             }
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                StatCard("💰", "Doanh thu", "${formatCurrency(data.total_revenue)} VND")
-                                StatCard("👤", "Người dùng", "${data.total_users}")
-                            }
+
                             ThongKeSanPhamSection(
                                 data = viewModel.data.value,
                                 loading = viewModel.loading.value,
@@ -221,15 +256,62 @@ fun ThongKeScreen(
                     } ?: Text("Không có dữ liệu thống kê.", color = Color.Red, fontSize = 18.sp)
                 }
             }
+            val orders by viewModel.orders
+            val ordersLoading by viewModel.ordersLoading
+
+            if (showOrderDialog) {
+                AlertDialog(
+                    onDismissRequest = { showOrderDialog = false },
+                    title = { Text("Chi tiết đơn hàng") },
+                    text = {
+                        if (ordersLoading) {
+                            CircularProgressIndicator()
+                        } else {
+                            LazyColumn {
+                                items(orders) { order ->
+                                    Column(modifier = Modifier.padding(8.dp)) {
+
+                                        Text(
+                                            text = "Mã: ${order.MaHoaDonBan}",
+                                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                                        )
+                                        Text("Ngày: ${order.NgayDatHang}", style = MaterialTheme.typography.bodyMedium)
+                                        Text("Trạng thái: ${order.TrangThai}", style = MaterialTheme.typography.bodyMedium)
+                                        Text(
+                                            "Tổng tiền: ${formatCurrency(order.TongTien)} VND",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Divider(modifier = Modifier.padding(vertical = 4.dp))
+                                    }
+                                }
+                            }
+                        }
+                    },
+                            confirmButton = {
+                        TextButton(onClick = { showOrderDialog = false }) {
+                            Text("Đóng")
+                        }
+                    }
+                )
+            }
+
         }
     }
 }
 
+
 @Composable
-fun StatCard(icon: String, label: String, value: String) {
+fun StatCard(
+    icon: String,
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier, // <<< THÊM modifier Ở ĐÂY
+    iconSize: Dp = 28.dp, // <<< THÊM iconSize Ở ĐÂY
+    valueFontSize: TextUnit = 18.sp, // <<< THÊM valueFontSize Ở ĐÂY
+    labelFontSize: TextUnit = 14.sp // <<< THÊM labelFontSize Ở ĐÂY
+) {
     Column(
-        modifier = Modifier
-            .width(155.dp)
+        modifier = modifier // <<< SỬ DỤNG modifier ĐƯỢC TRUYỀN VÀO
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(Color(0xFFe3f2fd), Color(0xFFbbdefb))
@@ -237,23 +319,55 @@ fun StatCard(icon: String, label: String, value: String) {
                 shape = RoundedCornerShape(12.dp)
             )
             .padding(vertical = 12.dp, horizontal = 10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center // <<< THÊM DÒNG NÀY ĐỂ CANH GIỮA DỌC
     ) {
-        Text(text = icon, fontSize = 28.sp)
+        if( icon.isNotEmpty()) { // <<< KIỂM TRA NẾU icon KHÔNG RỖNG
+            Text(text = icon, fontSize = 24.sp)
+        }
         Text(
             text = value,
             fontWeight = FontWeight.Bold,
-            fontSize = 18.sp,
+            fontSize = valueFontSize, // <<< SỬ DỤNG valueFontSize
             color = Color(0xFF1976D2)
         )
         Text(
             text = label,
             color = Color(0xFF616161),
-            fontSize = 14.sp
+            fontSize = labelFontSize // <<< SỬ DỤNG labelFontSize
         )
     }
 }
-
+@Composable
+fun SmallStatCard(icon: String, value: String, label: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(Color(0xFFe3f2fd), Color(0xFFbbdefb))
+                ),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(vertical = 8.dp, horizontal = 4.dp), // Giảm padding
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = icon, fontSize = 24.sp) // Kích thước icon nhỏ hơn
+        Text(
+            text = value,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp, // Kích thước giá trị nhỏ hơn
+            color = Color(0xFF1976D2)
+        )
+        Text(
+            text = label,
+            fontSize = 12.sp, // Kích thước nhãn nhỏ hơn
+            color = Color(0xFF616161),
+            textAlign = TextAlign.Center, // Canh giữa văn bản
+            maxLines = 1 // Giới hạn 1 dòng để tránh tràn
+        )
+    }
+}
 // Helper function to format currency
 fun formatCurrency(amount: Long): String {
     return NumberFormat.getNumberInstance(Locale.US).format(amount)

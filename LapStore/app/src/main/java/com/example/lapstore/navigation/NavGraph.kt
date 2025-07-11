@@ -189,13 +189,14 @@ fun NavgationGraph(
             val tensanpham =
                 backStackEntry.arguments?.getString("tensanpham")?.let { Uri.decode(it) } ?: ""
 
+
             PayScreen(
                 navController = navController,
                 selectedProducts = selectedProducts,
                 tongtien = tongtien,
                 tentaikhoan = tentaikhoan,
                 hinhanh = hinhAnhHienTai,
-                tensanpham = tensanpham // bạn có thể truyền nếu cần, hoặc bỏ luôn nếu không dùng
+                tensanpham = tensanpham ,
             )
         }
 

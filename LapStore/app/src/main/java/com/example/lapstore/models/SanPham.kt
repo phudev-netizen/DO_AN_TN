@@ -21,7 +21,7 @@ data class SanPham(
     @SerializedName("DaXoa") var DaXoa: Int,
     @SerializedName("NgayTao") var NgayTao: String,
     @SerializedName("NgayCapNhat") var NgayCapNhat: String,
-
-
 )
+
+
 

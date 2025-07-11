@@ -59,16 +59,11 @@ class SanPhamViewModel : ViewModel() {
     private val _danhsachSanPham = MutableStateFlow<List<SanPham>>(emptyList())
     val danhsachSanPham: StateFlow<List<SanPham>> get() = _danhsachSanPham
 
-    // Lấy danh sách phụ kiện từ API (giả sử id loại phụ kiện là 3)
-
-    private val _danhSachSanPhamPhuKien = MutableStateFlow<List<SanPham>>(emptyList())
-    val danhSachSanPhamPhuKien: StateFlow<List<SanPham>> = _danhSachSanPhamPhuKien
-
-    // Lấy danh sách phụ kiện từ API (giả sử id loại phụ kiện là 4)
-    private val _danhSachSanPhamPhuKienphim = MutableStateFlow<List<SanPham>>(emptyList())
-    val danhSachSanPhamPhuKienphim: StateFlow<List<SanPham>> = _danhSachSanPhamPhuKienphim
-
      var danhSachAllSanPham by mutableStateOf<List<SanPham>>(emptyList())
+
+
+
+
 
 
     fun getAllSanPham() {
@@ -77,7 +72,7 @@ class SanPhamViewModel : ViewModel() {
             errorMessage = null
             try {
                 val response = QuanLyBanLaptopRetrofitClient.sanphamAPIService.getAllSanPham()
-                danhSachAllSanPham = response.sanpham
+                danhSachAllSanPham = response.sanpham!!
             } catch (e: Exception) {
                 errorMessage = e.message
             } finally {
@@ -121,7 +116,7 @@ class SanPhamViewModel : ViewModel() {
                 val response = withContext(Dispatchers.IO) {
                     QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamByGioHang(MaKhachHang)
                 }
-                danhSachSanPhamCuaKhachHang = response.sanpham
+                danhSachSanPhamCuaKhachHang = response.sanpham!!
             } catch (e: Exception) {
                 Log.e("SanPham Error", "Lỗi khi lấy sản phẩm: ${e.message}")
             }
@@ -150,18 +145,35 @@ class SanPhamViewModel : ViewModel() {
     }
 
 
-    fun getSanPhamSearch(search: String) {
-        viewModelScope.launch {
-            try {
-                val response = withContext(Dispatchers.IO) {
-                    QuanLyBanLaptopRetrofitClient.sanphamAPIService.searchSanPham(search)
-                }
-                danhSach = response.sanpham
-            } catch (e: Exception) {
-                Log.e("SanPham Error", "Lỗi khi lấy sản phẩm: ${e.message}")
+fun getSanPhamSearch(
+    ten: String? = null,
+    cpu: String? = null,
+    ram: String? = null,
+    card: String? = null,
+    giaTu: Int? = null,
+    giaDen: Int? = null
+) {
+    viewModelScope.launch {
+        isLoading = true
+        errorMessage = null
+        try {
+            val response = withContext(Dispatchers.IO) {
+                QuanLyBanLaptopRetrofitClient
+                    .sanphamAPIService
+                    .searchSanPham(ten, cpu, ram, card, giaTu, giaDen)
             }
+            // gán an toàn: nếu null thì thành emptyList()
+            danhSach = response.sanpham ?: emptyList()
+        } catch (e: Exception) {
+            Log.e("SanPhamSearch", "Lỗi tìm kiếm: ${e.message}")
+            errorMessage = e.message
+            danhSach = emptyList()
+        } finally {
+            isLoading = false
         }
     }
+}
+
 
     fun getSanPhamTrongHoaDon(MaHoaDonBan: Int) {
         viewModelScope.launch {
@@ -169,7 +181,7 @@ class SanPhamViewModel : ViewModel() {
                 val response = withContext(Dispatchers.IO) {
                     QuanLyBanLaptopRetrofitClient.sanphamAPIService.getSanPhamTheoHoaDon(MaHoaDonBan)
                 }
-                danhSachSanPhamTrongHoaDon = response.sanpham
+                danhSachSanPhamTrongHoaDon = response.sanpham!!
             } catch (e: Exception) {
                 Log.e("Sản Phẩm Error", "Lỗi khi lấy Sản Phẩm")
             }
@@ -289,6 +301,52 @@ fun createSanPham(sanpham: SanPham, onResult: (Boolean, String) -> Unit = {_,_->
         }
     }
 
+    fun khoiPhucTonKhoKhiTraHang(danhsachchitiet: List<ChiTietHoaDonBan>) {
+        viewModelScope.launch {
+            danhsachchitiet.forEachIndexed { index, ct ->
+                try {
+                    val soLuongTra = ct.SoLuong ?: error("soLuong null tại index $index, MaSP=${ct.MaSanPham}")
+                    val maSanPham = ct.MaSanPham ?: error("maSanPham null tại index $index")
+
+                    val sp = danhSachSanPhamTrongHoaDon.find { it.MaSanPham == maSanPham }
+                        ?: error("Không tìm thấy sản phẩm với MaSP=$maSanPham tại index $index")
+
+                    val spCapNhat = sp.copy(SoLuong = sp.SoLuong + soLuongTra)
+
+                    Log.d("KHTH", "Phục hồi [#$index] MaSP=$maSanPham, SL=${sp.SoLuong} + $soLuongTra")
+
+                    updateSanPham(spCapNhat)
+                } catch (e: Exception) {
+                    Log.e("KHTH_ERROR", "Lỗi tại index $index: ${e.message}", e)
+                }
+            }
+        }
+    }
+    fun getDistinctCpuList(): List<String> =
+        danhSachAllSanPham.mapNotNull { it.CPU }.distinct()
+
+    fun getDistinctRamList(): List<String> =
+        danhSachAllSanPham.mapNotNull { it.RAM }.distinct()
+
+    fun getDistinctCardList(): List<String> =
+        danhSachAllSanPham.mapNotNull { it.CardManHinh }.distinct()
+
+    fun getDistinctSsdList(): List<String> =
+        danhSachAllSanPham.mapNotNull { it.SSD }.distinct()
+
+    fun getDistinctManHinhList(): List<String> =
+        danhSachAllSanPham.mapNotNull { it.ManHinh }.distinct()
+
+    fun getLoaiSanPhamList(): List<Pair<Int, String>> =
+        danhSachAllSanPham.map { it.MaLoaiSanPham to mapLoai(it.MaLoaiSanPham) }.distinctBy { it.first }
+
+    private fun mapLoai(ma: Int): String {
+        return when (ma) {
+            1 -> "Laptop Gaming"
+            2 -> "Văn phòng"
+            else -> "Khác"
+        }
+    }
 
 
 

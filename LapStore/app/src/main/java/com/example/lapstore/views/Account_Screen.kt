@@ -611,10 +611,6 @@ fun AccountOptionsSection(
             text = { Text("Đăng xuất tài khoản của bạn?", fontSize = 17.sp) },
             confirmButton = {
                 TextButton(
-//                    onClick = {
-//                        openDialog.value = false
-//                        navController.navigate(NavRoute.HOME.route)
-//                    }
                     onClick = {
                         openDialog.value = false
 
