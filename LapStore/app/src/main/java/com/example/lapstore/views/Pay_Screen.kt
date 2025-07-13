@@ -91,6 +91,8 @@ fun PayScreen(
     LaunchedEffect(Unit) {
         khuyenMaiViewModel.fetchTatCaKhuyenMai()
     }
+    var soluongMuaNgay by remember { mutableIntStateOf(1) }
+
     // Chuyển đổi selectedProducts từ String sang List<Triple<Int, Int, Int>>
     val tongTienHang = remember(selectedProducts, danhsachsanpham) {
         selectedProducts.sumOf { triple ->
@@ -409,81 +411,6 @@ fun PayScreen(
                 }
             }
 
-             //Hiển thị sản phẩm mua ngay (khi chỉ có 1 sản phẩm và có tên/hình)
-//            item {
-//                if (selectedProducts.size == 1 && tensanpham.isNotBlank() && hinhanh.isNotBlank()) {
-//                    val triple = selectedProducts.getOrNull(0) ?: return@item
-//                    val soluong = remember { mutableIntStateOf(triple.second) }
-//                    val giaSauGiam = triple.third // đã tính sẵn giá (nếu có giảm giá)
-//                    val tongTien by remember {
-//                        derivedStateOf { soluong.value * giaSauGiam }
-//                    }
-//
-//                    Spacer(modifier = Modifier.height(8.dp))
-//                    Card(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(4.dp),
-//                        elevation = CardDefaults.cardElevation(2.dp),
-//                        colors = CardDefaults.cardColors(containerColor = Color.White),
-//                        shape = RoundedCornerShape(12.dp)
-//                    ) {
-//                        Row(
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .padding(8.dp),
-//                            verticalAlignment = Alignment.CenterVertically
-//                        ) {
-//                            AsyncImage(
-//                                model = hinhanh,
-//                                contentDescription = "Ảnh sản phẩm",
-//                                modifier = Modifier
-//                                    .size(120.dp)
-//                                    .padding(4.dp),
-//                                contentScale = ContentScale.Crop,
-//                            )
-//
-//                            Spacer(modifier = Modifier.width(12.dp))
-//                            Column {
-//                                Text(
-//                                    text = tensanpham,
-//                                    fontWeight = FontWeight.Bold,
-//                                    fontSize = 18.sp
-//                                )
-//                                Text(
-//                                    text = "Giá: ${formatGiaTien(tongtien)}",
-//                                    color = Color.Red,
-//                                    fontWeight = FontWeight.Bold
-//                                )
-//                                Row(
-//                                    verticalAlignment = Alignment.CenterVertically
-//                                ) {
-//                                    Text(text = "Số lượng: ")
-//
-//                                    IconButton(onClick = {
-//                                        if (soluong.value > 1) soluong.value--
-//                                    }) {
-//                                        Icon(Icons.Default.Remove, contentDescription = "Giảm")
-//                                    }
-//
-//                                    Text(
-//                                        text = soluong.value.toString(),
-//                                        modifier = Modifier.width(32.dp),
-//                                        textAlign = TextAlign.Center
-//                                    )
-//
-//                                    IconButton(onClick = {
-//                                        soluong.value++
-//                                    }) {
-//                                        Icon(Icons.Default.Add, contentDescription = "Tăng")
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                    Spacer(modifier = Modifier.height(8.dp))
-//                }
-//            }
             item {
                 if (selectedProducts.size == 1 && tensanpham.isNotBlank() && hinhanh.isNotBlank()) {
                     val triple = selectedProducts.getOrNull(0) ?: return@item
@@ -495,6 +422,7 @@ fun PayScreen(
                     val giaSauGiam = getGiaSauGiam(giaGoc, km?.PhanTramGiam)
                     val tongTien by remember {
                         derivedStateOf { soluong.value * giaSauGiam }
+//                        val tongTien by remember { derivedStateOf { soluongMuaNgay * giaSauGiam } }
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -563,6 +491,9 @@ fun PayScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
+
+
+
             // Hiển thị sản phẩm từ giỏ hàng (nhiều sản phẩm)
             if (!(selectedProducts.size == 1 && tensanpham.isNotBlank() && hinhanh.isNotBlank())) {
                 items(selectedProducts) { triple ->

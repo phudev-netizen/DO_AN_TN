@@ -29,7 +29,10 @@ data class AddHoaDonBanAndGetIdResponse(
     val message: String,
     val MaHoaDonBan: Int? // chú ý tên trùng với key JSON backend trả về
 )
-
+data class LyDoTraHangRequest(
+    val MaHoaDonBan: Int,
+    val LyDoTraHang: String
+)
 interface HoaDonBanAPIService{
     @POST("HoaDonBan/create.php")
     suspend fun addHoaDonBan(
@@ -70,4 +73,11 @@ interface HoaDonBanAPIService{
 
     @GET("HoaDonBan/read.php")
     suspend fun getAllHoaDonBan(): HoaDonBanResponse
+
+    // ✅ Cập nhật lý do trả hàng
+    @POST("HoaDonBan/update_trahang.php")
+    suspend fun capNhatLyDoTraHang(
+        @Body request: LyDoTraHangRequest
+    ): ApiResponse
+
 }

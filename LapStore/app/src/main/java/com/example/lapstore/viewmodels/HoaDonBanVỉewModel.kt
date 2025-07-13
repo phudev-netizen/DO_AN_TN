@@ -1,6 +1,7 @@
 package com.example.lapstore.viewmodels
 
 import HoaDonDeleteRequest
+import LyDoTraHangRequest
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -151,4 +152,47 @@ class HoaDonBanVỉewModel: ViewModel() {
             0
         }
     }
+    private val _allHoaDonBan = MutableStateFlow<List<HoaDonBan>>(emptyList())
+    val allHoaDonBan: StateFlow<List<HoaDonBan>> = _allHoaDonBan
+
+    fun getAllHoaDonBan() {
+        viewModelScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    QuanLyBanLaptopRetrofitClient.hoaDonBanAPIService.getAllHoaDonBan()
+                }
+                // Giả sử response.hoadonban là List<HoaDonBan>
+                _allHoaDonBan.value = response.hoadonban ?: emptyList()
+            } catch (e: Exception) {
+                Log.e("HoaDonBanVM", "Lỗi getAll: ${e.message}")
+                _allHoaDonBan.value = emptyList()
+            }
+        }
+    }
+    fun capNhatLyDoTraHang(maHoaDonBan: Int, lyDo: String) {
+        viewModelScope.launch {
+            try {
+                val request = LyDoTraHangRequest(
+                    MaHoaDonBan = maHoaDonBan,
+                    LyDoTraHang = lyDo
+                )
+                val response = withContext(Dispatchers.IO) {
+                    QuanLyBanLaptopRetrofitClient.hoaDonBanAPIService.capNhatLyDoTraHang(request)
+                }
+
+                if (response.success == true) {
+                    Log.d("HoaDonBanVM", "Cập nhật lý do trả hàng thành công: ${response.message}")
+                } else {
+                    Log.e("HoaDonBanVM", "Cập nhật thất bại: ${response.message}")
+                }
+
+            } catch (e: Exception) {
+                Log.e("HoaDonBanVM", "Lỗi khi cập nhật lý do trả hàng: ${e.message}")
+            }
+        }
+    }
+
+
+
 }
+

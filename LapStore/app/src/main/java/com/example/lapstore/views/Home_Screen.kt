@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -32,6 +33,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.lapstore.R
+import com.example.lapstore.models.SanPham
+import com.example.lapstore.models.TaiKhoan
 import com.example.lapstore.viewmodels.GioHangViewModel
 import com.example.lapstore.viewmodels.TaiKhoanViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -46,11 +49,10 @@ fun HomeScreen(
     tentaikhoan: String?,
     role: String
 ) {
-    var isFocused by remember { mutableStateOf(false) }
     val systemUiController = rememberSystemUiController()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val keyboardController = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val danhSachSanPham = viewModel.danhSachAllSanPham
     val danhSachSanPhamGaming = viewModel.danhSachSanPhamGaming.collectAsState()
@@ -60,412 +62,259 @@ fun HomeScreen(
 
     val taiKhoanViewModel: TaiKhoanViewModel = viewModel()
     val taikhoan = taiKhoanViewModel.taikhoan
-
     val gioHangViewModel: GioHangViewModel = viewModel()
-
     val cartItemCount by remember {
         derivedStateOf { gioHangViewModel.listGioHang.sumOf { it.SoLuong } }
     }
 
-
-    val context = LocalContext.current
     val yeuThichViewModel: YeuThichViewModel = viewModel()
     val danhSachYeuThich by yeuThichViewModel.danhSachYeuThich.observeAsState(emptyList())
+
+    var isFocused by remember { mutableStateOf(false) }
     var showProductDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(taikhoan?.MaKhachHang) {
-        taikhoan?.MaKhachHang?.let { maKH ->
-            yeuThichViewModel.loadDanhSach(maKH)
-        }
-    }
+    val context = LocalContext.current
 
-    // Điều hướng đến SearchScreen khi trường tìm kiếm được focus
-
-    LaunchedEffect(isFocused) {
-        if (isFocused) {
-            if (taikhoan?.MaKhachHang != null && taikhoan.TenTaiKhoan != null) {
-            navController.navigate("${NavRoute.SEARCHSCREEN.route}?makhachhang=${taikhoan.MaKhachHang}&tentaikhoan=${taikhoan.TenTaiKhoan}")
-        } else {
-            navController.navigate(NavRoute.SEARCHSCREEN.route)
-            }
-        }
-    }
-    // Lấy thông tin tài khoản khi có tentaikhoan
     LaunchedEffect(tentaikhoan) {
         if (!tentaikhoan.isNullOrEmpty()) {
             taiKhoanViewModel.getTaiKhoanByTentaikhoan(tentaikhoan)
         }
     }
-    // Thiết lập màu sắc của thanh trạng thái
-    SideEffect {
-        systemUiController.setStatusBarColor(color = Color.Red, darkIcons = false)
-    }
-    // Lấy danh sách sản phẩm yêu thích khi có MaKhachHang
-    LaunchedEffect(Unit) {
-        viewModel.getSanPhamTheoLoaiGaming()
-        viewModel.getSanPhamTheoLoaiVanPhong()
-        viewModel.getAllSanPham()
-    }
+
     LaunchedEffect(taikhoan?.MaKhachHang) {
         taikhoan?.MaKhachHang?.let { maKH ->
             yeuThichViewModel.loadDanhSach(maKH)
-            gioHangViewModel.getGioHangByKhachHang(maKH.toInt()) // 🛒 Gọi ViewModel giỏ hàng
+            gioHangViewModel.getGioHangByKhachHang(maKH.toInt())
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.getAllSanPham()
+        viewModel.getSanPhamTheoLoaiGaming()
+        viewModel.getSanPhamTheoLoaiVanPhong()
+    }
 
-    // Giao diện chính của HomeScreen
-        Scaffold(
-            containerColor = Color.White,
-            topBar = {
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color.Red
-                    ),
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                if (taikhoan == null) {
-                                    navController.navigate(NavRoute.LOGINSCREEN.route)
-                                } else {
-                                    navController.navigate("${NavRoute.CART.route}?makhachhang=${taikhoan.MaKhachHang}&tentaikhoan=${taikhoan.TenTaiKhoan}")
-                                }
-                            }
-                        ) {
-                            BadgedBox(
-                                badge = {
-                                    if (cartItemCount > 0) {
-                                        Badge(
-                                            containerColor = Color.Yellow,
-                                            contentColor = Color.Black
-                                        ) {
-                                            Text(cartItemCount.toString(), fontSize = 10.sp)
-                                        }
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.ShoppingCart,
-                                    contentDescription = "",
-                                    tint = Color.White
-                                )
+    LaunchedEffect(isFocused) {
+        if (isFocused) {
+            if (taikhoan?.MaKhachHang != null && taikhoan.TenTaiKhoan != null) {
+                navController.navigate("${NavRoute.SEARCHSCREEN.route}?makhachhang=${taikhoan.MaKhachHang}&tentaikhoan=${taikhoan.TenTaiKhoan}")
+            } else {
+                navController.navigate(NavRoute.SEARCHSCREEN.route)
+            }
+        }
+    }
+
+    SideEffect {
+        systemUiController.setStatusBarColor(Color.Red, darkIcons = false)
+    }
+
+    Scaffold(
+        containerColor = Color.White,
+        topBar = {
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Red
+                ),
+                title = {
+                    OutlinedTextField(
+                        value = "",
+                        onValueChange = {},
+                        placeholder = { Text("Bạn cần tìm gì?", color = Color.Gray, fontSize = 12.sp) },
+                        trailingIcon = {
+                            Icon(Icons.Default.Search, contentDescription = null, tint = Color.Black)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .clip(RoundedCornerShape(25.dp))
+                            .onFocusChanged { isFocused = it.isFocused },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedBorderColor = Color.Transparent
+                        ),
+                        textStyle = TextStyle(fontSize = 14.sp)
+                    )
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            if (taikhoan == null) {
+                                navController.navigate(NavRoute.LOGINSCREEN.route)
+                            } else {
+                                navController.navigate("${NavRoute.CART.route}?makhachhang=${taikhoan.MaKhachHang}&tentaikhoan=${taikhoan.TenTaiKhoan}")
                             }
                         }
-                    },
-                            title = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth()
+                    ) {
+                        BadgedBox(
+                            badge = {
+                                if (cartItemCount > 0) {
+                                    Badge(containerColor = Color.Yellow) {
+                                        Text(cartItemCount.toString(), fontSize = 10.sp, color = Color.Black)
+                                    }
+                                }
+                            }
                         ) {
-                            OutlinedTextField(
-                                value = "",
-                                onValueChange = {},
-                                modifier = Modifier
-                                    .height(50.dp)
-                                    .fillMaxWidth()
-                                    .onFocusChanged { focusState ->
-                                        isFocused = focusState.isFocused
-                                    },
-                                textStyle = TextStyle(
-                                    color = Color.Black,
-                                    fontSize = 16.sp
-                                ),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedContainerColor = Color.White,
-                                    unfocusedContainerColor = Color.White,
-                                    focusedBorderColor = Color.White,
-                                    unfocusedBorderColor = Color.White
-                                ),
-                                placeholder = {
-                                    Text(
-                                        text = "Bạn cần tìm gì",
-                                        style = TextStyle(
-                                            color = Color.Black,
-                                            fontSize = 13.sp
-                                        ),
-                                    )
-                                },
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.Search,
-                                        contentDescription = "",
-                                        tint = Color.Black
-                                    )
-                                },
-                                shape = RoundedCornerShape(50)
-                            )
+                            Icon(Icons.Default.ShoppingCart, contentDescription = "Giỏ hàng", tint = Color.White)
                         }
                     }
-                )
-            },
-            bottomBar = {
-                BottomAppBar(
-                    containerColor = Color.White,
-                    contentColor = Color.Black,
-                    tonalElevation = 4.dp
+                }
+            )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = Color.White,
+                tonalElevation = 5.dp
+            ) {
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Column {
-                        HorizontalDivider(color = Color.Red)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.SpaceAround
-                            ) {
-                                IconButton(
-                                    modifier = Modifier.size(45.dp),
-                                    onClick = {
-                                        if (taikhoan != null) {
-                                            navController.navigate("${NavRoute.HOME.route}?tentaikhoan=${tentaikhoan}") {
-                                                popUpTo(0) { inclusive = true }
-                                            }
-                                        } else {
-                                            navController.navigate(NavRoute.HOME.route)
-                                        }
-                                    }
-                                ) {
-                                    Icon(
-                                        Icons.Outlined.Home,
-                                        contentDescription = "Profile",
-                                        tint = Color.Red
-                                    )
-                                }
-                                Text(
-                                    text = "Home",
-                                )
-                            }
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.SpaceAround
-                            ) {
-                                IconButton(
-                                    modifier = Modifier.size(45.dp),
-                                    onClick = {
-                                        if (tentaikhoan != null) {
-                                            navController.navigate("${NavRoute.FAVORITE.route}?tentaikhoan=${tentaikhoan}") {
-                                                popUpTo(0) { inclusive = true }
-                                            }
-                                        } else {
-                                            navController.navigate(NavRoute.FAVORITE.route)
-                                        }
-                                    }
-                                ) {
-                                    Icon(
-                                        Icons.Outlined.Favorite,
-                                        contentDescription = "Profile",
-                                        tint = Color.Red
-                                    )
-                                }
-                                Text(
-                                    text = "Yêu thích",
-                                )
-                            }
-                            // Kiểm tra vai trò của người dùng
-
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.SpaceAround
-                            ) {
-                                IconButton(
-                                    modifier = Modifier.size(45.dp),
-                                    onClick = {
-                                        if (tentaikhoan != null) {
-                                            navController.navigate("${NavRoute.ACCOUNT.route}?tentaikhoan=${taiKhoanViewModel.tentaikhoan}")
-                                        } else {
-                                            navController.navigate(NavRoute.LOGINSCREEN.route)
-                                        }
-                                    }
-                                ) {
-                                    Icon(
-                                        Icons.Outlined.Person,
-                                        contentDescription = "Profile",
-                                        tint = Color.Red
-                                    )
-                                }
-                                Text(text = "Tài khoản")
-                            }
+                    BottomNavItem(Icons.Outlined.Home, "Home") {
+                        navController.navigate("${NavRoute.HOME.route}?tentaikhoan=$tentaikhoan") {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                    BottomNavItem(Icons.Outlined.Favorite, "Yêu thích") {
+                        navController.navigate("${NavRoute.FAVORITE.route}?tentaikhoan=$tentaikhoan")
+                    }
+                    BottomNavItem(Icons.Outlined.Person, "Tài khoản") {
+                        if (tentaikhoan != null) {
+                            navController.navigate("${NavRoute.ACCOUNT.route}?tentaikhoan=${taiKhoanViewModel.tentaikhoan}")
+                        } else {
+                            navController.navigate(NavRoute.LOGINSCREEN.route)
                         }
                     }
                 }
             }
-        ) {
-            if (isLoading) {
-                Text(text = "Đang tải dữ liệu...")
-            } else if (errorMessage != null) {
-                Text(text = "Lỗi: $errorMessage")
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(it)
+        },
+        floatingActionButton = {
+            if (role == "admin") {
+                FloatingActionButton(
+                    onClick = { showProductDialog = true },
+                    containerColor = Color.Red
                 ) {
-                    item {
-                        Text(
-                            text = "Tất cả sản phẩm",
-                            modifier = Modifier.padding(10.dp),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            // Hiển thị danh sách sản phẩm
-                            items(danhSachSanPham) { sanpham ->
-                                val context = LocalContext.current
-                                val isFavorite =
-                                    danhSachYeuThich.any { it.maSanPham == sanpham.MaSanPham }
-                                ProductCard(
-                                    sanpham = sanpham,
-                                    isFavorite = isFavorite,
-                                    onFavoriteClick = {
-                                        val maKH = taikhoan?.MaKhachHang
-                                        if (maKH != null) {
-                                            if (isFavorite) {
-                                                yeuThichViewModel.xoaYeuThich(maKH, sanpham.MaSanPham) {
-                                                    Toast.makeText(context, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show()
-                                                }
-                                            } else {
-                                                yeuThichViewModel.themYeuThich(maKH, sanpham.MaSanPham) {
-                                                    Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show()
-                                                }
-                                            }
-                                        } else {
-                                            // ✅ Hiển thị thông báo yêu cầu đăng nhập
-                                            Toast.makeText(context, "Vui lòng đăng nhập để sử dụng chức năng yêu thích", Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                    navController = navController,
-                                    makhachhang = taikhoan?.MaKhachHang?.toString(),
-                                    tentaikhoan = taikhoan?.TenTaiKhoan
-                                )
-                            }
-
-                        }
-                    }
-                    // LazyRow cho Laptop Văn Phòng
-                    item {
-                        Row {
-                            Text(
-                                text = "Laptop Văn Phòng",
-                                modifier = Modifier.padding(10.dp),
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-                    item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(danhSachSanPhamVanPhong.value) { sanpham ->
-                                val context = LocalContext.current
-                                val isFavorite = danhSachYeuThich.any { it.maSanPham == sanpham.MaSanPham }
-                                ProductCard(
-                                    sanpham = sanpham,
-                                    isFavorite = isFavorite,
-                                    onFavoriteClick = {
-                                        val maKH = taikhoan?.MaKhachHang
-                                        if (maKH != null) {
-                                            if (isFavorite) {
-                                                yeuThichViewModel.xoaYeuThich(maKH, sanpham.MaSanPham) {
-                                                    Toast.makeText(context, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show()
-                                                }
-                                            } else {
-                                                yeuThichViewModel.themYeuThich(maKH, sanpham.MaSanPham) {
-                                                    Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show()
-                                                }
-                                            }
-                                        } else {
-                                            // ✅ Hiển thị thông báo yêu cầu đăng nhập
-                                            Toast.makeText(context, "Vui lòng đăng nhập để sử dụng chức năng yêu thích", Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                    navController = navController,
-                                    makhachhang = taikhoan?.MaKhachHang?.toString(),
-                                    tentaikhoan = taikhoan?.TenTaiKhoan
-                                )
-                            }
-                        }
-                    }
-                    // LazyRow cho Laptop Gaming
-                    item {
-                        Text(
-                            text = "Laptop Gaming",
-                            modifier = Modifier.padding(10.dp),
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    item {
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(danhSachSanPhamGaming.value) { sanpham ->
-                                val context = LocalContext.current
-
-                                val isFavorite = danhSachYeuThich.any { it.maSanPham == sanpham.MaSanPham }
-                                ProductCard(
-                                    sanpham = sanpham,
-                                    isFavorite = isFavorite,
-                                    onFavoriteClick = {
-                                        val maKH = taikhoan?.MaKhachHang
-                                        if (maKH != null) {
-                                            if (isFavorite) {
-                                                yeuThichViewModel.xoaYeuThich(maKH, sanpham.MaSanPham) {
-                                                    Toast.makeText(context, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show()
-                                                }
-                                            } else {
-                                                yeuThichViewModel.themYeuThich(maKH, sanpham.MaSanPham) {
-                                                    Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show()
-                                                }
-                                            }
-                                        } else {
-                                            // ✅ Hiển thị thông báo yêu cầu đăng nhập
-                                            Toast.makeText(context, "Vui lòng đăng nhập để sử dụng chức năng yêu thích", Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                    navController = navController,
-                                    makhachhang = taikhoan?.MaKhachHang?.toString(),
-                                    tentaikhoan = taikhoan?.TenTaiKhoan
-                                )
-
-                            }
-
-                        }
-                    }
-                }
-                if (role == "admin") {
-                    Box(Modifier.fillMaxSize()) {
-                        FloatingActionButton(
-                            onClick = { showProductDialog = true },
-                            containerColor = Color.Red,
-                            modifier = Modifier
-                                .align(Alignment.BottomEnd)
-                                .padding(20.dp)
-                        ) {
-                            Icon(Icons.Default.Edit, contentDescription = "Quản lý sản phẩm", tint = Color.White)
-                        }
-                    }
-                    ProductManagementDialog(
-                        showDialog = showProductDialog,
-                        onDismissRequest = { showProductDialog = false },
-                        viewModel = viewModel,
-                        onAddClick = {
-                            navController.navigate(NavRoute.PRODUCT_MANAGEMENT.route)
-                        },
-                        onUpdateClick = {
-                            navController.navigate(NavRoute.PRODUCT_MANAGEMENT.route)
-                        }
-                    )
+                    Icon(Icons.Default.Edit, tint = Color.White, contentDescription = null)
                 }
             }
         }
+    ) { innerPadding ->
+        if (isLoading) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Color.Red)
+            }
+        } else if (errorMessage != null) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Lỗi: $errorMessage")
+            }
+        } else {
+            LazyColumn(
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                item {
+                    SectionTitle("Tất cả sản phẩm")
+                }
+                item {
+                    ProductRow(danhSachSanPham, danhSachYeuThich, taikhoan, yeuThichViewModel, navController)
+                }
+                item {
+                    SectionTitle("Laptop Văn Phòng")
+                }
+                item {
+                    ProductRow(danhSachSanPhamVanPhong.value, danhSachYeuThich, taikhoan, yeuThichViewModel, navController)
+                }
+                item {
+                    SectionTitle("Laptop Gaming")
+                }
+                item {
+                    ProductRow(danhSachSanPhamGaming.value, danhSachYeuThich, taikhoan, yeuThichViewModel, navController)
+                }
+            }
+        }
+
+        if (showProductDialog) {
+            ProductManagementDialog(
+                showDialog = showProductDialog,
+                onDismissRequest = { showProductDialog = false },
+                viewModel = viewModel,
+                onAddClick = {
+                    navController.navigate(NavRoute.PRODUCT_MANAGEMENT.route)
+                },
+                onUpdateClick = {
+                    navController.navigate(NavRoute.PRODUCT_MANAGEMENT.route)
+                }
+            )
+        }
+    }
 }
 
+@Composable
+fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+    )
+}
+
+@Composable
+fun ProductRow(
+    products: List<SanPham>,
+    favorites: List<YeuThich>,
+    taikhoan: TaiKhoan?,
+    yeuThichViewModel: YeuThichViewModel,
+    navController: NavHostController
+) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(products) { sanpham ->
+            val context = LocalContext.current
+            val isFavorite = favorites.any { it.maSanPham == sanpham.MaSanPham }
+
+            ProductCard(
+                sanpham = sanpham,
+                isFavorite = isFavorite,
+                onFavoriteClick = {
+                    val maKH = taikhoan?.MaKhachHang
+                    if (maKH != null) {
+                        if (isFavorite) {
+                            yeuThichViewModel.xoaYeuThich(maKH, sanpham.MaSanPham) {
+                                Toast.makeText(context, "Đã xoá khỏi yêu thích", Toast.LENGTH_SHORT).show()
+                            }
+                        } else {
+                            yeuThichViewModel.themYeuThich(maKH, sanpham.MaSanPham) {
+                                Toast.makeText(context, "Đã thêm vào yêu thích", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(context, "Vui lòng đăng nhập để sử dụng chức năng yêu thích", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                navController = navController,
+                makhachhang = taikhoan?.MaKhachHang?.toString(),
+                tentaikhoan = taikhoan?.TenTaiKhoan
+            )
+        }
+    }
+}
+
+@Composable
+fun BottomNavItem(icon: ImageVector, label: String, onClick: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        IconButton(onClick = onClick) {
+            Icon(icon, contentDescription = label, tint = Color.Red)
+        }
+        Text(label, fontSize = 12.sp)
+    }
+}
 @Composable
 fun ProductManagementDialog(
     showDialog: Boolean,

@@ -505,63 +505,6 @@ fun ProductDetail_Screen(
                             Spacer(modifier = Modifier.width(8.dp))
 
                             // Nút MUA NGAY
-//                            Button(
-//                                onClick = {
-//                                    if (makhachhang.isNullOrBlank() || tentaikhoan.isNullOrBlank()) {
-//                                        navController.navigate(NavRoute.LOGINSCREEN.route)
-//                                    } else {
-//                                        isLoading = true
-//                                        scope.launch {
-//                                            val sanPhamTonKho = danhsachsanpham.find { it.MaSanPham == sanPham.MaSanPham }
-//                                            if (sanPhamTonKho == null || sanPhamTonKho.SoLuong <= 0) {
-//                                                delay(500)
-//                                                snackbarHostState.showSnackbar(
-//                                                    "Sản phẩm đã hết hàng, không thể mua ngay.",
-//                                                    duration = SnackbarDuration.Short
-//                                                )
-//                                            } else {
-//                                                // TÍNH GIÁ SAU GIẢM
-//                                                val giaSauGiam = if (khuyenMai != null)
-//                                                    (sanPham.Gia * (100 - khuyenMai.PhanTramGiam)) / 100
-//                                                else
-//                                                    sanPham.Gia
-//                                                // Kiểm tra số lượng mua
-//                                                val tongTien  = giaSauGiam * soluong.value
-//
-//                                                // CHỈ TRUYỀN BA TRƯỜNG: mã sản phẩm, số lượng, mã giỏ hàng (0 nếu không có)
-////                                                val rawSelectedProducts = "${sanPham.MaSanPham},1,0"
-//                                                val soLuongMua = soluong.value
-//                                                val rawSelectedProducts = "${sanPham.MaSanPham},${soluong.value},0"
-//                                                val encodedSelectedProducts = Uri.encode(rawSelectedProducts)
-//                                                val encodedTenTaiKhoan = Uri.encode(tentaikhoan)
-//                                                val encodedImage = Uri.encode(hinhAnhHienTai ?: "")
-//
-//                                                navController.navigate(
-//                                                    "${NavRoute.PAYSCREEN.route}?" +
-//                                                            "selectedProducts=$encodedSelectedProducts" +
-//                                                            "&tongtien=$giaSauGiam" + // giá đã giảm
-//                                                            "&tentaikhoan=$encodedTenTaiKhoan" +
-//                                                            "&makhachhang=$makhachhang" +
-//                                                            "&hinhAnhHienTai=$encodedImage" +
-//                                                            "&tensanpham=${Uri.encode(sanPham.TenSanPham)}"
-//                                                )
-//                                            }
-//                                            isLoading = false
-//                                        }
-//                                    }
-//                                },
-//                                enabled = !isLoading,
-//                                modifier = Modifier.weight(1f),
-//                                shape = RoundedCornerShape(10.dp),
-//                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-//                            ) {
-//                                Text(
-//                                    "MUA NGAY",
-//                                    fontWeight = FontWeight.Bold,
-//                                    fontSize = 18.sp,
-//                                    color = Color.White
-//                                )
-//                            }
                             Button(
                                 onClick = {
                                     if (makhachhang.isNullOrBlank() || tentaikhoan.isNullOrBlank()) {
@@ -570,7 +513,6 @@ fun ProductDetail_Screen(
                                         isLoading = true
                                         scope.launch {
                                             val sanPhamTonKho = danhsachsanpham.find { it.MaSanPham == sanPham.MaSanPham }
-
                                             if (sanPhamTonKho == null || sanPhamTonKho.SoLuong <= 0) {
                                                 delay(500)
                                                 snackbarHostState.showSnackbar(
@@ -583,26 +525,25 @@ fun ProductDetail_Screen(
                                                     (sanPham.Gia * (100 - khuyenMai.PhanTramGiam)) / 100
                                                 else
                                                     sanPham.Gia
+                                                // Kiểm tra số lượng mua
+                                                val tongTien  = giaSauGiam * soluong.value
 
-                                                val selectedProducts = listOf(
-                                                    Triple(sanPham.MaSanPham, soluong.value, giaSauGiam)
-                                                )
-
-                                                val encodedSelectedProducts = Uri.encode(
-                                                    selectedProducts.joinToString("|") { "${it.first},${it.second},${it.third}" }
-                                                )
-
+                                                // CHỈ TRUYỀN BA TRƯỜNG: mã sản phẩm, số lượng, mã giỏ hàng (0 nếu không có)
+//                                                val rawSelectedProducts = "${sanPham.MaSanPham},1,0"
+                                                val soLuongMua = soluong.value
+                                                val rawSelectedProducts = "${sanPham.MaSanPham},${soluong.value},0"
+                                                val encodedSelectedProducts = Uri.encode(rawSelectedProducts)
                                                 val encodedTenTaiKhoan = Uri.encode(tentaikhoan)
                                                 val encodedImage = Uri.encode(hinhAnhHienTai ?: "")
-                                                val encodedTenSanPham = Uri.encode(sanPham.TenSanPham)
 
                                                 navController.navigate(
                                                     "${NavRoute.PAYSCREEN.route}?" +
                                                             "selectedProducts=$encodedSelectedProducts" +
+                                                            "&tongtien=$giaSauGiam" + // giá đã giảm
                                                             "&tentaikhoan=$encodedTenTaiKhoan" +
                                                             "&makhachhang=$makhachhang" +
                                                             "&hinhAnhHienTai=$encodedImage" +
-                                                            "&tensanpham=$encodedTenSanPham"
+                                                            "&tensanpham=${Uri.encode(sanPham.TenSanPham)}"
                                                 )
                                             }
                                             isLoading = false
@@ -621,7 +562,6 @@ fun ProductDetail_Screen(
                                     color = Color.White
                                 )
                             }
-
 
 
                         }
@@ -729,7 +669,6 @@ fun formatGiaTien(gia: Int): String {
     val formatter = DecimalFormat("#,###")
     return "${formatter.format(gia)}đ"
 }
-
 
 @Composable
 fun ProductCommentSection(

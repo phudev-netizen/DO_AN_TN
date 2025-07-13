@@ -6,7 +6,7 @@ include_once('../../config/database.php');
 include_once('../../model/hoadonban.php');
 
 // Tạo đối tượng database và kết nối
-$database = new database();
+$database = new Database();
 $conn = $database->Connect(); // Lấy kết nối PDO
 
 // Khởi tạo lớp HoaDonBan với kết nối PDO
@@ -39,6 +39,7 @@ if ($numHoaDonTheoTrangThai > 0) {
             'TongTien'=> $TongTien,
             'PhuongThucThanhToan'=> $PhuongThucThanhToan,
             'TrangThai'=> $TrangThai, // Đảm bảo TrangThai là kiểu Int
+            'LyDoTraHang' => isset($LyDoTraHang) ? $LyDoTraHang : null 
         );
         array_push($hoadonbykhachhang_array['hoadonban'], $hoadon_item);
     }

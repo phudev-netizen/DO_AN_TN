@@ -264,9 +264,9 @@ fun SearchScreen(
     var giaDenStr by remember { mutableStateOf("") }
 
     // Options mẫu; bạn có thể load động từ server
-    val cpuOptions = listOf("i3", "i5", "i7", "Ryzen 3", "Ryzen 5", "Ryzen 7")
+    val cpuOptions = listOf("i3", "i5", "i7","i9", "Ryzen 3", "Ryzen 5", "Ryzen 7")
     val ramOptions = listOf("4GB", "8GB", "16GB", "32GB")
-    val cardOptions = listOf("Intel", "Integrated", "RTX 4060", "NVIDIA GTX")
+    val cardOptions = listOf("Intel", "Integrated", "RTX 4060", "RTX 3060","RTX 3050","NVIDIA GTX")
 
     // Khi bất cứ tiêu chí nào thay đổi thì gọi API
     LaunchedEffect(ten, cpu, ram, card, giaTuStr, giaDenStr) {
@@ -323,14 +323,13 @@ fun SearchScreen(
                 // CPU + RAM + Card trong 1 Row
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     DropdownFilter(label = "CPU", options = cpuOptions, selected = cpu, onSelect = { cpu = it })
-//                    DropdownFilter(label = "RAM", options = ramOptions, selected = ram, onSelect = { ram = it })
                 }
                 Spacer(Modifier.height(8.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     DropdownFilter(label = "RAM", options = ramOptions, selected = ram, onSelect = { ram = it })
                 }
                 Spacer(Modifier.height(8.dp))
-                DropdownFilter(label = "Card", options = cardOptions, selected = card, onSelect = { card = it })
+                DropdownFilter(label = "GPU", options = cardOptions, selected = card, onSelect = { card = it })
                 Spacer(Modifier.height(8.dp))
 
                 // Giá từ – đến

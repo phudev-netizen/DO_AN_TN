@@ -1,0 +1,6 @@
+Raw: {"LyDoTraHang":"lỗi sp","MaHoaDonBan":261}
+Parsed: stdClass Object
+(
+    [LyDoTraHang] => lỗi sp
+    [MaHoaDonBan] => 261
+)

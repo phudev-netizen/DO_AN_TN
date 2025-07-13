@@ -174,28 +174,26 @@ fun AddDiaChiScreen(
     makhachhang: Int?
 ) {
     val maxLength = 10
-    var snackbarHostState = remember {
-        SnackbarHostState()
-    }
-
-    var scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     val systemUiController = rememberSystemUiController()
     SideEffect {
         systemUiController.setStatusBarColor(color = Color.White, darkIcons = true)
     }
+
     var hoten by remember { mutableStateOf("") }
     var sodienthoai by remember { mutableStateOf("") }
     var thongtindiachi by remember { mutableStateOf("") }
     var isChecked by remember { mutableStateOf(false) }
 
-
-    var diaChiViewmodel: DiaChiViewmodel = viewModel()
-
-    var listDiaChi = diaChiViewmodel.listDiacHi
+    val diaChiViewmodel: DiaChiViewmodel = viewModel()
+    val listDiaChi = diaChiViewmodel.listDiacHi
     diaChiViewmodel.getDiaChiKhachHang(makhachhang)
 
-    Log.d("",listDiaChi.toString())
+    // Regex check
+    val isValidPhone = Regex("^0[0-9]{9}\$").matches(sodienthoai)
+    val isPhoneError = sodienthoai.isNotEmpty() && !isValidPhone
 
     Scaffold(
         containerColor = Color.White,
@@ -204,17 +202,9 @@ fun AddDiaChiScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White
                 ),
-                title = {
-                    Text(
-                        "Địa chỉ mới"
-                    )
-                },
+                title = { Text("Địa chỉ mới") },
                 navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            navController.popBackStack()
-                        }
-                    ) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBackIosNew,
                             contentDescription = "",
@@ -229,174 +219,175 @@ fun AddDiaChiScreen(
             modifier = Modifier
                 .padding(it)
                 .padding(10.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
         ) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(5.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(4.dp),
             ) {
-                Column(
-                    modifier = Modifier.padding(7.dp)
-                ) {
-                    Text(
-                        "Liên hệ", fontWeight = FontWeight.Bold
-                    )
-                }
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    value = hoten,
-                    placeholder = { Text("Họ tên") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                    ),
-                    shape = RoundedCornerShape(10.dp),
-                    onValueChange = {
-                        hoten = it
-                    }
-                )
-                HorizontalDivider(
-                    color = Color.Black, // Màu của thanh ngang
-                    thickness = 1.dp, // Độ dày của thanh ngang
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                )
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    value = sodienthoai,
-                    placeholder = { Text("Số điện thoại") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                    ),
-                    shape = RoundedCornerShape(10.dp),
-                    onValueChange = {
-                        if(it.length <=maxLength){
-                            sodienthoai = it
-                        }
-                    }
-                )
-                HorizontalDivider(
-                    color = Color.Black, // Màu của thanh ngang
-                    thickness = 1.dp, // Độ dày của thanh ngang
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp))
-            }
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            ) {
-                Column(
-                    modifier = Modifier.padding(7.dp)
-                ) {
-                    Text(
-                        "Địa chỉ", fontWeight = FontWeight.Bold
-                    )
-                }
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
-                    value = thongtindiachi,
-                    placeholder = { Text("Tỉnh, huyện, xã, số nhà") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.White,
-                        unfocusedBorderColor = Color.White,
-                    ),
-                    maxLines = 3,
-                    shape = RoundedCornerShape(10.dp),
-                    onValueChange = {
-                        thongtindiachi = it
-                    }
-                )
-                HorizontalDivider(color = Color.Black, // Màu của thanh ngang
-                    thickness = 1.dp, // Độ dày của thanh ngang
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp))
+                Column(modifier = Modifier.padding(7.dp)) {
+                    Text("Liên hệ", fontWeight = FontWeight.Bold)
 
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        value = hoten,
+                        placeholder = { Text("Họ tên") },
+                        onValueChange = { hoten = it },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.LightGray
+                        )
+                    )
+
+                    HorizontalDivider(
+                        color = Color.Black,
+                        thickness = 1.dp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                    )
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        value = sodienthoai,
+                        onValueChange = {
+                            if (it.length <= maxLength) {
+                                sodienthoai = it
+                            }
+                        },
+                        placeholder = { Text("Số điện thoại") },
+                        isError = isPhoneError,
+                        supportingText = {
+                            if (isPhoneError) {
+                                Text(
+                                    "Số điện thoại không hợp lệ",
+                                    color = Color.Red,
+                                    fontSize = 12.sp
+                                )
+                            }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        shape = RoundedCornerShape(10.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = if (isPhoneError) Color.Red else Color.Black,
+                            unfocusedBorderColor = if (isPhoneError) Color.Red else Color.LightGray,
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black,
+                            cursorColor = Color.Red
+                        )
+                    )
+
+                    // 👇 Hiển thị số đang nhập
+                    Text(
+                        "Bạn đang nhập: $sodienthoai",
+                        modifier = Modifier.padding(top = 8.dp),
+                        color = if (isPhoneError) Color.Red else Color.Black
+                    )
+
+                    HorizontalDivider(
+                        color = Color.Black,
+                        thickness = 1.dp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                    )
+                }
             }
 
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(5.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(4.dp),
             ) {
-                Column(
-                    modifier = Modifier.padding(7.dp)
-                ) {
-                    Text(
-                        "Cài đặt", fontWeight = FontWeight.Bold
+                Column(modifier = Modifier.padding(7.dp)) {
+                    Text("Địa chỉ", fontWeight = FontWeight.Bold)
+
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        value = thongtindiachi,
+                        placeholder = { Text("Tỉnh, huyện, xã, số nhà") },
+                        maxLines = 3,
+                        onValueChange = { thongtindiachi = it },
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Black,
+                            unfocusedBorderColor = Color.LightGray
+                        )
                     )
+
+                    HorizontalDivider(
+                        color = Color.Black,
+                        thickness = 1.dp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(4.dp),
+            ) {
+                Column(modifier = Modifier.padding(7.dp)) {
+                    Text("Cài đặt", fontWeight = FontWeight.Bold)
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            "Đặt làm mặc đinh",
-                            modifier = Modifier.padding(start = 7.dp)
-                        )
+                        Text("Đặt làm mặc định", modifier = Modifier.padding(start = 7.dp))
                         Switch(
                             checked = isChecked,
+                            onCheckedChange = { isChecked = it },
                             colors = SwitchDefaults.colors(
                                 uncheckedThumbColor = Color.White,
-                                checkedTrackColor = Color.Red,
-                            ),
-                            onCheckedChange = {
-                                isChecked = it
-                            }
+                                checkedTrackColor = Color.Red
+                            )
                         )
                     }
-
                 }
             }
-            SnackbarHost(
-                modifier = Modifier.padding(4.dp),
-                hostState = snackbarHostState
-            )
+
+            SnackbarHost(modifier = Modifier.padding(4.dp), hostState = snackbarHostState)
+
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(5.dp),
                 shape = RoundedCornerShape(10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                 onClick = {
-                    if(hoten == "" || sodienthoai == "" && thongtindiachi == ""){
+                    if (hoten.isBlank() || sodienthoai.isBlank() || thongtindiachi.isBlank()) {
                         scope.launch {
-                            snackbarHostState.showSnackbar(
-                                message = "Vui lòng nhập đây đủ thông tin"
-                            )
+                            snackbarHostState.showSnackbar("Vui lòng nhập đầy đủ thông tin")
                         }
-                    }
-                    else{
+                    } else if (!isValidPhone) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Số điện thoại không hợp lệ")
+                        }
+                    } else {
                         if (isChecked) {
                             for (diachi in listDiaChi) {
                                 if (diachi.MacDinh == 1) {
-                                    var diachi = DiaChi(
+                                    val diachiUpdate = DiaChi(
                                         diachi.MaDiaChi,
                                         diachi.ThongTinDiaChi,
                                         diachi.MaKhachHang,
@@ -404,12 +395,13 @@ fun AddDiaChiScreen(
                                         diachi.SoDienThoai,
                                         0
                                     )
-                                    diaChiViewmodel.updateDiaChi(diachi)
+                                    diaChiViewmodel.updateDiaChi(diachiUpdate)
                                 }
                             }
                         }
+
                         if (makhachhang != null) {
-                            var diachi = DiaChi(
+                            val newDiaChi = DiaChi(
                                 0,
                                 thongtindiachi,
                                 makhachhang,
@@ -417,33 +409,23 @@ fun AddDiaChiScreen(
                                 sodienthoai,
                                 if (isChecked) 1 else 0
                             )
-                            var diachinew = DiaChi(
-                                0,
-                                thongtindiachi,
-                                makhachhang,
-                                hoten,
-                                sodienthoai,
-                                1
-                            )
-                            if(listDiaChi.isEmpty())
-                                diaChiViewmodel.addDiaChi(diachinew)
-                            else
-                                diaChiViewmodel.addDiaChi(diachi)
+                            if (listDiaChi.isEmpty()) {
+                                val newDiaChiDefault = newDiaChi.copy(MacDinh = 1)
+                                diaChiViewmodel.addDiaChi(newDiaChiDefault)
+                            } else {
+                                diaChiViewmodel.addDiaChi(newDiaChi)
+                            }
                         }
+
                         navController.popBackStack()
                     }
                 }
             ) {
-                Text(
-                    "Thêm địa chỉ mới",
-                    fontSize = 17.sp,
-                    color = Color.White
-                )
+                Text("Thêm địa chỉ mới", fontSize = 17.sp, color = Color.White)
             }
         }
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

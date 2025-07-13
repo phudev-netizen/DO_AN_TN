@@ -12,6 +12,9 @@ class HoaDonBan
     public $PhuongThucThanhToan;
     public $TrangThai;
 
+    public $LyDoTraHang;
+
+
     // Kết nối cơ sở dữ liệu
     public function __construct($database)
     {
@@ -187,8 +190,6 @@ class HoaDonBan
         }
     }
     
-
-
     // Phương thức xóa hóa đơn bán
     public function deleteHoaDonBan()
     {
@@ -206,5 +207,25 @@ class HoaDonBan
             return false;
         }
     }
+    // Phương thức cập nhật trạng thái và lý do trả hàng
+public function updateTrangThaiVaLyDoTraHang() {
+    $query = "UPDATE hoadonban 
+              SET TrangThai = :TrangThai, LyDoTraHang = :LyDoTraHang 
+              WHERE MaHoaDonBan = :MaHoaDonBan";
+
+    $stmt = $this->conn->prepare($query);
+
+    // Xử lý các binding
+    $stmt->bindParam(':TrangThai', $this->TrangThai);
+    $stmt->bindParam(':LyDoTraHang', $this->LyDoTraHang);
+    $stmt->bindParam(':MaHoaDonBan', $this->MaHoaDonBan);
+
+    if ($stmt->execute()) {
+        return true;
+    }
+
+    return false;
+}
+
 }
 ?>
