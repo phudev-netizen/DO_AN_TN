@@ -129,5 +129,50 @@ class TaiKhoan{
         printf("Error %s.\n",$stmt->error);
         return false;
     }
+
+public function ForgotPassword($usernameOrEmail, &$newPass) {
+    $query = "SELECT tk.*, kh.Email 
+              FROM taikhoan tk 
+              JOIN khachhang kh ON tk.MaKhachHang = kh.MaKhachHang 
+              WHERE tk.TenTaiKhoan = :u OR kh.Email = :u";
+    
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(":u", $usernameOrEmail);
+
+    if ($stmt->execute() && $stmt->rowCount() > 0) {
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // ✅ Tạo mật khẩu ngẫu nhiên gồm chữ và số
+        $newPass = $this->generateRandomPassword(8); // 8 ký tự
+
+        // ✅ Cập nhật vào CSDL
+        $update = "UPDATE taikhoan SET MatKhau = :mk WHERE MaKhachHang = :id";
+        $stmt2 = $this->conn->prepare($update);
+        $stmt2->bindParam(":mk", $newPass); 
+        $stmt2->bindParam(":id", $user['MaKhachHang']);
+
+        return $stmt2->execute();
+    }
+
+    return false;
 }
+
+// ✅ Hàm tạo mật khẩu random
+private function generateRandomPassword($length = 8) {
+    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    $password = '';
+    for ($i = 0; $i < $length; $i++) {
+        $password .= $chars[random_int(0, strlen($chars) - 1)];
+    }
+    return $password;
+}
+
+
+
+
+
+
+
+}
+
 ?>

@@ -24,6 +24,16 @@ data class KiemTraTaiKhoanResponse(
     val role: String?
 )
 
+data class ForgotPassRequest(
+    val usernameOrEmail: String
+)
+
+data class BaseResponse(
+    val success: Boolean,
+    val message: String
+)
+
+
 interface TaiKhoanAPIService{
     @GET("TaiKhoan/checktaikhoan.php")
     suspend fun kiemTraDangNhap(
@@ -50,4 +60,11 @@ interface TaiKhoanAPIService{
     suspend fun TaoTaiKhoan(
         @Body taiKhoan: TaiKhoan,
     ): taikhoanUpdateResponse
+
+    @POST("TaiKhoan/forgot_password.php")
+    suspend fun forgotPassword(
+        @Body request: ForgotPassRequest
+    ): BaseResponse
+
+
 }

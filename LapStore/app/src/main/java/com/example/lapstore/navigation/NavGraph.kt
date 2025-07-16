@@ -21,6 +21,7 @@ import com.example.lapstore.views.AddDiaChiScreen
 import com.example.lapstore.views.AddressManagementScreen
 import com.example.lapstore.views.AdminScreen
 import com.example.lapstore.views.CartManagementSection
+import com.example.lapstore.views.ForgotPasswordScreen
 import com.example.lapstore.views.LoginScreen
 import com.example.lapstore.views.ProductDetail_Screen
 import com.example.lapstore.views.RegisterScreen
@@ -54,6 +55,9 @@ sealed class NavRoute(val route: String) {
     object PRODUCT_MANAGEMENT : NavRoute("product_management_screen")
     object OTPSCREEN : NavRoute("otp_screen")
     object SPLASH : NavRoute("splash_screen")
+    object FORGOTPASSWORD : NavRoute("forgot_password")
+
+
 
 
 
@@ -102,9 +106,17 @@ fun NavgationGraph(
             val userPreferences = remember { UserPreferences(context) }
             SplashScreen(navController = navController, userPreferences = userPreferences)
         }
+          //quen mật khẩu
+            composable(NavRoute.FORGOTPASSWORD.route) {
+                // Truyền ViewModel vào đây
+                ForgotPasswordScreen(
+                    navController = navController,
+                    taiKhoanViewModel = taiKhoanViewModel
+                )
+            }
 
 
-        // Màn hình tài khoản
+            // Màn hình tài khoản
         composable(
             route = "${ACCOUNT.route}?tentaikhoan={tentaikhoan}",
             arguments = listOf(navArgument("tentaikhoan") { type = NavType.StringType })
